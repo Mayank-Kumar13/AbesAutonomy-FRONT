@@ -1,0 +1,103 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+.navbar{
+    width:100%;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    background:#0d1117;
+    padding:18px 60px;
+    position:sticky;
+    top:0;
+    z-index:100;
+    
+}
+
+.logo-section{
+    margin-left:-40px;
+    display:flex;
+    align-items:center;
+    gap:18px;
+}
+
+.abesname{
+    color:white;
+    font-size:40px;
+    font-weight:bold;
+     font-family: "montserrat";
+}
+
+.nav-right{
+    display:flex;
+    align-items:center;
+    gap:35px;
+}
+
+ul{
+    display:flex;
+    list-style:none;
+    gap:35px;
+}
+
+ul li a{
+    position:relative;
+    display:inline-block;
+    color:white;
+    text-decoration:none;
+    font-size:17px;
+    padding:10px 0;
+    transition:.3s;
+}
+
+ul li a:hover{
+    color:#d4a373;
+}
+
+ul li a::after{
+    content:"";
+    position:absolute;
+    left:50%;
+    bottom:-14px;
+    transform:translateX(-50%);
+    width:0;
+    height:2px;
+    background:#d4a373;
+    border-radius:50px;
+    transition:.3s;
+}
+
+ul li a:hover::after{
+    width:42px;
+}
+
+ul li a.active{
+    color:white;
+}
+
+ul li a.active::after{
+    width:42px;
+}
+
+.sign-in{
+    color:#d4a373;
+    font-size:22px;
+    cursor:pointer;
+    transition:.3s;
+    border:1px solid #d4a373;
+    padding:5px 15px;
+}
+
+.sign-in:hover{
+    color:white;
+}
+
+.profile{
+    color:#d4a373;
+    cursor:pointer;
+    font-size:45px;
+    margin-top:5px;
+}

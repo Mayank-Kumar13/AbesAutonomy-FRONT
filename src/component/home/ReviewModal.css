@@ -1,0 +1,232 @@
+/* ═══════════════════════════════════════════════════════
+   Review Modal — Matches ABES Autonomy dark theme
+   ═══════════════════════════════════════════════════════ */
+
+.review-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.review-modal {
+  background: #11161d;
+  border: 1px solid #222d38;
+  border-radius: 18px;
+  padding: 2.5rem;
+  width: 100%;
+  max-width: 480px;
+  position: relative;
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+
+.review-modal-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: transparent;
+  border: 1px solid #1f2937;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #9ca3af;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.review-modal-close:hover {
+  color: #fff;
+  border-color: #d4a373;
+}
+
+.review-modal-title {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.75rem;
+  font-weight: 500;
+  color: #fff;
+  margin: 0 0 0.5rem 0;
+}
+
+.review-modal-subtitle {
+  color: #9ca3af;
+  font-size: 0.875rem;
+  margin: 0 0 2rem 0;
+}
+
+/* ─── Star Rating ──────────────────────────── */
+
+.rating-section {
+  margin-bottom: 1.5rem;
+}
+
+.rating-label,
+.content-label {
+  display: block;
+  color: #d4a373;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.75rem;
+}
+
+.star-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.star-btn {
+  background: transparent;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  color: #374151;
+  transition: all 0.2s ease;
+  border-radius: 4px;
+}
+
+.star-btn:hover,
+.star-filled {
+  color: #d4a373;
+}
+
+.star-btn:focus-visible {
+  outline: 2px solid #d4a373;
+  outline-offset: 2px;
+}
+
+/* ─── Textarea ─────────────────────────────── */
+
+.content-section {
+  margin-bottom: 1.5rem;
+  position: relative;
+}
+
+.review-textarea {
+  width: 100%;
+  background: #0a0c10;
+  border: 1px solid #1f2937;
+  border-radius: 12px;
+  padding: 1rem;
+  color: #fff;
+  font-size: 0.9375rem;
+  font-family: system-ui, -apple-system, sans-serif;
+  resize: vertical;
+  min-height: 120px;
+  outline: none;
+  transition: border-color 0.3s ease;
+  box-sizing: border-box;
+}
+
+.review-textarea::placeholder {
+  color: #6b7280;
+}
+
+.review-textarea:focus {
+  border-color: #d4a373;
+}
+
+.char-count {
+  display: block;
+  text-align: right;
+  color: #6b7280;
+  font-size: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+/* ─── Error / Success ──────────────────────── */
+
+.review-modal-error {
+  color: #ef4444;
+  font-size: 0.875rem;
+  margin: 0 0 1rem 0;
+  padding: 0.75rem 1rem;
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: 8px;
+}
+
+.review-modal-success {
+  text-align: center;
+  padding: 2rem 0;
+}
+
+.success-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: rgba(212, 163, 115, 0.15);
+  border: 2px solid #d4a373;
+  color: #d4a373;
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem;
+}
+
+.review-modal-success p {
+  color: #d4a373;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+/* ─── Submit Button ────────────────────────── */
+
+.review-submit-btn {
+  width: 100%;
+  background: transparent;
+  border: 1px solid #d4a373;
+  color: #d4a373;
+  padding: 0.875rem 1.5rem;
+  border-radius: 12px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.review-submit-btn:hover:not(:disabled) {
+  background: #d4a373;
+  color: #0a0c10;
+}
+
+.review-submit-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ─── Responsive ───────────────────────────── */
+
+@media (max-width: 480px) {
+  .review-modal {
+    padding: 1.5rem;
+  }
+
+  .review-modal-title {
+    font-size: 1.5rem;
+  }
+}

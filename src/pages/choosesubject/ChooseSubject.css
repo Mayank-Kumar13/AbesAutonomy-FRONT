@@ -1,0 +1,246 @@
+.choose-subject-wrapper {
+  background-color: #0a0c10;
+  min-height: 100vh;
+  padding: 4rem 1.5rem;
+  font-family: system-ui, -apple-system, sans-serif;
+  color: #ffffff;
+}
+
+.choose-subject-container {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+/* --- Header Section --- */
+.header-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 4rem;
+  position: relative;
+}
+
+.title-container {
+  text-align: center;
+  flex: 1;
+}
+
+.page-title {
+  font-family: Georgia, serif;
+  font-size: 3rem;
+  font-weight: normal;
+  letter-spacing: 0.05em;
+  margin: 0 0 1rem 0;
+}
+
+.page-subtitle {
+  color: #9ca3af;
+  font-size: 1rem;
+  max-width: 450px;
+  margin: 0 auto;
+  line-height: 1.5;
+}
+
+/* --- Semester Toggle --- */
+.semester-container {
+  position: absolute;
+  right: 0;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.75rem;
+}
+
+.semester-label {
+  color: #9ca3af;
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.semester-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.semester-label {
+  color: #9ca3af;
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 0.25rem;
+}
+
+.sem-btn {
+  background: transparent;
+  border: 1px solid #1f2937;
+  color: #9ca3af;
+  /* Removed fixed width, added horizontal padding */
+  padding: 0 1rem; 
+  height: 40px;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.sem-btn.active, .sem-btn:hover {
+  border-color: #c89b63;
+  color: #c89b63;
+}
+
+/* --- Subject Grid --- */
+.subject-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+
+/* Make it responsive */
+@media (max-width: 900px) {
+  .subject-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .header-section {
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+  }
+  .semester-container {
+    position: static;
+    align-items: center;
+  }
+}
+
+@media (max-width: 600px) {
+  .subject-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* --- The Blueprint Card Placeholder --- */
+.blueprint-card {
+  background: transparent;
+  border: 1px solid #1f2937;
+  border-radius: 12px;
+  padding: 2.5rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.blueprint-card:hover {
+  border-color: #374151;
+  transform: translateY(-2px);
+}
+
+.icon-ring {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  border: 1px solid #d99b78;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #d99b78;
+  margin-bottom: 1.5rem;
+}
+
+.math-fx {
+  font-family: Georgia, serif;
+  font-style: italic;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.subject-title {
+  font-family: Georgia, serif;
+  font-size: 1.5rem;
+  font-weight: normal;
+  margin: 0 0 0.75rem 0;
+  letter-spacing: 0.05em;
+}
+
+.subject-desc {
+  color: #9ca3af;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  margin: 0 0 2rem 0;
+  flex-grow: 1;
+}
+
+.explore-btn {
+  background: transparent;
+  border: 1px solid #1f2937;
+  color: #d99b78;
+  padding: 0.5rem 1.25rem;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.explore-btn:hover {
+  border-color: #d99b78;
+}
+
+/* ═══════════════════════════════════════════════════════
+   Handwritten Notes — Credit Section
+   ═══════════════════════════════════════════════════════ */
+
+.handwritten-credit-section {
+  margin-top: 5rem;
+  padding-top: 3rem;
+  border-top: 1px solid #1f2937;
+}
+
+.handwritten-credit-header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.handwritten-credit-title {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 2rem;
+  font-weight: 500;
+  color: #fff;
+  margin: 0 0 0.75rem 0;
+  letter-spacing: 0.03em;
+}
+
+.handwritten-credit-subtitle {
+  color: #9ca3af;
+  font-size: 1rem;
+  max-width: 450px;
+  margin: 0 auto;
+  line-height: 1.5;
+}
+
+.handwritten-credit-card-wrapper {
+  display: flex;
+  justify-content: center;
+}
+
+/* Override the credit-card bottom margin inside this context
+   so it doesn't create excessive spacing before the footer */
+.handwritten-credit-card-wrapper .credit-card {
+  margin-bottom: 0;
+}
+
+@media (max-width: 600px) {
+  .handwritten-credit-title {
+    font-size: 1.5rem;
+  }
+
+  .handwritten-credit-section {
+    margin-top: 3rem;
+    padding-top: 2rem;
+  }
+}
