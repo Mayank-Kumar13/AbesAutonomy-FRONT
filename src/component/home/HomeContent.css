@@ -91,8 +91,8 @@
 
 .building-card img{
     width:100%;
-    height:90%;
-    object-fit:cover;
+    height:100%;
+    object-fit:fill;
     filter:brightness(.65);
     transition:.35s;
 }
