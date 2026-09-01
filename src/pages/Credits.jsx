@@ -17,6 +17,21 @@ const Credits = () => {
     <Credit_Card name="Mayank Kumar" year="2nd Year" description={description[1]} image="/TOMAR.png" github={github[1]} linkedin={linkedin[1]} instagram={instagram[1]}  />
     <Credit_Card name="Mukul Yadav" year="2nd Year" description={description[2]} image="/image.png" github={github[2]} linkedin={linkedin[2]} instagram={instagram[2]} />
     </div>
+
+    <div className="details">
+      <h3 id="contributor-heading">Handwritten Notes Contributor</h3>
+    </div>
+    <div  id="contributor-card" className="credits-container">
+      <Credit_Card
+        name="NITIN"  
+        year="2nd Year" 
+        description="Topper student with 10 SGPA. Contributed high-quality handwritten notes to help fellow students excel in their academics." 
+        image="/NITIN.jpeg" 
+        github="https://github.com/nitinbhhardwaj"
+        linkedin="https://www.linkedin.com/in/nitin-bhardwaj-8bb880395/"
+        instagram="https://www.instagram.com/nitinbhhardwaz?igsh=MWlwbDFsZmVrY28wYQ%3D%3D&igsi=MWlwbDFsZmVrY28wYQ%3D%3D&utm_source=qr"
+      />
+    </div>
     </>
   )
 }

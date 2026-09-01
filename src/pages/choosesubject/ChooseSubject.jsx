@@ -59,9 +59,9 @@ const HANDWRITTEN_CREDIT = {
   description:
     "Topper student with 10 SGPA. Contributed high-quality handwritten notes to help fellow students excel in their academics.",
   image: "/NITIN.jpeg",
-  github: "#",
-  linkedin: "#",
-  instagram: "#",
+  github: "https://github.com/nitinbhhardwaj",
+  linkedin: "https://www.linkedin.com/in/nitin-bhardwaj-8bb880395/",
+  instagram: "https://www.instagram.com/nitinbhhardwaz?igsh=MWlwbDFsZmVrY28wYQ%3D%3D&igsi=MWlwbDFsZmVrY28wYQ%3D%3D&utm_source=qr",
 };
 
 const ChooseSubject = () => {
