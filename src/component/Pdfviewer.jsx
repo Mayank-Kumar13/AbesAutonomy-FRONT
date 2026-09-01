@@ -1,10 +1,45 @@
-export default function Pdfviewer({ file }) {
-  // If the file is a full URL (ImageKit), use it directly.
-  // If it's a local path (starts with /), use the pdfjs viewer.
-  const isFullUrl = file.startsWith('http://') || file.startsWith('https://');
+import { useState, useEffect } from "react";
 
-  // For full URLs (ImageKit), use the pdfjs viewer with the URL directly
-  const viewerUrl = `/pdfjs-6.1.200-dist/web/viewer.html?file=${encodeURIComponent(file)}`;
+export default function Pdfviewer({ file }) {
+  const [blobUrl, setBlobUrl] = useState(null);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    // Revoke previous blob URLs to prevent memory leaks
+    if (blobUrl) {
+      URL.revokeObjectURL(blobUrl);
+    }
+
+    // Only fetch if a file URL is provided
+    if (!file) return;
+
+    fetch(file)
+      .then(async (res) => {
+        if (!res.ok) throw new Error("Failed to fetch PDF");
+        const blob = await res.blob();
+        setBlobUrl(URL.createObjectURL(blob));
+      })
+      .catch((err) => {
+        console.error("PDF fetch error:", err);
+        setError(err.message);
+      });
+
+    return () => {
+      if (blobUrl) {
+        URL.revokeObjectURL(blobUrl);
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [file]);
+
+  if (error) {
+    return <p style={{ textAlign: "center", padding: "20px", color: "red" }}>Error loading PDF: {error}</p>;
+  }
+  if (!blobUrl) {
+    return <p style={{ textAlign: "center", padding: "20px" }}>Loading Document...</p>;
+  }
+
+  const viewerUrl = `/pdfjs-6.1.200-dist/web/viewer.html?file=${encodeURIComponent(blobUrl)}`;
 
   return (
     <iframe
