@@ -13,14 +13,32 @@ export default function Pdfviewer({ file }) {
     // Only fetch if a file URL is provided
     if (!file) return;
 
-    fetch(file)
+    console.log("[DIAGNOSTIC] PDF source URL origin:", new URL(file, window.location.origin).origin);
+    console.log("[DIAGNOSTIC] fetch(file) starts for:", file);
+    
+    // Check if we need to add the auth token.
+    const token = localStorage.getItem("token");
+    const headers = {};
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
+
+    fetch(file, { headers })
       .then(async (res) => {
-        if (!res.ok) throw new Error("Failed to fetch PDF");
+        console.log("[DIAGNOSTIC] HTTP status:", res.status, res.statusText);
+        console.log("[DIAGNOSTIC] response Content-Type:", res.headers.get("Content-Type"));
+        if (!res.ok) throw new Error(`Failed to fetch PDF (Status: ${res.status})`);
+        
         const blob = await res.blob();
-        setBlobUrl(URL.createObjectURL(blob));
+        console.log("[DIAGNOSTIC] Blob creation succeeds. Size:", blob.size, "bytes, Type:", blob.type);
+        
+        const objectUrl = URL.createObjectURL(blob);
+        console.log("[DIAGNOSTIC] createObjectURL succeeds");
+        
+        setBlobUrl(objectUrl);
       })
       .catch((err) => {
-        console.error("PDF fetch error:", err);
+        console.error("[DIAGNOSTIC] fetch error:", err);
         setError(err.message);
       });
 
@@ -40,6 +58,7 @@ export default function Pdfviewer({ file }) {
   }
 
   const viewerUrl = `/pdfjs-6.1.200-dist/web/viewer.html?file=${encodeURIComponent(blobUrl)}`;
+  console.log("[DIAGNOSTIC] final viewer URL TYPE:", viewerUrl.substring(0, 50) + "...");
 
   return (
     <iframe
