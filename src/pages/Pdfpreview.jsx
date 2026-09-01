@@ -18,9 +18,8 @@ export default function PdfPreview() {
     }
   }, [noteId]);
 
-  // If noteId is provided, proxy the PDF through the backend to avoid CORS/origin issues
-  // in the PDF.js viewer. Otherwise, fallback to the direct URL/local path.
-  const viewerFileUrl = noteId ? `/api/notes/${noteId}/pdf` : pdfUrl;
+  const API_BASE = import.meta.env.VITE_API_URL || "/api";
+  const viewerFileUrl = noteId ? `${API_BASE}/notes/${noteId}/pdf` : pdfUrl;
 
   return (
     <div>
