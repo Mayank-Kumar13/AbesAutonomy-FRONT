@@ -105,7 +105,7 @@ const HomeContent = () => {
           scrollRef.current.scrollTo({ left: scrollLeft + cardWidth, behavior: "smooth" });
         }
       }
-    }, 6000);
+    }, 3000);
 
     return () => clearInterval(interval);
   }, [reviews]);
