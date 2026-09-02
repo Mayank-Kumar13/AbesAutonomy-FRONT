@@ -40,6 +40,8 @@ export default function AdminPanel() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [tab, setTab] = useState('users');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [actionLoading, setActionLoading] = useState(null);
 
   // ─── Uploads tab state ────────────────────────────
   const [notes, setNotes] = useState([]);
@@ -211,6 +213,55 @@ export default function AdminPanel() {
     }
   };
 
+  const handleDeleteUser = async (user) => {
+    if (!window.confirm(`Are you sure you want to delete ${user.name}? This will permanently remove their account.`)) return;
+    setActionLoading(`delete-${user._id}`);
+    try {
+      await authApi.deleteAdminUser(user._id);
+      setUsers((prev) => prev.filter((u) => u._id !== user._id));
+    } catch (err) {
+      alert(`Error deleting user: ${err.message}`);
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleToggleRole = async (user) => {
+    const newRole = user.role === 'admin' ? 'user' : 'admin';
+    if (!window.confirm(`Are you sure you want to make ${user.name} a ${newRole}?`)) return;
+    setActionLoading(`role-${user._id}`);
+    try {
+      const res = await authApi.updateAdminUserRole(user._id, newRole);
+      setUsers((prev) => prev.map((u) => (u._id === user._id ? { ...u, role: res.data.role } : u)));
+    } catch (err) {
+      alert(`Error updating role: ${err.message}`);
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleClearLogs = async () => {
+    if (!window.confirm('Are you sure you want to clear ALL login logs? This cannot be undone.')) return;
+    setActionLoading('clear-logs');
+    try {
+      await authApi.clearAdminLogs();
+      setLogs([]);
+    } catch (err) {
+      alert(`Error clearing logs: ${err.message}`);
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const filteredUsers = users.filter((u) => {
+    if (!searchQuery) return true;
+    const lowerQuery = searchQuery.toLowerCase();
+    return (
+      (u.name && u.name.toLowerCase().includes(lowerQuery)) ||
+      (u.email && u.email.toLowerCase().includes(lowerQuery))
+    );
+  });
+
   if (loading) {
     return <div className="admin-wrapper"><p className="admin-loading">Loading admin panel...</p></div>;
   }
@@ -259,38 +310,74 @@ export default function AdminPanel() {
 
       {tab === 'users' && (
         <div className="admin-table-wrap">
+          <div className="admin-table-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', padding: '0 1rem' }}>
+            <h2 className="upload-form-title" style={{ margin: 0 }}>Users ({filteredUsers.length})</h2>
+            <input
+              type="text"
+              placeholder="Search by name or email..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="admin-search-input"
+              style={{ padding: '0.5rem 1rem', borderRadius: '4px', border: '1px solid #cbd5e1', width: '300px' }}
+            />
+          </div>
           <table className="admin-table">
             <thead>
               <tr>
                 <th>Status</th>
                 <th>Name</th>
                 <th>Email</th>
+                <th>Role</th>
                 <th>Provider</th>
                 <th>Verified</th>
                 <th>Logins</th>
                 <th>Watch Time</th>
                 <th>Last Active</th>
                 <th>Joined</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
-              {users.map((u) => (
+              {filteredUsers.map((u) => (
                 <tr key={u._id}>
                   <td>
                     {u.isLive ? <span className="badge live-badge">Live</span> : <span className="badge">Offline</span>}
                   </td>
                   <td>{u.name}</td>
                   <td>{u.email}</td>
+                  <td>
+                    {u.role === 'admin' ? <span className="badge" style={{backgroundColor: '#4f46e5', color: 'white'}}>Admin</span> : 'User'}
+                  </td>
                   <td>{u.provider}</td>
                   <td>{u.emailVerified ? 'Yes' : 'No'}</td>
                   <td>{u.loginCount || 0}</td>
                   <td>{formatWatchTime(u.totalWatchTimeMs || 0)}</td>
                   <td>{formatDate(u.lastActiveAt)}</td>
                   <td>{formatDate(u.createdAt)}</td>
+                  <td style={{ display: 'flex', gap: '0.5rem' }}>
+                    <button
+                      type="button"
+                      className="admin-action-btn"
+                      style={{ padding: '4px 8px', fontSize: '0.8rem', backgroundColor: '#e2e8f0', color: '#1e293b', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+                      onClick={() => handleToggleRole(u)}
+                      disabled={actionLoading === `role-${u._id}`}
+                    >
+                      {actionLoading === `role-${u._id}` ? '...' : (u.role === 'admin' ? 'Remove Admin' : 'Make Admin')}
+                    </button>
+                    <button
+                      type="button"
+                      className="delete-note-btn"
+                      style={{ padding: '4px 8px', fontSize: '0.8rem' }}
+                      onClick={() => handleDeleteUser(u)}
+                      disabled={actionLoading === `delete-${u._id}`}
+                    >
+                      {actionLoading === `delete-${u._id}` ? '...' : 'Delete'}
+                    </button>
+                  </td>
                 </tr>
               ))}
-              {users.length === 0 && (
-                <tr><td colSpan={9} className="admin-empty">No users yet</td></tr>
+              {filteredUsers.length === 0 && (
+                <tr><td colSpan={11} className="admin-empty">No users found</td></tr>
               )}
             </tbody>
           </table>
@@ -299,6 +386,16 @@ export default function AdminPanel() {
 
       {tab === 'logs' && (
         <div className="admin-table-wrap">
+          <div className="admin-table-header" style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1rem', padding: '0 1rem' }}>
+            <button
+              type="button"
+              className="delete-note-btn"
+              onClick={handleClearLogs}
+              disabled={actionLoading === 'clear-logs'}
+            >
+              {actionLoading === 'clear-logs' ? 'Clearing...' : 'Clear All Logs'}
+            </button>
+          </div>
           <table className="admin-table">
             <thead>
               <tr>
