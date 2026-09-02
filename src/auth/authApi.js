@@ -82,6 +82,12 @@ export const authApi = {
   googleLoginUrl: () => buildOAuthUrl("/auth/google"),
   githubLoginUrl: () => buildOAuthUrl("/auth/github"),
 
+  exchangeCode: (provider, code) =>
+    request(`/auth/${provider}/callback`, {
+      method: "POST",
+      body: JSON.stringify({ code }),
+    }),
+
   heartbeat: (intervalMs = 20000) =>
     request("/activity/heartbeat", {
       method: "POST",

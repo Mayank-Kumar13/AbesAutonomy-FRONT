@@ -22,6 +22,7 @@ import Contribute from './pages/InfoPage/Contribute';
 import ForgotPassword from './pages/forgotPassword/ForgotPassword';
 import ResetPassword from './pages/forgotPassword/ResetPassword';
 import OAuthCallback from './pages/oauth/OAuthCallback';
+import ProviderCallback from './pages/oauth/ProviderCallback';
 import ProtectedRoute from './auth/ProtectedRoute';
 import AdminPanel from './pages/admin/AdminPanel';
 import AdminRoute from './auth/AdminRoute';
@@ -45,6 +46,10 @@ const App = () => {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/auth/callback" element={<OAuthCallback />} />
+        <Route path="/auth/google/callback" element={<ProviderCallback provider="google" />} />
+        <Route path="/auth/github/callback" element={<ProviderCallback provider="github" />} />
+        <Route path="/auth/google/callback" element={<OAuthCallback />} />
+        <Route path="/auth/github/callback" element={<OAuthCallback />} />
         <Route path="/about" element={<About/>}/>
         {/* <Route path="/privacy" element={<PrivacyPolicy />} /> */}
         <Route path="/terms" element={<Terms />} />
