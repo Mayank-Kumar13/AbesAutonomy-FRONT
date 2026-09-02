@@ -94,7 +94,7 @@ export default function AdminPanel() {
     setReviewsLoading(true);
     try {
       const res = await authApi.getAdminReviews(1, 100);
-      setReviews(res.data?.docs || []);
+      setReviews(res.data || []);
       setReviewsError('');
     } catch (err) {
       setReviewsError(err.message);
