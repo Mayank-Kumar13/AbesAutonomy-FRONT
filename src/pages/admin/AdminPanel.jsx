@@ -52,6 +52,13 @@ export default function AdminPanel() {
   const [deletingId, setDeletingId] = useState(null);
   const notesLoadedRef = useRef(false);
 
+  // ─── Reviews tab state ────────────────────────────
+  const [reviews, setReviews] = useState([]);
+  const [reviewsLoading, setReviewsLoading] = useState(false);
+  const [reviewsError, setReviewsError] = useState('');
+  const [deletingReviewId, setDeletingReviewId] = useState(null);
+  const reviewsLoadedRef = useRef(false);
+
   const loadAll = useCallback(async () => {
     try {
       const [statsRes, usersRes, logsRes] = await Promise.all([
@@ -83,6 +90,19 @@ export default function AdminPanel() {
     }
   }, []);
 
+  const loadReviews = useCallback(async () => {
+    setReviewsLoading(true);
+    try {
+      const res = await authApi.getAdminReviews(1, 100);
+      setReviews(res.data?.docs || []);
+      setReviewsError('');
+    } catch (err) {
+      setReviewsError(err.message);
+    } finally {
+      setReviewsLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     loadAll();
     const interval = setInterval(loadAll, 60000);
@@ -94,7 +114,11 @@ export default function AdminPanel() {
       notesLoadedRef.current = true;
       loadNotes();
     }
-  }, [tab, loadNotes]);
+    if (tab === 'reviews' && !reviewsLoadedRef.current) {
+      reviewsLoadedRef.current = true;
+      loadReviews();
+    }
+  }, [tab, loadNotes, loadReviews]);
 
   const handleUploadFieldChange = (field) => (e) => {
     setUploadForm((prev) => ({ ...prev, [field]: e.target.value }));
@@ -173,6 +197,20 @@ export default function AdminPanel() {
     }
   };
 
+  const handleDeleteReview = async (review) => {
+    const userName = review.user?.name || review.displayName || 'Anonymous';
+    if (!window.confirm(`Delete review from ${userName}? This cannot be undone.`)) return;
+    setDeletingReviewId(review._id);
+    try {
+      await authApi.deleteAdminReview(review._id);
+      setReviews((prev) => prev.filter((r) => r._id !== review._id));
+    } catch (err) {
+      setReviewsError(err.message);
+    } finally {
+      setDeletingReviewId(null);
+    }
+  };
+
   if (loading) {
     return <div className="admin-wrapper"><p className="admin-loading">Loading admin panel...</p></div>;
   }
@@ -213,6 +251,9 @@ export default function AdminPanel() {
         </button>
         <button className={`admin-tab-btn ${tab === 'uploads' ? 'active' : ''}`} onClick={() => setTab('uploads')}>
           Uploads
+        </button>
+        <button className={`admin-tab-btn ${tab === 'reviews' ? 'active' : ''}`} onClick={() => setTab('reviews')}>
+          Reviews
         </button>
       </div>
 
@@ -469,6 +510,51 @@ export default function AdminPanel() {
               </table>
             </div>
           </div>
+        </div>
+      )}
+
+      {tab === 'reviews' && (
+        <div className="admin-table-wrap">
+          {reviewsError && <p className="admin-error" style={{ margin: '1rem' }}>{reviewsError}</p>}
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>Email</th>
+                <th>Rating</th>
+                <th>Content</th>
+                <th>Date</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {reviews.map((r) => (
+                <tr key={r._id}>
+                  <td>{r.user?.name || r.displayName || 'Anonymous'}</td>
+                  <td>{r.user?.email || '—'}</td>
+                  <td style={{ color: '#c89b63' }}>{'★'.repeat(r.rating) + '☆'.repeat(5 - r.rating)}</td>
+                  <td style={{ maxWidth: '300px', whiteSpace: 'normal', wordBreak: 'break-word', lineHeight: '1.4' }}>{r.content}</td>
+                  <td>{formatDate(r.createdAt)}</td>
+                  <td>
+                    <button
+                      type="button"
+                      className="delete-note-btn"
+                      onClick={() => handleDeleteReview(r)}
+                      disabled={deletingReviewId === r._id}
+                    >
+                      {deletingReviewId === r._id ? 'Deleting...' : 'Delete'}
+                    </button>
+                  </td>
+                </tr>
+              ))}
+              {!reviewsLoading && reviews.length === 0 && (
+                <tr><td colSpan={6} className="admin-empty">No reviews found</td></tr>
+              )}
+              {reviewsLoading && (
+                <tr><td colSpan={6} className="admin-empty">Loading reviews...</td></tr>
+              )}
+            </tbody>
+          </table>
         </div>
       )}
     </div>

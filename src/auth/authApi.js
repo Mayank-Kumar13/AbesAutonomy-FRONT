@@ -98,4 +98,6 @@ export const authApi = {
   getAdminStats: () => request("/admin/stats"),
   getAdminUsers: () => request("/admin/users"),
   getAdminLogs: () => request("/admin/logs"),
+  getAdminReviews: (page = 1, limit = 50) => request(`/admin/reviews?page=${page}&limit=${limit}`),
+  deleteAdminReview: (id) => request(`/admin/reviews/${id}`, { method: "DELETE" }),
 };
