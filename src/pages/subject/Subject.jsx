@@ -57,6 +57,28 @@ const Subject = () => {
     });
   };
 
+  const handleDownloadAll = () => {
+    if (!notes || notes.length === 0) {
+      alert("No notes available to download.");
+      return;
+    }
+    
+    notes.forEach((note, index) => {
+      if (note.pdfUrl) {
+        // Add a slight delay to prevent browser from blocking multiple simultaneous downloads
+        setTimeout(() => {
+          const link = document.createElement("a");
+          link.href = note.pdfUrl;
+          link.download = note.title ? `${note.title}.pdf` : `document_${index + 1}.pdf`;
+          link.target = "_blank";
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        }, index * 300);
+      }
+    });
+  };
+
   // Group notes by unit for display
   const groupedByUnit = {};
   notes.forEach((note) => {
@@ -89,7 +111,7 @@ const Subject = () => {
           </p>
         </div>
 
-        <button className="download-all">
+        <button className="download-all" onClick={handleDownloadAll}>
           <Download size={22} />
           <span>DOWNLOAD ALL</span>
         </button>
