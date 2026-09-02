@@ -19,8 +19,20 @@ const Contact = () => {
 
         <h2 className="info-heading">Reach Out Directly</h2>
         <p className="info-text">
-          Drop us an email at: <span className="highlight">support@abesautonomy.com</span>
-          <br /><br />
+          Drop us an email at: <span className="highlight">abesautonomy30@gmail.com</span>
+        </p>
+
+        <h2 className="info-heading">Developer Contacts</h2>
+        <p className="info-text" style={{ marginBottom: '10px' }}>
+          For any urgent queries, collaboration, or feedback, you can reach out directly to the core developers:
+        </p>
+        <ul className="info-list">
+          <li><strong>Mayank Kotuli:</strong> +91 9310664653</li>
+          <li><strong>Mayank Kumar:</strong> +91 97602 98122</li>
+          <li><strong>Mukul Yadav:</strong> +91 97582 81801</li>
+        </ul>
+        
+        <p className="info-text" style={{ marginTop: '20px' }}>
           Alternatively, you can message the development team directly via our official social channels linked in the footer. We typically respond within 24 hours.
         </p>
       </div>
