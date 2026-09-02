@@ -11,16 +11,13 @@ export function AuthProvider({ children }) {
 
   const loadProfile = useCallback(async () => {
     const token = localStorage.getItem("token");
-    if (!token) {
-      setUser(null);
-      setLoading(false);
-      return;
-    }
+    
+    // We shouldn't exit early if there is no token, because the backend might be using HttpOnly cookies for Google OAuth.
     try {
       const res = await authApi.getProfile();
       setUser(res.data);
-    } catch {
-      localStorage.removeItem("token");
+    } catch (err) {
+      if (token) localStorage.removeItem("token");
       setUser(null);
     } finally {
       setLoading(false);
