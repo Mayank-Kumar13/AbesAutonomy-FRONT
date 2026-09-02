@@ -79,7 +79,7 @@ export const authApi = {
       body: JSON.stringify({ token, newPassword }),
     }),
 
-  googleLoginUrl: () => buildOAuthUrl("/auth/google"),
+  googleLoginUrl: () => "https://api.abes.work/api/auth/google",
   githubLoginUrl: () => buildOAuthUrl("/auth/github"),
 
   exchangeCode: (provider, code) =>
