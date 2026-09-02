@@ -57,24 +57,42 @@ const Subject = () => {
     });
   };
 
-  const handleDownloadAll = () => {
+  const handleDownloadAll = async () => {
     if (!notes || notes.length === 0) {
       alert("No notes available to download.");
       return;
     }
-    
-    notes.forEach((note, index) => {
+
+    notes.forEach(async (note, index) => {
       if (note.pdfUrl) {
-        // Add a slight delay to prevent browser from blocking multiple simultaneous downloads
-        setTimeout(() => {
+        try {
+          // Fetch the PDF as a blob to bypass pop-up blockers for multiple files
+          const response = await fetch(note.pdfUrl);
+          const blob = await response.blob();
+          const blobUrl = window.URL.createObjectURL(blob);
+          
           const link = document.createElement("a");
-          link.href = note.pdfUrl;
+          link.href = blobUrl;
           link.download = note.title ? `${note.title}.pdf` : `document_${index + 1}.pdf`;
-          link.target = "_blank";
           document.body.appendChild(link);
           link.click();
           document.body.removeChild(link);
-        }, index * 300);
+          
+          // Cleanup the object URL
+          setTimeout(() => window.URL.revokeObjectURL(blobUrl), 1000);
+        } catch (error) {
+          console.error("Blob download failed for:", note.title, error);
+          // Fallback if fetch fails (e.g., due to CORS)
+          setTimeout(() => {
+            const link = document.createElement("a");
+            link.href = note.pdfUrl;
+            link.target = "_blank";
+            link.download = note.title ? `${note.title}.pdf` : `document_${index + 1}.pdf`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+          }, index * 300);
+        }
       }
     });
   };
