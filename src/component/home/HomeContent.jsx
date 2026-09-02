@@ -90,6 +90,26 @@ const HomeContent = () => {
     fetchReviews();
   }, [fetchReviews]);
 
+  // Auto-scroll reviews every 6 seconds
+  useEffect(() => {
+    if (reviews.length === 0) return;
+    
+    const interval = setInterval(() => {
+      if (scrollRef.current) {
+        const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
+        const cardWidth = 300; // 280px card + 20px gap
+
+        if (scrollLeft + clientWidth >= scrollWidth - 10) {
+          scrollRef.current.scrollTo({ left: 0, behavior: "smooth" });
+        } else {
+          scrollRef.current.scrollTo({ left: scrollLeft + cardWidth, behavior: "smooth" });
+        }
+      }
+    }, 6000);
+
+    return () => clearInterval(interval);
+  }, [reviews]);
+
   const handleWriteReview = () => {
     if (!isAuthenticated) {
       // Navigate to login — simple approach
