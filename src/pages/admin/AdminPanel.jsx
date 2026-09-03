@@ -564,10 +564,6 @@ export default function AdminPanel() {
                           </select>
                         ) : subjectsError ? (
                           <div className="admin-error">{subjectsError}</div>
-                        ) : subjects.length === 0 ? (
-                          <select disabled value="">
-                            <option value="">No subjects found</option>
-                          </select>
                         ) : (
                           <select
                             value={entry.subject}
@@ -575,10 +571,12 @@ export default function AdminPanel() {
                             disabled={uploading}
                           >
                             <option value="" disabled>Select Subject ▼</option>
-                            {subjects.map((s) => (
-                              <option key={s.subject || s._id || s.name} value={s.subject || s._id || s.name}>
-                                {s.subject || s.name || s.title || s._id}
-                              </option>
+                            {Array.from(new Set([
+                              'DSA', 'MATHS', 'PHYSICS', 'EVS', 'AI', 
+                              'ELECTRICAL', 'SOFT SKILL', 'DT', 'MECHANICS', 'ELECTRONICS',
+                              ...subjects.map(s => s.subject || s._id || s.name)
+                            ])).filter(Boolean).map((s) => (
+                              <option key={s} value={s}>{s}</option>
                             ))}
                           </select>
                         )}
