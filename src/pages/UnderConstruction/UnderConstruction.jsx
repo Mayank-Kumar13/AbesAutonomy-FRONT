@@ -12,8 +12,13 @@ const UnderConstruction = () => {
           We're getting things ready and preparing something amazing for you. 
           The full website experience will be available very soon!
         </p>
+        <div className="uc-loader">
+          <div className="uc-loader-ring"></div>
+          <div className="uc-loader-ring"></div>
+          <div className="uc-loader-ring"></div>
+        </div>
         <div className="uc-date-badge">
-          Official Launch: 5 September
+          Currently Website Under Construction
         </div>
         <p className="uc-check-back">Please check back soon.</p>
         
