@@ -156,14 +156,9 @@ const Subject = () => {
                     style={{ cursor: "pointer" }}
                   >
                     <FileText className="file-icon" />
-                    <h2>
-                      {unitData.unitNumber > 0
-                        ? `Unit ${unitData.unitNumber}`
-                        : "General"}
-                    </h2>
-                    <p style={{ color: "#888", fontSize: "13px", margin: "0 0 16px" }}>
+                    <h2 style={{ marginBottom: "16px" }}>
                       {note.title}
-                    </p>
+                    </h2>
                     <button className="unit-download-btn">
                       <span>Preview</span>
                     </button>
@@ -181,16 +176,11 @@ const Subject = () => {
                   style={{ cursor: unitData.notes.length > 0 ? "pointer" : "default" }}
                 >
                   <FileText className="file-icon" />
-                  <h2>
-                    {unitData.unitNumber > 0
-                      ? `Unit ${unitData.unitNumber}`
-                      : "General"}
+                  <h2 style={unitData.notes.length > 0 ? { marginBottom: "16px" } : {}}>
+                    {unitData.notes.length > 0
+                      ? unitData.notes[0].title
+                      : `Unit ${unitData.unitNumber}`}
                   </h2>
-                  {unitData.notes.length > 0 && (
-                    <p style={{ color: "#888", fontSize: "13px", margin: "0 0 16px" }}>
-                      {unitData.notes[0].title}
-                    </p>
-                  )}
                   <button className="unit-download-btn">
                     <span>
                       {unitData.notes.length > 0 ? "Preview" : "Coming Soon"}
