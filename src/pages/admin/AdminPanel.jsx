@@ -64,6 +64,10 @@ export default function AdminPanel() {
   const [deletingReviewId, setDeletingReviewId] = useState(null);
   const reviewsLoadedRef = useRef(false);
 
+  const [subjects, setSubjects] = useState([]);
+  const [subjectsLoading, setSubjectsLoading] = useState(false);
+  const [subjectsError, setSubjectsError] = useState('');
+
   const loadAll = useCallback(async () => {
     try {
       const [statsRes, usersRes, logsRes] = await Promise.all([
