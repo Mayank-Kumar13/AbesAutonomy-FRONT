@@ -19361,7 +19361,7 @@ const PDFViewerApplication = {
       }
     }
     if (triggerAutoPrint) {
-      this.triggerPrinting();
+      // this.triggerPrinting();
     }
   },
   async _initializeMetadata(pdfDocument) {
