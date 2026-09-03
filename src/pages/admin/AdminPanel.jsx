@@ -18,7 +18,15 @@ const makeFileEntry = (file) => ({
   description: '',
 });
 
-
+const formatWatchTime = (ms) => {
+  const totalMinutes = Math.floor(ms / 60000);
+  const days = Math.floor(totalMinutes / 1440);
+  const hours = Math.floor((totalMinutes % 1440) / 60);
+  const minutes = totalMinutes % 60;
+  if (days > 0) return `${days}d ${hours}h ${minutes}m`;
+  if (hours > 0) return `${hours}h ${minutes}m`;
+  return `${minutes}m`;
+};
 
 const formatDate = (d) => {
   if (!d) return '—';
@@ -342,7 +350,10 @@ export default function AdminPanel() {
           <span className="admin-card-label">Verified Users</span>
           <span className="admin-card-value">{stats?.verifiedUsers ?? '—'}</span>
         </div>
-
+        <div className="admin-card">
+          <span className="admin-card-label">Total Watch Time (all users)</span>
+          <span className="admin-card-value">{formatWatchTime(stats?.totalWatchTimeMs ?? 0)}</span>
+        </div>
       </div>
 
       <div className="admin-table-wrap" style={{ padding: '1.5rem', marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -405,7 +416,7 @@ export default function AdminPanel() {
                 <th>Provider</th>
                 <th>Verified</th>
                 <th>Logins</th>
-
+                <th>Watch Time</th>
                 <th>Last Active</th>
                 <th>Joined</th>
                 <th>Actions</th>
@@ -425,7 +436,7 @@ export default function AdminPanel() {
                   <td>{u.provider}</td>
                   <td>{u.emailVerified ? 'Yes' : 'No'}</td>
                   <td>{u.loginCount || 0}</td>
-
+                  <td>{formatWatchTime(u.totalWatchTimeMs || 0)}</td>
                   <td>{formatDate(u.lastActiveAt)}</td>
                   <td>{formatDate(u.createdAt)}</td>
                   <td style={{ display: 'flex', gap: '0.5rem' }}>
