@@ -7,6 +7,7 @@ const HEARTBEAT_INTERVAL_MS = 20000;
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [websiteStatus, setWebsiteStatus] = useState('UNDER_CONSTRUCTION');
   const heartbeatRef = useRef(null);
 
   const loadProfile = useCallback(async () => {
@@ -14,8 +15,21 @@ export function AuthProvider({ children }) {
     
     // We shouldn't exit early if there is no token, because the backend might be using HttpOnly cookies for Google OAuth.
     try {
-      const res = await authApi.getProfile();
-      setUser(res.data);
+      const [profileRes, settingsRes] = await Promise.all([
+        token ? authApi.getProfile().catch(() => null) : Promise.resolve(null),
+        authApi.getSettings().catch(() => ({ data: { websiteStatus: 'UNDER_CONSTRUCTION' } }))
+      ]);
+
+      if (profileRes) {
+        setUser(profileRes.data);
+      } else {
+        if (token) localStorage.removeItem("token");
+        setUser(null);
+      }
+
+      if (settingsRes && settingsRes.data) {
+        setWebsiteStatus(settingsRes.data.websiteStatus);
+      }
     } catch (err) {
       if (token) localStorage.removeItem("token");
       setUser(null);
@@ -85,6 +99,8 @@ export function AuthProvider({ children }) {
   const value = {
     user,
     loading,
+    websiteStatus,
+    setWebsiteStatus,
     isAuthenticated: !!user,
     login,
     register,

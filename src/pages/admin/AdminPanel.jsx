@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { authApi } from '../../auth/authApi';
+import { useAuth } from '../../auth/AuthContext';
 import { uploadApi, notesApi } from '../../services/api';
 import './AdminPanel.css';
 
@@ -42,6 +43,9 @@ export default function AdminPanel() {
   const [tab, setTab] = useState('users');
   const [searchQuery, setSearchQuery] = useState('');
   const [actionLoading, setActionLoading] = useState(null);
+  
+  const { websiteStatus, setWebsiteStatus } = useAuth();
+  const [statusLoading, setStatusLoading] = useState(false);
 
   // ─── Uploads tab state ────────────────────────────
   const [notes, setNotes] = useState([]);
@@ -253,6 +257,23 @@ export default function AdminPanel() {
     }
   };
 
+  const handleToggleStatus = async () => {
+    const isLive = websiteStatus === 'LIVE';
+    const actionStr = isLive ? 'put the website Under Construction' : 'make the website public (LIVE)';
+    if (!window.confirm(`Are you sure you want to ${actionStr}?`)) return;
+    
+    setStatusLoading(true);
+    try {
+      const newStatus = isLive ? 'UNDER_CONSTRUCTION' : 'LIVE';
+      await authApi.updateSettings(newStatus);
+      setWebsiteStatus(newStatus);
+    } catch (err) {
+      alert(`Error updating status: ${err.message}`);
+    } finally {
+      setStatusLoading(false);
+    }
+  };
+
   const filteredUsers = users.filter((u) => {
     if (!searchQuery) return true;
     const lowerQuery = searchQuery.toLowerCase();
@@ -291,6 +312,46 @@ export default function AdminPanel() {
           <span className="admin-card-label">Total Watch Time (all users)</span>
           <span className="admin-card-value">{formatWatchTime(stats?.totalWatchTimeMs ?? 0)}</span>
         </div>
+      </div>
+
+      <div className="admin-table-wrap" style={{ padding: '1.5rem', marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div>
+          <h2 style={{ color: '#e2e8f0', margin: '0 0 0.5rem 0' }}>Website Status</h2>
+          <p style={{ color: '#a0aec0', margin: 0, fontSize: '0.9rem' }}>
+            Current Status: 
+            <span style={{ fontWeight: 'bold', marginLeft: '0.5rem', color: websiteStatus === 'LIVE' ? '#4ade80' : '#f97316' }}>
+              {websiteStatus === 'LIVE' ? '🟢 Live' : '🟠 Under Construction'}
+            </span>
+          </p>
+        </div>
+        <button 
+          className="upload-submit-btn" 
+          style={{ margin: 0, padding: '0.75rem 1.5rem', width: 'auto', backgroundColor: websiteStatus === 'LIVE' ? '#b91c1c' : '#15803d' }}
+          onClick={handleToggleStatus}
+          disabled={statusLoading}
+        >
+          {statusLoading ? 'Updating...' : websiteStatus === 'LIVE' ? 'Put Website Under Construction' : 'Make Website Live'}
+        </button>
+      </div>
+
+      <div className="admin-table-wrap" style={{ padding: '1.5rem', marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div>
+          <h2 style={{ color: '#e2e8f0', margin: '0 0 0.5rem 0' }}>Website Status</h2>
+          <p style={{ color: '#a0aec0', margin: 0, fontSize: '0.9rem' }}>
+            Current Status: 
+            <span style={{ fontWeight: 'bold', marginLeft: '0.5rem', color: websiteStatus === 'LIVE' ? '#4ade80' : '#f97316' }}>
+              {websiteStatus === 'LIVE' ? '🟢 Live' : '🟠 Under Construction'}
+            </span>
+          </p>
+        </div>
+        <button 
+          className="upload-submit-btn" 
+          style={{ margin: 0, padding: '0.75rem 1.5rem', width: 'auto', backgroundColor: websiteStatus === 'LIVE' ? '#b91c1c' : '#15803d' }}
+          onClick={handleToggleStatus}
+          disabled={statusLoading}
+        >
+          {statusLoading ? 'Updating...' : websiteStatus === 'LIVE' ? 'Put Website Under Construction' : 'Make Website Live'}
+        </button>
       </div>
 
       <div className="admin-tabs">

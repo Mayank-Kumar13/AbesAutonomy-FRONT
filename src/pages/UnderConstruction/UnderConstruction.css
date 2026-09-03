@@ -1,0 +1,89 @@
+.uc-wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #0b0d10;
+  color: #e2e8f0;
+  font-family: system-ui, -apple-system, sans-serif;
+  padding: 2rem;
+  text-align: center;
+}
+
+.uc-content {
+  max-width: 600px;
+  background: #121418;
+  border: 1px solid #2d3748;
+  border-radius: 12px;
+  padding: 4rem 3rem;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+  position: relative;
+}
+
+.uc-title {
+  font-family: "Times New Roman", Georgia, serif;
+  font-size: 2.5rem;
+  color: #c89b63;
+  margin: 0 0 1rem 0;
+  letter-spacing: 0.05em;
+}
+
+.uc-subtitle {
+  font-size: 1.5rem;
+  font-weight: 500;
+  margin: 0 0 1.5rem 0;
+  color: #ffffff;
+}
+
+.uc-description {
+  color: #a0aec0;
+  line-height: 1.6;
+  font-size: 1rem;
+  margin: 0 0 2.5rem 0;
+}
+
+.uc-date-badge {
+  display: inline-block;
+  background: rgba(200, 155, 99, 0.1);
+  border: 1px solid rgba(200, 155, 99, 0.3);
+  color: #c89b63;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1.1rem;
+  margin-bottom: 2rem;
+  letter-spacing: 0.05em;
+}
+
+.uc-check-back {
+  color: #718096;
+  font-size: 0.95rem;
+  margin-bottom: 0;
+}
+
+.uc-admin-link {
+  position: absolute;
+  bottom: -40px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #4a5568;
+  font-size: 0.8rem;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.uc-admin-link:hover {
+  color: #718096;
+}
+
+@media (max-width: 600px) {
+  .uc-content {
+    padding: 3rem 1.5rem;
+  }
+  .uc-title {
+    font-size: 2rem;
+  }
+  .uc-subtitle {
+    font-size: 1.25rem;
+  }
+}
