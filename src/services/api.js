@@ -288,7 +288,7 @@ export const uploadApi = {
   async uploadPdf(file, metadata = {}) {
     const formData = new FormData();
 
-    formData.append('pdf', file);
+    formData.append('file', file);
 
     for (const [key, value] of Object.entries(metadata)) {
       formData.append(

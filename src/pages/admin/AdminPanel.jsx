@@ -114,10 +114,24 @@ export default function AdminPanel() {
     return () => clearInterval(interval);
   }, [loadAll]);
 
+  const loadSubjects = useCallback(async () => {
+    setSubjectsLoading(true);
+    try {
+      const res = await metaApi.getSubjects();
+      setSubjects(res.data || res || []);
+      setSubjectsError('');
+    } catch (err) {
+      setSubjectsError(err.message || 'Failed to load subjects.');
+    } finally {
+      setSubjectsLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     if (tab === 'uploads' && !notesLoadedRef.current) {
       notesLoadedRef.current = true;
       loadNotes();
+      loadSubjects();
     }
     if (tab === 'reviews' && !reviewsLoadedRef.current) {
       reviewsLoadedRef.current = true;
@@ -625,7 +639,7 @@ export default function AdminPanel() {
                   ? 'Uploading...'
                   : `Upload ${fileEntries.length || ''} PDF${fileEntries.length === 1 ? '' : 's'}`}
               </button>
-              <button type="button" className="upload-reset-btn" onClick={resetUploadForm} disabled={uploading}>
+              <button type="button" className="upload-reset-btn" onClick={() => resetUploadForm(false)} disabled={uploading}>
                 Clear
               </button>
             </div>
