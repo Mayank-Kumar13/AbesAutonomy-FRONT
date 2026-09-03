@@ -7,17 +7,16 @@ import './AdminPanel.css';
 const BRANCHES = ['electrical', 'electronics', 'common'];
 const RESOURCE_TYPES = ['theory', 'assignment', 'lab_manual', 'pyq', 'handwritten', 'info'];
 
-const emptyUploadForm = {
-  title: '',
-  description: '',
+let fileEntryIdCounter = 0;
+const makeFileEntry = (file) => ({
+  id: `${Date.now()}-${fileEntryIdCounter++}`,
+  file,
+  title: file.name.replace(/\.pdf$/i, ''),
   subject: '',
   branch: 'common',
-  year: '1',
-  semester: '',
   resourceType: 'theory',
-  unit: '',
-  tags: '',
-};
+  description: '',
+});
 
 const formatWatchTime = (ms) => {
   const totalMinutes = Math.floor(ms / 60000);
@@ -51,9 +50,9 @@ export default function AdminPanel() {
   const [notes, setNotes] = useState([]);
   const [notesLoading, setNotesLoading] = useState(false);
   const [notesError, setNotesError] = useState('');
-  const [uploadForm, setUploadForm] = useState(emptyUploadForm);
-  const [file, setFile] = useState(null);
+  const [fileEntries, setFileEntries] = useState([]);
   const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(null); // { done, total }
   const [uploadMsg, setUploadMsg] = useState(null); // { type: 'success' | 'error', text }
   const [deletingId, setDeletingId] = useState(null);
   const notesLoadedRef = useRef(false);
@@ -126,68 +125,93 @@ export default function AdminPanel() {
     }
   }, [tab, loadNotes, loadReviews]);
 
-  const handleUploadFieldChange = (field) => (e) => {
-    setUploadForm((prev) => ({ ...prev, [field]: e.target.value }));
+  const handleFilesChange = (e) => {
+    const selected = Array.from(e.target.files || []);
+    const pdfsOnly = selected.filter((f) => f.type === 'application/pdf');
+
+    if (pdfsOnly.length !== selected.length) {
+      setUploadMsg({ type: 'error', text: 'Only PDF files are allowed — non-PDF files were skipped.' });
+    } else {
+      setUploadMsg(null);
+    }
+
+    if (pdfsOnly.length > 0) {
+      setFileEntries((prev) => [...prev, ...pdfsOnly.map(makeFileEntry)]);
+    }
+
+    e.target.value = ''; // allow re-selecting the same file(s) again later
   };
 
-  const handleFileChange = (e) => {
-    const f = e.target.files?.[0] || null;
-    if (f && f.type !== 'application/pdf') {
-      setUploadMsg({ type: 'error', text: 'Only PDF files are allowed.' });
-      setFile(null);
-      e.target.value = '';
-      return;
-    }
-    setFile(f);
-    setUploadMsg(null);
+  const updateFileEntry = (id, field, value) => {
+    setFileEntries((prev) =>
+      prev.map((entry) => (entry.id === id ? { ...entry, [field]: value } : entry))
+    );
+  };
+
+  const removeFileEntry = (id) => {
+    setFileEntries((prev) => prev.filter((entry) => entry.id !== id));
   };
 
   const resetUploadForm = () => {
-    setUploadForm(emptyUploadForm);
-    setFile(null);
+    setFileEntries([]);
+    setUploadProgress(null);
   };
 
   const handleUploadSubmit = async (e) => {
     e.preventDefault();
     setUploadMsg(null);
 
-    if (!file) {
-      setUploadMsg({ type: 'error', text: 'Please choose a PDF file to upload.' });
+    if (fileEntries.length === 0) {
+      setUploadMsg({ type: 'error', text: 'Please choose at least one PDF file to upload.' });
       return;
     }
-    if (!uploadForm.title.trim() || !uploadForm.subject.trim()) {
-      setUploadMsg({ type: 'error', text: 'Title and subject are required.' });
+
+    const missing = fileEntries.find((entry) => !entry.title.trim() || !entry.subject.trim());
+    if (missing) {
+      setUploadMsg({ type: 'error', text: 'Title and subject are required for every file.' });
       return;
     }
 
     setUploading(true);
-    try {
-      const metadata = {
-        title: uploadForm.title.trim(),
-        description: uploadForm.description.trim(),
-        subject: uploadForm.subject.trim(),
-        branch: uploadForm.branch,
-        year: uploadForm.year,
-        resourceType: uploadForm.resourceType,
-      };
-      if (uploadForm.semester) metadata.semester = uploadForm.semester;
-      if (uploadForm.unit) metadata.unit = uploadForm.unit;
-      if (uploadForm.tags.trim()) {
-        metadata.tags = JSON.stringify(
-          uploadForm.tags.split(',').map((t) => t.trim()).filter(Boolean)
-        );
+    setUploadProgress({ done: 0, total: fileEntries.length });
+
+    const failed = [];
+    let succeeded = 0;
+
+    // Uploaded one at a time (not in parallel) so the server isn't hit with
+    // many large file uploads simultaneously.
+    for (const entry of fileEntries) {
+      try {
+        const metadata = {
+          title: entry.title.trim(),
+          description: entry.description.trim(),
+          subject: entry.subject.trim(),
+          branch: entry.branch,
+          resourceType: entry.resourceType,
+        };
+        await uploadApi.uploadPdf(entry.file, metadata);
+        succeeded += 1;
+      } catch (err) {
+        failed.push({ name: entry.file.name, error: err.message || 'Upload failed.' });
       }
-
-      await uploadApi.uploadPdf(file, metadata);
-
-      setUploadMsg({ type: 'success', text: 'PDF uploaded successfully.' });
-      resetUploadForm();
-      loadNotes();
-    } catch (err) {
-      setUploadMsg({ type: 'error', text: err.message || 'Upload failed.' });
-    } finally {
-      setUploading(false);
+      setUploadProgress((prev) => ({ done: (prev?.done || 0) + 1, total: fileEntries.length }));
     }
+
+    setUploading(false);
+
+    if (failed.length === 0) {
+      setUploadMsg({ type: 'success', text: `${succeeded} PDF${succeeded === 1 ? '' : 's'} uploaded successfully.` });
+      resetUploadForm();
+    } else {
+      setUploadMsg({
+        type: 'error',
+        text: `${succeeded} uploaded, ${failed.length} failed: ${failed.map((f) => `${f.name} (${f.error})`).join('; ')}`,
+      });
+      // Keep only the failed entries in the form so the user can retry them
+      setFileEntries((prev) => prev.filter((entry) => failed.some((f) => f.name === entry.file.name)));
+    }
+
+    loadNotes();
   };
 
   const handleDeleteNote = async (note) => {
@@ -486,125 +510,120 @@ export default function AdminPanel() {
       {tab === 'uploads' && (
         <div className="admin-uploads">
           <form className="upload-form" onSubmit={handleUploadSubmit}>
-            <h2 className="upload-form-title">Upload New PDF</h2>
+            <h2 className="upload-form-title">Upload New PDFs</h2>
 
             <div className="upload-field file-field">
-              <label htmlFor="pdf-file">PDF File *</label>
+              <label htmlFor="pdf-file">PDF Files *</label>
               <input
                 id="pdf-file"
                 type="file"
                 accept="application/pdf"
-                onChange={handleFileChange}
+                multiple
+                onChange={handleFilesChange}
               />
-              {file && <span className="file-chosen">{file.name}</span>}
+              <span className="file-chosen">
+                {fileEntries.length === 0
+                  ? 'No files chosen'
+                  : `${fileEntries.length} file${fileEntries.length === 1 ? '' : 's'} selected`}
+              </span>
             </div>
 
-            <div className="upload-grid">
-              <div className="upload-field">
-                <label htmlFor="title">Title *</label>
-                <input
-                  id="title"
-                  type="text"
-                  value={uploadForm.title}
-                  onChange={handleUploadFieldChange('title')}
-                  placeholder="e.g. Unit 3 - Digital Electronics Notes"
-                />
-              </div>
+            {fileEntries.length > 0 && (
+              <div className="upload-entries">
+                {fileEntries.map((entry) => (
+                  <div key={entry.id} className="upload-entry-card">
+                    <div className="upload-entry-header">
+                      <span className="upload-entry-filename">{entry.file.name}</span>
+                      <button
+                        type="button"
+                        className="upload-entry-remove"
+                        onClick={() => removeFileEntry(entry.id)}
+                        disabled={uploading}
+                      >
+                        Remove
+                      </button>
+                    </div>
 
-              <div className="upload-field">
-                <label htmlFor="subject">Subject *</label>
-                <input
-                  id="subject"
-                  type="text"
-                  value={uploadForm.subject}
-                  onChange={handleUploadFieldChange('subject')}
-                  placeholder="e.g. DIGITAL ELECTRONICS"
-                />
-              </div>
+                    <div className="upload-grid">
+                      <div className="upload-field">
+                        <label>Title *</label>
+                        <input
+                          type="text"
+                          value={entry.title}
+                          onChange={(e) => updateFileEntry(entry.id, 'title', e.target.value)}
+                          placeholder="e.g. Unit 3 - Digital Electronics Notes"
+                          disabled={uploading}
+                        />
+                      </div>
 
-              <div className="upload-field">
-                <label htmlFor="branch">Branch</label>
-                <select id="branch" value={uploadForm.branch} onChange={handleUploadFieldChange('branch')}>
-                  {BRANCHES.map((b) => (
-                    <option key={b} value={b}>{b}</option>
-                  ))}
-                </select>
-              </div>
+                      <div className="upload-field">
+                        <label>Subject *</label>
+                        <input
+                          type="text"
+                          value={entry.subject}
+                          onChange={(e) => updateFileEntry(entry.id, 'subject', e.target.value)}
+                          placeholder="e.g. DIGITAL ELECTRONICS"
+                          disabled={uploading}
+                        />
+                      </div>
 
-              <div className="upload-field">
-                <label htmlFor="resourceType">Resource Type</label>
-                <select id="resourceType" value={uploadForm.resourceType} onChange={handleUploadFieldChange('resourceType')}>
-                  {RESOURCE_TYPES.map((r) => (
-                    <option key={r} value={r}>{r.replace('_', ' ')}</option>
-                  ))}
-                </select>
-              </div>
+                      <div className="upload-field">
+                        <label>Branch</label>
+                        <select
+                          value={entry.branch}
+                          onChange={(e) => updateFileEntry(entry.id, 'branch', e.target.value)}
+                          disabled={uploading}
+                        >
+                          {BRANCHES.map((b) => (
+                            <option key={b} value={b}>{b}</option>
+                          ))}
+                        </select>
+                      </div>
 
-              <div className="upload-field">
-                <label htmlFor="year">Year</label>
-                <select id="year" value={uploadForm.year} onChange={handleUploadFieldChange('year')}>
-                  {[1, 2, 3, 4].map((y) => (
-                    <option key={y} value={y}>{y}</option>
-                  ))}
-                </select>
-              </div>
+                      <div className="upload-field">
+                        <label>Resource Type</label>
+                        <select
+                          value={entry.resourceType}
+                          onChange={(e) => updateFileEntry(entry.id, 'resourceType', e.target.value)}
+                          disabled={uploading}
+                        >
+                          {RESOURCE_TYPES.map((r) => (
+                            <option key={r} value={r}>{r.replace('_', ' ')}</option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
 
-              <div className="upload-field">
-                <label htmlFor="semester">Semester</label>
-                <input
-                  id="semester"
-                  type="number"
-                  min="1"
-                  max="8"
-                  value={uploadForm.semester}
-                  onChange={handleUploadFieldChange('semester')}
-                  placeholder="Optional"
-                />
+                    <div className="upload-field">
+                      <label>Description</label>
+                      <textarea
+                        rows={2}
+                        value={entry.description}
+                        onChange={(e) => updateFileEntry(entry.id, 'description', e.target.value)}
+                        placeholder="Optional short description"
+                        disabled={uploading}
+                      />
+                    </div>
+                  </div>
+                ))}
               </div>
-
-              <div className="upload-field">
-                <label htmlFor="unit">Unit</label>
-                <input
-                  id="unit"
-                  type="number"
-                  min="1"
-                  max="10"
-                  value={uploadForm.unit}
-                  onChange={handleUploadFieldChange('unit')}
-                  placeholder="Optional"
-                />
-              </div>
-
-              <div className="upload-field">
-                <label htmlFor="tags">Tags</label>
-                <input
-                  id="tags"
-                  type="text"
-                  value={uploadForm.tags}
-                  onChange={handleUploadFieldChange('tags')}
-                  placeholder="Comma separated, optional"
-                />
-              </div>
-            </div>
-
-            <div className="upload-field">
-              <label htmlFor="description">Description</label>
-              <textarea
-                id="description"
-                rows={3}
-                value={uploadForm.description}
-                onChange={handleUploadFieldChange('description')}
-                placeholder="Optional short description"
-              />
-            </div>
+            )}
 
             {uploadMsg && (
               <p className={`upload-msg ${uploadMsg.type}`}>{uploadMsg.text}</p>
             )}
 
+            {uploading && uploadProgress && (
+              <p className="upload-msg">
+                Uploading {uploadProgress.done} of {uploadProgress.total}...
+              </p>
+            )}
+
             <div className="upload-actions">
-              <button type="submit" className="upload-submit-btn" disabled={uploading}>
-                {uploading ? 'Uploading...' : 'Upload PDF'}
+              <button type="submit" className="upload-submit-btn" disabled={uploading || fileEntries.length === 0}>
+                {uploading
+                  ? 'Uploading...'
+                  : `Upload ${fileEntries.length || ''} PDF${fileEntries.length === 1 ? '' : 's'}`}
               </button>
               <button type="button" className="upload-reset-btn" onClick={resetUploadForm} disabled={uploading}>
                 Clear
