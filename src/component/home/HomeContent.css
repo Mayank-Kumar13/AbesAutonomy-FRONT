@@ -164,6 +164,14 @@
         grid-template-columns:1fr;
     }
 
+    .about-card {
+        width: 100%;
+    }
+
+    .building-card {
+        margin-left: 0;
+    }
+
     .resource-section{
         grid-template-columns:repeat(2,1fr);
     }
@@ -177,11 +185,19 @@
 @media(max-width:768px){
 
     .home{
-        padding:35px 20px 60px;
+        padding:25px 15px 40px;
+    }
+
+    .welcome-heading {
+        font-size: 36px;
+    }
+
+    .welcome-quote {
+        font-size: 16px;
     }
 
     .search-heading{
-        font-size:38px;
+        font-size:30px;
         text-align:center;
     }
 
@@ -193,6 +209,17 @@
         grid-template-columns:1fr;
     }
 
+    .why, .important {
+        font-size: 24px;
+        margin-left: 0 !important;
+        text-align: center;
+    }
+    
+    .why p {
+        font-size: 24px;
+        margin-left: 0;
+        text-align: center;
+    }
 }
 
 .why{

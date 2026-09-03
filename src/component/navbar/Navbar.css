@@ -101,3 +101,50 @@ ul li a.active::after{
     font-size:45px;
     margin-top:5px;
 }
+
+.mobile-toggle {
+    display: none;
+    cursor: pointer;
+    z-index: 101;
+}
+
+@media (max-width: 900px) {
+    .navbar {
+        padding: 15px 30px;
+    }
+    .abesname {
+        font-size: 28px;
+    }
+    
+    .mobile-toggle {
+        display: block;
+    }
+
+    .nav-right {
+        position: fixed;
+        top: 0;
+        right: -100%;
+        width: 250px;
+        height: 100vh;
+        background: #0d1117;
+        flex-direction: column;
+        justify-content: center;
+        transition: right 0.3s ease;
+        z-index: 100;
+        border-left: 1px solid #333;
+    }
+
+    .nav-right.active {
+        right: 0;
+    }
+
+    .nav-links {
+        flex-direction: column;
+        gap: 20px;
+        align-items: center;
+    }
+
+    .nav-right .profile {
+        margin-top: 20px;
+    }
+}

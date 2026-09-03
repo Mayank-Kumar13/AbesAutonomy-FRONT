@@ -50,3 +50,12 @@
   color: #c89b63;
   font-weight: 500;
 }
+
+@media (max-width: 768px) {
+  .info-page-wrapper {
+    padding: 3rem 1rem;
+  }
+  .info-title {
+    font-size: 2rem;
+  }
+}

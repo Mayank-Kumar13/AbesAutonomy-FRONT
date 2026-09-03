@@ -4,11 +4,13 @@ import { NavLink } from "react-router-dom";
 import { HiOutlineUserCircle } from "react-icons/hi2";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../auth/AuthContext";
+import { HiMenu, HiX } from "react-icons/hi";
 
 const Navbar = () => {
   const { user, isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const menuRef = useRef(null);
 
   useEffect(() => {
@@ -184,12 +186,17 @@ const Navbar = () => {
         <h2 className="abesname">ABES Autonomy</h2>
       </div>
       </Link>
-      <div className="nav-right">
-        <ul>
-          <li><NavLink to="/">Home</NavLink></li>
-          <li><NavLink to="/resources">Resources</NavLink></li>
-          <li><NavLink to="/amcat">AMCAT</NavLink></li>
-          <li><NavLink to="/credits">Credits</NavLink></li>
+
+      <div className="mobile-toggle" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+        {mobileMenuOpen ? <HiX size={28} color="#C5AC86" /> : <HiMenu size={28} color="#C5AC86" />}
+      </div>
+
+      <div className={`nav-right ${mobileMenuOpen ? "active" : ""}`}>
+        <ul className="nav-links">
+          <li><NavLink to="/" onClick={() => setMobileMenuOpen(false)}>Home</NavLink></li>
+          <li><NavLink to="/resources" onClick={() => setMobileMenuOpen(false)}>Resources</NavLink></li>
+          <li><NavLink to="/amcat" onClick={() => setMobileMenuOpen(false)}>AMCAT</NavLink></li>
+          <li><NavLink to="/credits" onClick={() => setMobileMenuOpen(false)}>Credits</NavLink></li>
         </ul>
 
         {isAuthenticated ? (
@@ -241,7 +248,7 @@ const Navbar = () => {
             )}
           </div>
         ) : (
-          <Link to="/login" style={{ textDecoration: 'none', color: 'inherit' }}>
+          <Link to="/login" style={{ textDecoration: 'none', color: 'inherit' }} onClick={() => setMobileMenuOpen(false)}>
           <div className="sign-in">Sign In</div>
           </Link>
         )}

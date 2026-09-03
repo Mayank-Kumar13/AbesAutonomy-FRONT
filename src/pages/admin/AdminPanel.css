@@ -319,3 +319,20 @@
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+@media (max-width: 768px) {
+  .admin-wrapper {
+    padding: 3rem 1rem 2rem;
+  }
+  .admin-tabs {
+    flex-wrap: wrap;
+  }
+  .admin-table-header {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start !important;
+  }
+  .admin-search-input {
+    width: 100% !important;
+  }
+}
