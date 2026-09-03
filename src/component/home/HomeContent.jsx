@@ -11,6 +11,7 @@ import {
   Star,
   MessageSquare,
   Pen,
+  Notebook,
 } from "lucide-react";
 import { reviewApi } from "../../services/api";
 import { useAuth } from "../../auth/AuthContext";
@@ -36,10 +37,10 @@ const cards = [
     resourceType: "pyq",
   },
   {
-    title: "SUBJECTS",
-    description: "Browse all subjects and course materials.",
-    icon: <BookOpen size={34} />,
-    resourceType: "theory",
+    title: "HANDWRITTEN NOTES",
+    description: "Handwritten notes by Topper Student [10 SGPA]",
+    icon: <Notebook size={34} />,
+    resourceType: "handwritten",
   },
 ];
 
