@@ -21,21 +21,25 @@ const cards = [
     title: "ASSIGNMENTS",
     description: "Homework, problem sets and project assignments.",
     icon: <ClipboardList size={34} />,
+    resourceType: "assignment",
   },
   {
     title: "LAB MANUALS",
     description: "Practical manuals, experiment records and lab guides.",
     icon: <FlaskConical size={34} />,
+    resourceType: "lab_manual",
   },
   {
     title: "PREVIOUS PAPERS",
     description: "Previous year question papers and exam resources.",
     icon: <Copy size={34} />,
+    resourceType: "pyq",
   },
   {
     title: "SUBJECTS",
     description: "Browse all subjects and course materials.",
     icon: <BookOpen size={34} />,
+    resourceType: "theory",
   },
 ];
 
@@ -182,6 +186,11 @@ const HomeContent = () => {
     <Link
       key={index}
       to="/ChooseSubject"
+      state={{
+        year: 1,
+        resourceType: card.resourceType,
+        resourceTitle: card.title,
+      }}
       className="resource-link"
     >
 
