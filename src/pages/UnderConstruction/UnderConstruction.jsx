@@ -12,10 +12,12 @@ const UnderConstruction = () => {
           We're getting things ready and preparing something amazing for you. 
           The full website experience will be available very soon!
         </p>
-        <div className="uc-loader">
-          <div className="uc-loader-ring"></div>
-          <div className="uc-loader-ring"></div>
-          <div className="uc-loader-ring"></div>
+        <div className="uc-gif-container">
+          <img 
+            src="https://gifsec.com/wp-content/uploads/2022/12/under-construction-gif-2.gif" 
+            alt="Working on the website"
+            className="uc-working-gif"
+          />
         </div>
         <div className="uc-date-badge">
           Currently Website Under Construction
