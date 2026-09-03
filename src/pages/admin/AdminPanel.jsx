@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { authApi } from '../../auth/authApi';
 import { useAuth } from '../../auth/AuthContext';
-import { uploadApi, notesApi } from '../../services/api';
+import { uploadApi, notesApi, metaApi } from '../../services/api';
 import './AdminPanel.css';
 
 const BRANCHES = ['electrical', 'electronics', 'common'];
