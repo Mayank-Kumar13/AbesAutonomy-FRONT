@@ -558,13 +558,30 @@ export default function AdminPanel() {
 
                       <div className="upload-field">
                         <label>Subject *</label>
-                        <input
-                          type="text"
-                          value={entry.subject}
-                          onChange={(e) => updateFileEntry(entry.id, 'subject', e.target.value)}
-                          placeholder="e.g. DIGITAL ELECTRONICS"
-                          disabled={uploading}
-                        />
+                        {subjectsLoading ? (
+                          <select disabled value="">
+                            <option value="">Loading subjects...</option>
+                          </select>
+                        ) : subjectsError ? (
+                          <div className="admin-error">{subjectsError}</div>
+                        ) : subjects.length === 0 ? (
+                          <select disabled value="">
+                            <option value="">No subjects found</option>
+                          </select>
+                        ) : (
+                          <select
+                            value={entry.subject}
+                            onChange={(e) => updateFileEntry(entry.id, 'subject', e.target.value)}
+                            disabled={uploading}
+                          >
+                            <option value="" disabled>Select Subject ▼</option>
+                            {subjects.map((s) => (
+                              <option key={s.subject || s._id || s.name} value={s.subject || s._id || s.name}>
+                                {s.subject || s.name || s.title || s._id}
+                              </option>
+                            ))}
+                          </select>
+                        )}
                       </div>
 
                       <div className="upload-field">
