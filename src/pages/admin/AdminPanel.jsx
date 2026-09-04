@@ -57,6 +57,11 @@ export default function AdminPanel() {
   const [deletingId, setDeletingId] = useState(null);
   const notesLoadedRef = useRef(false);
 
+  // ─── Rename Note State ────────────────────────────
+  const [editingNoteId, setEditingNoteId] = useState(null);
+  const [editingNoteTitle, setEditingNoteTitle] = useState('');
+  const [renamingId, setRenamingId] = useState(null);
+
   // ─── Reviews tab state ────────────────────────────
   const [reviews, setReviews] = useState([]);
   const [reviewsLoading, setReviewsLoading] = useState(false);
@@ -242,6 +247,26 @@ export default function AdminPanel() {
       setNotesError(err.message);
     } finally {
       setDeletingId(null);
+    }
+  };
+
+  const handleRenameSubmit = async (note) => {
+    const newTitle = editingNoteTitle.trim();
+    if (!newTitle) {
+      alert('Note title cannot be empty.');
+      return;
+    }
+    setRenamingId(note._id);
+    try {
+      await notesApi.update(note._id, { title: newTitle });
+      setNotes((prev) => prev.map((n) => n._id === note._id ? { ...n, title: newTitle } : n));
+      setEditingNoteId(null);
+      setNotesError('');
+      alert(`Successfully renamed to "${newTitle}"`);
+    } catch (err) {
+      alert(`Error renaming note: ${err.message}`);
+    } finally {
+      setRenamingId(null);
     }
   };
 
@@ -673,14 +698,61 @@ export default function AdminPanel() {
                 <tbody>
                   {notes.map((n) => (
                     <tr key={n._id}>
-                      <td>{n.title}</td>
+                      <td>
+                        {editingNoteId === n._id ? (
+                          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                            <input
+                              type="text"
+                              value={editingNoteTitle}
+                              onChange={(e) => setEditingNoteTitle(e.target.value)}
+                              style={{
+                                background: '#0b0d10',
+                                border: '1px solid #2d3748',
+                                borderRadius: '4px',
+                                padding: '0.3rem 0.5rem',
+                                color: '#e2e8f0',
+                                fontSize: '0.85rem'
+                              }}
+                              autoFocus
+                            />
+                            <button
+                              type="button"
+                              style={{ padding: '0.3rem 0.5rem', fontSize: '0.75rem', backgroundColor: '#4ade80', color: '#0b0d10', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+                              onClick={() => handleRenameSubmit(n)}
+                              disabled={renamingId === n._id}
+                            >
+                              {renamingId === n._id ? 'Saving...' : 'Save'}
+                            </button>
+                            <button
+                              type="button"
+                              className="delete-note-btn"
+                              style={{ padding: '0.3rem 0.5rem', fontSize: '0.75rem' }}
+                              onClick={() => setEditingNoteId(null)}
+                              disabled={renamingId === n._id}
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        ) : (
+                          n.title
+                        )}
+                      </td>
                       <td>{n.subject}</td>
                       <td>{n.branch}</td>
                       <td>{n.year}</td>
                       <td>{n.resourceType}</td>
                       <td>{n.viewCount || 0}</td>
                       <td>{formatDate(n.createdAt)}</td>
-                      <td>
+                      <td style={{ display: 'flex', gap: '0.5rem' }}>
+                        {editingNoteId !== n._id && (
+                          <button
+                            type="button"
+                            style={{ padding: '4px 8px', fontSize: '0.8rem', backgroundColor: '#3b82f6', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+                            onClick={() => { setEditingNoteId(n._id); setEditingNoteTitle(n.title); }}
+                          >
+                            Rename
+                          </button>
+                        )}
                         <button
                           type="button"
                           className="delete-note-btn"
