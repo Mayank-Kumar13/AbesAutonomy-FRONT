@@ -156,8 +156,6 @@ const HomeContent = () => {
             </pre>
             </pre>
 
-          <div className="quote-mark">"</div>
-
           <p>
             Education is not just about learning,
             it's about building a better tomorrow.
