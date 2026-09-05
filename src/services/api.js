@@ -66,7 +66,7 @@ export const clearAuth = () => {
 /**
  * Core fetch wrapper with auth header injection and error handling.
  */
-async function request(url, options = {}) {
+async function request(url, options = {}, retries = 3, backoff = 1000) {
   const headers = {
     ...(options.headers || {}),
   };
@@ -101,6 +101,12 @@ async function request(url, options = {}) {
   }
 
   if (!response.ok) {
+    if (response.status === 429 && retries > 0) {
+      console.warn(`Rate limited (429). Retrying in ${backoff}ms...`);
+      await new Promise(resolve => setTimeout(resolve, backoff));
+      return request(url, options, retries - 1, backoff * 2);
+    }
+
     const message =
       typeof data === 'object' && data?.message
         ? data.message
@@ -184,7 +190,7 @@ export const authApi = {
 // ─────────────────────────────────────────────────────
 
 export const notesApi = {
-  async list(filters = {}) {
+  async list(filters = {}, options = {}) {
     const params = new URLSearchParams();
 
     for (const [key, value] of Object.entries(filters)) {
@@ -199,7 +205,7 @@ export const notesApi = {
 
     const qs = params.toString();
 
-    return request(`/notes${qs ? `?${qs}` : ''}`);
+    return request(`/notes${qs ? `?${qs}` : ''}`, options);
   },
 
   async get(id) {
@@ -251,7 +257,7 @@ export const notesApi = {
 // ─────────────────────────────────────────────────────
 
 export const metaApi = {
-  async getSubjects(filters = {}) {
+  async getSubjects(filters = {}, options = {}) {
     const params = new URLSearchParams();
 
     for (const [key, value] of Object.entries(filters)) {
@@ -267,7 +273,8 @@ export const metaApi = {
     const qs = params.toString();
 
     return request(
-      `/meta/subjects${qs ? `?${qs}` : ''}`
+      `/meta/subjects${qs ? `?${qs}` : ''}`,
+      options
     );
   },
 

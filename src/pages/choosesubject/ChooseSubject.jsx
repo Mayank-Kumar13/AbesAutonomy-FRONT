@@ -76,10 +76,11 @@ const ChooseSubject = () => {
 
   useEffect(() => {
     let isMounted = true;
+    const controller = new AbortController();
     
     if (isHandwritten) {
       setLoading(true);
-      metaApi.getSubjects({ branch: activeGroup, resourceType: 'handwritten', year: year })
+      metaApi.getSubjects({ branch: activeGroup, resourceType: 'handwritten', year: year }, { signal: controller.signal })
         .then(res => {
           if (isMounted) {
             const fetchedSubjects = res.data ? res.data.map(s => s.subject.toUpperCase()) : [];
@@ -94,6 +95,7 @@ const ChooseSubject = () => {
           }
         })
         .catch(err => {
+          if (err.name === 'AbortError') return;
           console.error("Failed to fetch subjects:", err);
           if (isMounted) {
             setSubjects(FALLBACK_SUBJECTS[activeGroup] || []);
@@ -105,7 +107,10 @@ const ChooseSubject = () => {
       setLoading(false);
     }
     
-    return () => { isMounted = false; };
+    return () => {
+      isMounted = false;
+      controller.abort();
+    };
   }, [activeGroup, isHandwritten, year]);
 
   const displayedSubjects = subjects.map(subjectName => ({

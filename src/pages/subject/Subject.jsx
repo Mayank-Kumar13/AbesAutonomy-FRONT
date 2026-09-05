@@ -21,6 +21,7 @@ const Subject = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    const controller = new AbortController();
     const fetchNotes = async () => {
       setLoading(true);
       setError(null);
@@ -32,10 +33,11 @@ const Subject = () => {
           branch: branch,
           limit: 50,
           sort: "unit",
-        });
+        }, { signal: controller.signal });
 
         setNotes(result.data || []);
       } catch (err) {
+        if (err.name === 'AbortError') return;
         console.error("Failed to fetch notes:", err);
         setError("Failed to load notes. Please try again.");
         setNotes([]);
@@ -45,6 +47,8 @@ const Subject = () => {
     };
 
     fetchNotes();
+
+    return () => controller.abort();
   }, [heading, year, resourceType, branch]);
 
   const handlePreview = (note) => {

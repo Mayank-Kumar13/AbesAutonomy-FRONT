@@ -2,7 +2,7 @@
 // For production builds, set VITE_API_URL to the full backend URL.
 const envApiUrl = import.meta.env.VITE_API_URL; const API_URL = (envApiUrl && envApiUrl.includes("abes.work")) ? "/api" : (envApiUrl || "/api");
 
-async function request(path, options = {}) {
+async function request(path, options = {}, retries = 3, backoff = 1000) {
   const token = localStorage.getItem("token");
 
   const res = await fetch(`${API_URL}${path}`, {
@@ -18,6 +18,11 @@ async function request(path, options = {}) {
   const data = await res.json();
 
   if (!res.ok) {
+    if (res.status === 429 && retries > 0) {
+      console.warn(`Rate limited (429). Retrying in ${backoff}ms...`);
+      await new Promise(resolve => setTimeout(resolve, backoff));
+      return request(path, options, retries - 1, backoff * 2);
+    }
     throw new Error(data.message || "Something went wrong");
   }
 

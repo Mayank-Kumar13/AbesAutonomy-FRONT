@@ -237,7 +237,6 @@
    so it doesn't create excessive spacing before the footer */
 .handwritten-credit-card-wrapper .credit-card {
   margin-bottom: 0;
-  max-width: 100%;
 }
 
 @media (max-width: 600px) {
