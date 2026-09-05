@@ -73,6 +73,12 @@ export default function AdminPanel() {
   const [subjectsLoading, setSubjectsLoading] = useState(false);
   const [subjectsError, setSubjectsError] = useState('');
 
+  // ─── Activities tab state ────────────────────────────
+  const [activities, setActivities] = useState([]);
+  const [activitiesLoading, setActivitiesLoading] = useState(false);
+  const [activitiesError, setActivitiesError] = useState('');
+  const activitiesLoadedRef = useRef(false);
+
   const loadAll = useCallback(async () => {
     try {
       const [statsRes, usersRes, logsRes] = await Promise.all([
@@ -117,6 +123,19 @@ export default function AdminPanel() {
     }
   }, []);
 
+  const loadActivities = useCallback(async () => {
+    setActivitiesLoading(true);
+    try {
+      const res = await authApi.getAdminActivities(100);
+      setActivities(res.data || []);
+      setActivitiesError('');
+    } catch (err) {
+      setActivitiesError(err.message);
+    } finally {
+      setActivitiesLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     loadAll();
     const interval = setInterval(loadAll, 60000);
@@ -146,7 +165,11 @@ export default function AdminPanel() {
       reviewsLoadedRef.current = true;
       loadReviews();
     }
-  }, [tab, loadNotes, loadReviews]);
+    if (tab === 'activities' && !activitiesLoadedRef.current) {
+      activitiesLoadedRef.current = true;
+      loadActivities();
+    }
+  }, [tab, loadNotes, loadReviews, loadActivities]);
 
   const handleFilesChange = (e) => {
     const selected = Array.from(e.target.files || []);
@@ -415,6 +438,9 @@ export default function AdminPanel() {
         </button>
         <button className={`admin-tab-btn ${tab === 'reviews' ? 'active' : ''}`} onClick={() => setTab('reviews')}>
           Reviews
+        </button>
+        <button className={`admin-tab-btn ${tab === 'activities' ? 'active' : ''}`} onClick={() => setTab('activities')}>
+          Activities
         </button>
       </div>
 
@@ -816,6 +842,46 @@ export default function AdminPanel() {
               )}
               {reviewsLoading && (
                 <tr><td colSpan={6} className="admin-empty">Loading reviews...</td></tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {tab === 'activities' && (
+        <div className="admin-table-wrap">
+          <div className="admin-table-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', padding: '0 1rem' }}>
+            <h2 className="upload-form-title" style={{ margin: 0 }}>Admin Activities ({activities.length})</h2>
+            <button type="button" className="upload-reset-btn" onClick={() => loadActivities()} disabled={activitiesLoading}>
+              Refresh
+            </button>
+          </div>
+          {activitiesError && <p className="admin-error">{activitiesError}</p>}
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th>Admin Name</th>
+                <th>Email</th>
+                <th>Action</th>
+                <th>Details</th>
+                <th>Time</th>
+              </tr>
+            </thead>
+            <tbody>
+              {activities.map((act) => (
+                <tr key={act._id}>
+                  <td>{act.adminName}</td>
+                  <td>{act.adminEmail}</td>
+                  <td><span className="badge" style={{backgroundColor: '#334155', padding: '4px 8px', borderRadius: '4px', fontSize: '0.85em', color: 'white'}}>{act.action}</span></td>
+                  <td>{act.details}</td>
+                  <td>{formatDate(act.createdAt)}</td>
+                </tr>
+              ))}
+              {!activitiesLoading && activities.length === 0 && (
+                <tr><td colSpan={5} className="admin-empty">No admin activities found</td></tr>
+              )}
+              {activitiesLoading && (
+                <tr><td colSpan={5} className="admin-empty">Loading activities...</td></tr>
               )}
             </tbody>
           </table>

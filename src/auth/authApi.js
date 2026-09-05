@@ -110,4 +110,5 @@ export const authApi = {
   deleteAdminReview: (id) => request(`/admin/reviews/${id}`, { method: "DELETE" }),
   getSettings: () => request('/settings'),
   updateSettings: (websiteStatus) => request('/settings', { method: "PATCH", body: JSON.stringify({ websiteStatus }) }),
+  getAdminActivities: (limit = 50) => request(`/admin/activities?limit=${limit}`),
 };
