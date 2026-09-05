@@ -5,7 +5,7 @@ import { uploadApi, notesApi, metaApi } from '../../services/api';
 import './AdminPanel.css';
 
 const BRANCHES = ['electrical', 'electronics', 'common'];
-const RESOURCE_TYPES = ['theory', 'assignment', 'lab_manual', 'pyq', 'handwritten', 'info'];
+const RESOURCE_TYPES = ['theory', 'assignment', 'lab_manual', 'pyq', 'handwritten', 'syllabus'];
 
 let fileEntryIdCounter = 0;
 const makeFileEntry = (file) => ({
