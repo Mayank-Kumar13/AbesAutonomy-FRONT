@@ -23,6 +23,12 @@
     gap:18px;
 }
 
+.logo-section svg {
+    width: 70px;
+    height: 70px;
+    transition: width 0.3s, height 0.3s;
+}
+
 .abesname{
     color:white;
     font-size:40px;
@@ -113,6 +119,11 @@ ul li a.active::after{
     }
     .abesname {
         font-size: 28px;
+    }
+    
+    .logo-section svg {
+        width: 49px;
+        height: 49px;
     }
     
     .mobile-toggle {

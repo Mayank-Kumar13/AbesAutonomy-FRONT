@@ -37,6 +37,7 @@
   margin: 0;
   position: relative;
   display: inline-block;
+  white-space: nowrap; /* Prevent wrapping on narrow screens */
   padding-right: 8px;
   padding-bottom: 5px; /* Prevent bottom descender clipping */
 }
