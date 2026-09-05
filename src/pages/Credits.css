@@ -37,7 +37,7 @@ body {
     margin-top:-100px;
 }
 #contributor-card{
-    margin-bottom: 40px;
+    margin-top: 20px;
 }
 
 @media (max-width: 768px) {
