@@ -8,7 +8,7 @@ import {
   FlaskConical,
   CircleHelp,
   Notebook,
-  Info
+  BookOpen
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { notesApi } from "../services/api";
@@ -20,7 +20,7 @@ const RESOURCE_TYPE_MAP = {
   3: "lab_manual",
   4: "pyq",
   5: "handwritten",
-  6: "info",
+  6: "syllabus",
 };
 
 const Resources = () => {
@@ -63,9 +63,9 @@ const Resources = () => {
   },
   {
     id: 6,
-    title: "INFO",
-    description: "Important information & guidelines",
-    icon: Info,
+    title: "SYLLABUS",
+    description: "Course syllabus & curriculum",
+    icon: BookOpen,
   },
 ];
 
