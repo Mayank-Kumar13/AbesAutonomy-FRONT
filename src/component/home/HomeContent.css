@@ -17,7 +17,7 @@
  
 .welcome-heading{
     font-family: Georgia, "Times New Roman", serif;
-    font-size:58px;
+    font-size: clamp(2rem, 5vw, 3.5rem);
     font-weight:500;
     letter-spacing:1px;
     margin-bottom:20px;
@@ -49,7 +49,7 @@
     display:flex;
     flex-direction:column;
     justify-content:center;
-    width:120%;
+    width:100%;
 }
 
 .about-card h2{
@@ -86,7 +86,6 @@
     overflow:hidden;
     border:1px solid #222d38;
     width:100%;
-    margin-left:50px;
 }
 
 .building-card img{
@@ -189,7 +188,7 @@
     }
 
     .welcome-heading {
-        font-size: 36px;
+        /* Handled by clamp() now, but keeping block just in case */
     }
 
     .welcome-quote {
@@ -224,20 +223,23 @@
 
 .why{
     color:white;
-    font-size:30px;
+    font-size: clamp(1.5rem, 4vw, 30px);
     font-family:"Times New Roman", serif;
+    text-align: center;
 }
 .why p{
     color:#d4a373;
-    font-size:30px;
+    font-size: clamp(1.2rem, 3.5vw, 30px);
     font-family:"Times New Roman", serif;
-    margin-left:125px;
+    text-align: center;
+    margin-top: 10px;
 }
 .important{
     color:white;
-    font-size:30px;
+    font-size: clamp(1.5rem, 4vw, 30px);
     font-family:"Times New Roman", serif;
-    margin-left:48px;
+    text-align: center;
+    margin-top: 10px;
 }
 .resource-link{
     text-decoration:none;
@@ -271,7 +273,6 @@
 .review-section{
     margin-top:50px;
     text-align:center;
-    height: 800px;
 }
 .review-section img{
     width:100%;
@@ -553,6 +554,7 @@
 
     .review-card {
         width: 240px;
+        margin-left: 1rem;
     }
 
     .reviews-live-section {

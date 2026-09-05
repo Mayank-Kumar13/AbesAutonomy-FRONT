@@ -14,7 +14,7 @@ body {
 }
 
 h1 {
-    font-size: 50px;
+    font-size: clamp(2rem, 5vw, 50px);
     margin-bottom: 15px;
     font-family: "montserrat";
 }
@@ -62,7 +62,7 @@ p{
   display: flex;
   justify-content: center;
   align-items: center;
-
+  flex-wrap: wrap;
   gap: 16px;
 
   margin-top: 40px;
@@ -217,10 +217,10 @@ p{
 
 @media (max-width: 768px) {
   .hero_section h1 {
-    font-size: 36px;
+    /* Handled by clamp */
   }
   .search-box {
-    width: 90%;
+    width: 100%;
   }
   .resources-grid {
     grid-template-columns: 1fr;

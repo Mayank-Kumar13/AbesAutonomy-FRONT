@@ -208,8 +208,20 @@ hr {
 
   .profile-header {
     flex-direction: column;
-    align-items: flex-start;
-    gap: 25px;
+    align-items: center; /* Center everything on mobile */
+    text-align: center;
+    gap: 20px;
+  }
+  
+  .profile-left {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .avatar {
+    width: 75px;
+    height: 75px;
+    font-size: 26px;
   }
 
   .field {

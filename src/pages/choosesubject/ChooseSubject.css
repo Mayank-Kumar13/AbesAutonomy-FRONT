@@ -27,7 +27,7 @@
 
 .page-title {
   font-family: Georgia, serif;
-  font-size: 3rem;
+  font-size: clamp(2rem, 5vw, 3rem);
   font-weight: normal;
   letter-spacing: 0.05em;
   margin: 0 0 1rem 0;
@@ -62,6 +62,8 @@
 .semester-buttons {
   display: flex;
   gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 .semester-label {
@@ -111,6 +113,9 @@
   .semester-container {
     position: static;
     align-items: center;
+  }
+  .semester-buttons {
+    justify-content: center;
   }
 }
 
@@ -232,6 +237,7 @@
    so it doesn't create excessive spacing before the footer */
 .handwritten-credit-card-wrapper .credit-card {
   margin-bottom: 0;
+  max-width: 100%;
 }
 
 @media (max-width: 600px) {

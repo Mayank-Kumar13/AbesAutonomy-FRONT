@@ -58,6 +58,16 @@
   border-color: #d4a373;
 }
 
+/* Touch target area for mobile */
+@media (max-width: 480px) {
+  .review-modal-close {
+    width: 44px;
+    height: 44px;
+    top: 0.5rem;
+    right: 0.5rem;
+  }
+}
+
 .review-modal-title {
   font-family: Georgia, "Times New Roman", serif;
   font-size: 1.75rem;
@@ -97,11 +107,14 @@
 .star-btn {
   background: transparent;
   border: none;
-  padding: 4px;
+  padding: 8px; /* Increased padding for better touch target */
   cursor: pointer;
   color: #374151;
   transition: all 0.2s ease;
   border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .star-btn:hover,

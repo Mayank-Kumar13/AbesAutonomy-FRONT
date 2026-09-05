@@ -24,6 +24,16 @@
 @media (max-width: 768px) {
   .footer-grid {
     grid-template-columns: 1fr;
+    gap: 2rem;
+    text-align: center;
+  }
+  
+  .brand-section, .link-column {
+    align-items: center;
+  }
+
+  .social-icons {
+    justify-content: center;
   }
 }
 
