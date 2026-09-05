@@ -19,11 +19,19 @@ const IntroOverlay = () => {
 
     if (containerRef.current) {
         const rect = containerRef.current.getBoundingClientRect();
-        const centerX = (window.innerWidth / 2) - (rect.width * 1.5 / 2);
-        const centerY = (window.innerHeight / 2) - (rect.height * 1.5 / 2);
+        
+        // Dynamic initial scale for small screens
+        const maxAvailableWidth = window.innerWidth * 0.9;
+        let initialScale = 1.5;
+        if (rect.width * initialScale > maxAvailableWidth) {
+            initialScale = maxAvailableWidth / rect.width;
+        }
+
+        const centerX = (window.innerWidth / 2) - ((rect.width * initialScale) / 2);
+        const centerY = (window.innerHeight / 2) - ((rect.height * initialScale) / 2);
         
         setStyle({
-            transform: `translate(${centerX}px, ${centerY}px) scale(1.5)`,
+            transform: `translate(${centerX}px, ${centerY}px) scale(${initialScale})`,
             transition: 'none', // skip transition for initial placement
             opacity: 1
         });
@@ -42,14 +50,22 @@ const IntroOverlay = () => {
         const target = document.querySelector(".navbar .logo-section");
         let destX = 60; // fallback margin left
         let destY = 18; // fallback top padding
-        if (target) {
+        let targetScale = 1;
+
+        if (target && containerRef.current) {
             const targetRect = target.getBoundingClientRect();
+            const rect = containerRef.current.getBoundingClientRect();
+            // Need the unscaled original width, so we divide by current scale
+            const currentScale = rect.width / containerRef.current.offsetWidth || 1;
+            const originalWidth = rect.width / currentScale;
+
             destX = targetRect.left;
             destY = targetRect.top;
+            targetScale = targetRect.width / originalWidth;
         }
 
         setStyle({
-            transform: `translate(${destX}px, ${destY}px) scale(1)`,
+            transform: `translate(${destX}px, ${destY}px) scale(${targetScale})`,
             opacity: 1
             // transition is removed from inline so CSS takes over
         });

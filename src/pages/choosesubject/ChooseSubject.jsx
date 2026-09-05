@@ -74,12 +74,39 @@ const ChooseSubject = () => {
 
   const isHandwritten = resourceType === 'handwritten';
 
-  // Always use the static subjects configuration as requested by the user.
-  // We do not want to hide subjects just because they lack MongoDB records.
   useEffect(() => {
-    setSubjects(FALLBACK_SUBJECTS[activeGroup] || []);
-    setLoading(false);
-  }, [activeGroup]);
+    let isMounted = true;
+    
+    if (isHandwritten) {
+      setLoading(true);
+      metaApi.getSubjects({ branch: activeGroup, resourceType: 'handwritten', year: year })
+        .then(res => {
+          if (isMounted) {
+            const fetchedSubjects = res.data ? res.data.map(s => s.subject.toUpperCase()) : [];
+            const fallbackSet = FALLBACK_SUBJECTS[activeGroup] || [];
+            
+            // Keep the order of FALLBACK_SUBJECTS for known subjects, append any new ones
+            const validSubjects = fallbackSet.filter(subj => fetchedSubjects.includes(subj));
+            const additionalSubjects = fetchedSubjects.filter(subj => !fallbackSet.includes(subj));
+            
+            setSubjects([...validSubjects, ...additionalSubjects]);
+            setLoading(false);
+          }
+        })
+        .catch(err => {
+          console.error("Failed to fetch subjects:", err);
+          if (isMounted) {
+            setSubjects(FALLBACK_SUBJECTS[activeGroup] || []);
+            setLoading(false);
+          }
+        });
+    } else {
+      setSubjects(FALLBACK_SUBJECTS[activeGroup] || []);
+      setLoading(false);
+    }
+    
+    return () => { isMounted = false; };
+  }, [activeGroup, isHandwritten, year]);
 
   const displayedSubjects = subjects.map(subjectName => ({
     heading: subjectName,
