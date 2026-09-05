@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /login
+Disallow: /profile
+
+Sitemap: https://www.abes.work/sitemap.xml
