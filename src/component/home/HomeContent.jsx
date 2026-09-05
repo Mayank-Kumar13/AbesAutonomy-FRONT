@@ -146,15 +146,15 @@ const HomeContent = () => {
 
         <div className="about-card">
 
-          <pre className="why">WHY ABES AUTONOMY
+          <div className="why">WHY ABES AUTONOMY
             
             <p>
                IS 
                </p>
-              <pre className="important">
+              <div className="important">
             IMPORTANT?
-            </pre>
-            </pre>
+            </div>
+            </div>
 
           <p>
             Education is not just about learning,
