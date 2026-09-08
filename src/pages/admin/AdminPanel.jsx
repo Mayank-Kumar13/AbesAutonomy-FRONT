@@ -79,6 +79,12 @@ export default function AdminPanel() {
   const [activitiesError, setActivitiesError] = useState('');
   const activitiesLoadedRef = useRef(false);
 
+  // ─── Security tab state ────────────────────────────
+  const [suspiciousIPs, setSuspiciousIPs] = useState([]);
+  const [securityLoading, setSecurityLoading] = useState(false);
+  const [securityError, setSecurityError] = useState('');
+  const securityLoadedRef = useRef(false);
+
   const loadAll = useCallback(async () => {
     try {
       const [statsRes, usersRes, logsRes] = await Promise.all([
@@ -136,6 +142,19 @@ export default function AdminPanel() {
     }
   }, []);
 
+  const loadSuspiciousIPs = useCallback(async () => {
+    setSecurityLoading(true);
+    try {
+      const res = await authApi.getAdminSuspiciousIPs(100);
+      setSuspiciousIPs(res.data || []);
+      setSecurityError('');
+    } catch (err) {
+      setSecurityError(err.message);
+    } finally {
+      setSecurityLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     loadAll();
     const interval = setInterval(loadAll, 60000);
@@ -169,7 +188,11 @@ export default function AdminPanel() {
       activitiesLoadedRef.current = true;
       loadActivities();
     }
-  }, [tab, loadNotes, loadReviews, loadActivities]);
+    if (tab === 'security' && !securityLoadedRef.current) {
+      securityLoadedRef.current = true;
+      loadSuspiciousIPs();
+    }
+  }, [tab, loadNotes, loadReviews, loadActivities, loadSuspiciousIPs]);
 
   const handleFilesChange = (e) => {
     const selected = Array.from(e.target.files || []);
@@ -441,6 +464,9 @@ export default function AdminPanel() {
         </button>
         <button className={`admin-tab-btn ${tab === 'activities' ? 'active' : ''}`} onClick={() => setTab('activities')}>
           Activities
+        </button>
+        <button className={`admin-tab-btn ${tab === 'security' ? 'active' : ''}`} onClick={() => setTab('security')}>
+          Security
         </button>
       </div>
 
@@ -882,6 +908,49 @@ export default function AdminPanel() {
               )}
               {activitiesLoading && (
                 <tr><td colSpan={5} className="admin-empty">Loading activities...</td></tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {tab === 'security' && (
+        <div className="admin-table-wrap">
+          <div className="admin-table-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', padding: '0 1rem' }}>
+            <h2 className="upload-form-title" style={{ margin: 0, color: '#ef4444' }}>Suspicious IPs (Rate Limited)</h2>
+            <button type="button" className="upload-reset-btn" onClick={() => loadSuspiciousIPs()} disabled={securityLoading}>
+              Refresh
+            </button>
+          </div>
+          <p style={{ padding: '0 1rem', color: '#a0aec0', fontSize: '0.9rem', marginBottom: '1rem' }}>
+            These IP addresses have exceeded the strict rate limit of 5 requests per 15 minutes on sensitive authentication routes.
+          </p>
+          {securityError && <p className="admin-error">{securityError}</p>}
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th>IP Address</th>
+                <th>Endpoint Targeted</th>
+                <th>Method</th>
+                <th>Attempts Blocked</th>
+                <th>Last Blocked</th>
+              </tr>
+            </thead>
+            <tbody>
+              {suspiciousIPs.map((ipRec) => (
+                <tr key={ipRec._id}>
+                  <td style={{ fontFamily: 'monospace', color: '#fca5a5' }}>{ipRec.ip}</td>
+                  <td>{ipRec.endpoint}</td>
+                  <td><span className="badge" style={{backgroundColor: '#334155'}}>{ipRec.method}</span></td>
+                  <td style={{ fontWeight: 'bold' }}>{ipRec.attemptCount}</td>
+                  <td>{formatDate(ipRec.updatedAt)}</td>
+                </tr>
+              ))}
+              {!securityLoading && suspiciousIPs.length === 0 && (
+                <tr><td colSpan={5} className="admin-empty" style={{ color: '#4ade80' }}>No suspicious IPs detected recently.</td></tr>
+              )}
+              {securityLoading && (
+                <tr><td colSpan={5} className="admin-empty">Loading security data...</td></tr>
               )}
             </tbody>
           </table>

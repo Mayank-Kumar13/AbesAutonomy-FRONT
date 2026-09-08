@@ -111,4 +111,5 @@ export const authApi = {
   getSettings: () => request('/settings'),
   updateSettings: (websiteStatus) => request('/settings', { method: "PATCH", body: JSON.stringify({ websiteStatus }) }),
   getAdminActivities: (limit = 50) => request(`/admin/activities?limit=${limit}`),
+  getAdminSuspiciousIPs: (limit = 50) => request(`/admin/suspicious-ips?limit=${limit}`),
 };
