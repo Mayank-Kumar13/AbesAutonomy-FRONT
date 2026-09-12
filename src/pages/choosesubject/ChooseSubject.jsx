@@ -59,8 +59,6 @@ const ChooseSubject = () => {
     sessionStorage.setItem('abes_activeGroup', activeGroup);
   }, [selectedYear, activeGroup]);
 
-  const isHandwritten = resourceType === 'handwritten';
-
   useEffect(() => {
     let isMounted = true;
     const controller = new AbortController();
