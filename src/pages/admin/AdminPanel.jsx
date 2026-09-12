@@ -85,9 +85,10 @@ export default function AdminPanel() {
   const [deletingId, setDeletingId] = useState(null);
   const notesLoadedRef = useRef(false);
 
-  // ─── Rename Note State ────────────────────────────
+  // ─── Edit Note State ────────────────────────────
   const [editingNoteId, setEditingNoteId] = useState(null);
   const [editingNoteTitle, setEditingNoteTitle] = useState('');
+  const [editingNoteBranch, setEditingNoteBranch] = useState('');
   const [renamingId, setRenamingId] = useState(null);
 
   // ─── Reviews tab state ────────────────────────────
@@ -363,7 +364,7 @@ export default function AdminPanel() {
     }
   };
 
-  const handleRenameSubmit = async (note) => {
+  const handleEditSubmit = async (note) => {
     const newTitle = editingNoteTitle.trim();
     if (!newTitle) {
       alert('Note title cannot be empty.');
@@ -371,13 +372,13 @@ export default function AdminPanel() {
     }
     setRenamingId(note._id);
     try {
-      await notesApi.update(note._id, { title: newTitle });
-      setNotes((prev) => prev.map((n) => n._id === note._id ? { ...n, title: newTitle } : n));
+      await notesApi.update(note._id, { title: newTitle, branch: editingNoteBranch });
+      setNotes((prev) => prev.map((n) => n._id === note._id ? { ...n, title: newTitle, branch: editingNoteBranch } : n));
       setEditingNoteId(null);
       setNotesError('');
-      alert(`Successfully renamed to "${newTitle}"`);
+      alert(`Successfully updated note`);
     } catch (err) {
-      alert(`Error renaming note: ${err.message}`);
+      alert(`Error updating note: ${err.message}`);
     } finally {
       setRenamingId(null);
     }
@@ -975,7 +976,7 @@ export default function AdminPanel() {
                             <button
                               type="button"
                               style={{ padding: '0.3rem 0.5rem', fontSize: '0.75rem', backgroundColor: '#4ade80', color: '#0b0d10', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
-                              onClick={() => handleRenameSubmit(n)}
+                              onClick={() => handleEditSubmit(n)}
                               disabled={renamingId === n._id}
                             >
                               {renamingId === n._id ? 'Saving...' : 'Save'}
@@ -995,7 +996,28 @@ export default function AdminPanel() {
                         )}
                       </td>
                       <td>{n.subject}</td>
-                      <td>{n.branch}</td>
+                      <td>
+                        {editingNoteId === n._id ? (
+                          <select
+                            value={editingNoteBranch}
+                            onChange={(e) => setEditingNoteBranch(e.target.value)}
+                            style={{
+                              background: '#0b0d10',
+                              border: '1px solid #2d3748',
+                              borderRadius: '4px',
+                              padding: '0.3rem',
+                              color: '#e2e8f0',
+                              fontSize: '0.85rem'
+                            }}
+                          >
+                            {(n.year === 1 ? BRANCHES_Y1 : BRANCHES_Y2).map(b => (
+                              <option key={b} value={b}>{b}</option>
+                            ))}
+                          </select>
+                        ) : (
+                          n.branch
+                        )}
+                      </td>
                       <td>{n.year}</td>
                       <td>{n.resourceType}</td>
                       <td>{n.viewCount || 0}</td>
@@ -1005,9 +1027,9 @@ export default function AdminPanel() {
                           <button
                             type="button"
                             style={{ padding: '4px 8px', fontSize: '0.8rem', backgroundColor: '#3b82f6', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
-                            onClick={() => { setEditingNoteId(n._id); setEditingNoteTitle(n.title); }}
+                            onClick={() => { setEditingNoteId(n._id); setEditingNoteTitle(n.title); setEditingNoteBranch(n.branch); }}
                           >
-                            Rename
+                            Edit
                           </button>
                         )}
                         <button
