@@ -246,6 +246,7 @@ const SubjectManagement = () => {
                         <option value="ds">DS</option>
                         <option value="aiml">AIML</option>
                         <option value="ece">ECE</option>
+                        <option value="common">Common</option>
                       </>
                     )}
                   </select>

@@ -138,6 +138,7 @@ const ChooseSubject = () => {
                   <button className={`sem-btn ${activeGroup === 'ds' ? 'active' : ''}`} onClick={() => setActiveGroup('ds')}>DS</button>
                   <button className={`sem-btn ${activeGroup === 'aiml' ? 'active' : ''}`} onClick={() => setActiveGroup('aiml')}>AIML</button>
                   <button className={`sem-btn ${activeGroup === 'ece' ? 'active' : ''}`} onClick={() => setActiveGroup('ece')}>ECE</button>
+                  <button className={`sem-btn ${activeGroup === 'common' ? 'active' : ''}`} onClick={() => setActiveGroup('common')}>Common</button>
                 </div>
               </div>
             )}

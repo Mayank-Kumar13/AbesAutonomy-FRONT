@@ -6,7 +6,7 @@ import './AdminPanel.css';
 import SubjectManagement from './SubjectManagement';
 
 const BRANCHES_Y1 = ['electrical', 'electronics', 'common'];
-const BRANCHES_Y2 = ['cse', 'ds', 'aiml', 'ece'];
+const BRANCHES_Y2 = ['cse', 'ds', 'aiml', 'ece', 'common'];
 const BRANCHES = Array.from(new Set(['cse', 'it', 'me', 'aids', 'ds', 'aiml', 'ece', 'electrical', 'electronics', 'common']));
 const RESOURCE_TYPES = ['theory', 'assignment', 'lab_manual', 'pyq', 'handwritten', 'syllabus'];
 
