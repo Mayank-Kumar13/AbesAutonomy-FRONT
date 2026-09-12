@@ -110,9 +110,9 @@ const ChooseSubject = () => {
             <p className="page-subtitle">Select a subject to explore all related resources, notes, previous papers and more.</p>
           </div>
           
-          <div className="filter-controls-container" style={{ position: 'absolute', right: 0, top: 0, display: 'flex', flexDirection: 'column', gap: '15px', alignItems: 'flex-end' }}>
+          <div className="filter-controls-container">
             {/* Year Selector */}
-            <div className="semester-container" style={{ position: 'relative', top: 'auto', right: 'auto' }}>
+            <div className="semester-container">
               <span className="semester-label">YEAR</span>
               <div className="semester-buttons">
                 <button className={`sem-btn ${selectedYear === 1 ? 'active' : ''}`} onClick={() => setSelectedYear(1)}>YEAR 1</button>
@@ -122,7 +122,7 @@ const ChooseSubject = () => {
 
             {/* Group Selector - Only show for Year 1 or if you explicitly want it for other years */}
             {selectedYear === 1 && (
-              <div className="semester-container" style={{ position: 'relative', top: 'auto', right: 'auto' }}>
+              <div className="semester-container">
                 <span className="semester-label">GROUP</span>
                 <div className="semester-buttons">
                   <button className={`sem-btn ${activeGroup === 'electrical' ? 'active' : ''}`} onClick={() => setActiveGroup('electrical')}>Electrical</button>

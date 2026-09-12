@@ -42,10 +42,17 @@
 }
 
 /* --- Semester Toggle --- */
-.semester-container {
+.filter-controls-container {
   position: absolute;
   right: 0;
   top: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 15px;
+}
+
+.semester-container {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
@@ -110,8 +117,11 @@
     align-items: center;
     gap: 2rem;
   }
-  .semester-container {
+  .filter-controls-container {
     position: static;
+    align-items: center;
+  }
+  .semester-container {
     align-items: center;
   }
   .semester-buttons {
