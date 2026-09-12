@@ -3,6 +3,7 @@ import { authApi } from '../../auth/authApi';
 import { useAuth } from '../../auth/AuthContext';
 import { uploadApi, notesApi, metaApi } from '../../services/api';
 import './AdminPanel.css';
+import SubjectManagement from './SubjectManagement';
 
 const BRANCHES = ['electrical', 'electronics', 'common'];
 const RESOURCE_TYPES = ['theory', 'assignment', 'lab_manual', 'pyq', 'handwritten', 'syllabus'];
@@ -577,7 +578,14 @@ export default function AdminPanel() {
         <button className={`admin-tab-btn ${tab === 'mailHistory' ? 'active' : ''}`} onClick={() => setTab('mailHistory')}>
           Mail History
         </button>
+        <button className={`admin-tab-btn ${tab === 'subjects' ? 'active' : ''}`} onClick={() => setTab('subjects')}>
+          Subjects
+        </button>
       </div>
+
+      {tab === 'subjects' && (
+        <SubjectManagement />
+      )}
 
       {tab === 'users' && (
         <div className="admin-table-wrap">

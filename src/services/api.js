@@ -288,6 +288,53 @@ export const metaApi = {
 };
 
 // ─────────────────────────────────────────────────────
+// Subjects API
+// ─────────────────────────────────────────────────────
+
+export const subjectsApi = {
+  async getSubjects(filters = {}, options = {}) {
+    const params = new URLSearchParams();
+
+    for (const [key, value] of Object.entries(filters)) {
+      if (
+        value !== undefined &&
+        value !== null &&
+        value !== ''
+      ) {
+        params.append(key, value);
+      }
+    }
+
+    const qs = params.toString();
+    return request(`/subjects${qs ? `?${qs}` : ''}`, options);
+  },
+  
+  async getAllSubjects(options = {}) {
+    return request('/subjects/all', options);
+  },
+
+  async createSubject(subjectData) {
+    return request('/subjects', {
+      method: 'POST',
+      body: JSON.stringify(subjectData),
+    });
+  },
+
+  async updateSubject(id, updates) {
+    return request(`/subjects/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(updates),
+    });
+  },
+
+  async deleteSubject(id) {
+    return request(`/subjects/${id}`, {
+      method: 'DELETE',
+    });
+  },
+};
+
+// ─────────────────────────────────────────────────────
 // Upload API
 // ─────────────────────────────────────────────────────
 

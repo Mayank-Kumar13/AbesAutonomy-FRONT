@@ -16,9 +16,9 @@ import {
   Leaf,     // For EVS
   BookOpen, // Fallback icon
 } from 'lucide-react';
-import { metaApi } from '../../services/api';
+import { subjectsApi } from '../../services/api';
 
-// Icon mapping for known subjects
+// Icon mapping for fallback or direct mapping
 const SUBJECT_ICONS = {
   DSA: <LineChart size={35} strokeWidth={1.5} />,
   MATHS: <span style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontWeight: 'bold', fontSize: '28px', lineHeight: '1' }}>f(x)</span>,
@@ -31,27 +31,6 @@ const SUBJECT_ICONS = {
   MECHANICS: <Cog size={35} strokeWidth={1.5} />,
   ELECTRONICS: <Cpu size={35} strokeWidth={1.5} />,
 };
-
-// Descriptions for known subjects
-const SUBJECT_DESC = {
-  DSA: "Data Structures and Algorithms",
-  MATHS: "Mathematics for Problem Solving",
-  PHYSICS: "Engineering Physics and Applications",
-  EVS: "Environmental Studies and Sustainability",
-  AI: "Artificial Intelligence Fundamentals",
-  ELECTRICAL: "Basic Electrical Engineering",
-  'SOFT SKILL': "Soft Skills and Personal Development",
-  DT: "Digital Techniques and Logic Design",
-  MECHANICS: "Engineering Mechanics and Dynamics",
-  ELECTRONICS: "Fundamentals of Electronics Engineering",
-};
-
-// Fallback hardcoded subjects per branch
-const FALLBACK_SUBJECTS = {
-  electrical: ['DSA', 'MATHS', 'PHYSICS', 'EVS', 'AI', 'ELECTRICAL'],
-  electronics: ['DSA', 'MATHS', 'SOFT SKILL', 'DT', 'MECHANICS', 'ELECTRONICS'],
-};
-
 
 const HANDWRITTEN_CREDIT = {
   name: "NITIN",
@@ -66,9 +45,10 @@ const HANDWRITTEN_CREDIT = {
 
 const ChooseSubject = () => {
   const location = useLocation();
-  const { year = 1, resourceType = 'theory', resourceTitle = 'THEORY NOTES' } = location.state || {};
+  const { year: initialYear = 1, resourceType = 'theory', resourceTitle = 'THEORY NOTES' } = location.state || {};
 
   const [activeGroup, setActiveGroup] = useState('electrical');
+  const [selectedYear, setSelectedYear] = useState(initialYear);
   const [subjects, setSubjects] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -78,46 +58,42 @@ const ChooseSubject = () => {
     let isMounted = true;
     const controller = new AbortController();
     
-    if (isHandwritten) {
-      setLoading(true);
-      metaApi.getSubjects({ branch: activeGroup, resourceType: 'handwritten', year: year }, { signal: controller.signal })
-        .then(res => {
-          if (isMounted) {
-            const fetchedSubjects = res.data ? res.data.map(s => s.subject.toUpperCase()) : [];
-            const fallbackSet = FALLBACK_SUBJECTS[activeGroup] || [];
-            
-            // Keep the order of FALLBACK_SUBJECTS for known subjects, append any new ones
-            const validSubjects = fallbackSet.filter(subj => fetchedSubjects.includes(subj));
-            const additionalSubjects = fetchedSubjects.filter(subj => !fallbackSet.includes(subj));
-            
-            setSubjects([...validSubjects, ...additionalSubjects]);
-            setLoading(false);
-          }
-        })
-        .catch(err => {
-          if (err.name === 'AbortError') return;
-          console.error("Failed to fetch subjects:", err);
-          if (isMounted) {
-            setSubjects(FALLBACK_SUBJECTS[activeGroup] || []);
-            setLoading(false);
-          }
-        });
-    } else {
-      setSubjects(FALLBACK_SUBJECTS[activeGroup] || []);
-      setLoading(false);
-    }
+    setLoading(true);
+    
+    subjectsApi.getSubjects({ year: selectedYear, group: activeGroup }, { signal: controller.signal })
+      .then(res => {
+        if (isMounted) {
+          setSubjects(res.data || []);
+          setLoading(false);
+        }
+      })
+      .catch(err => {
+        if (err.name === 'AbortError') return;
+        console.error("Failed to fetch subjects:", err);
+        if (isMounted) {
+          setSubjects([]);
+          setLoading(false);
+        }
+      });
     
     return () => {
       isMounted = false;
       controller.abort();
     };
-  }, [activeGroup, isHandwritten, year]);
+  }, [activeGroup, selectedYear]);
 
-  const displayedSubjects = subjects.map(subjectName => ({
-    heading: subjectName,
-    para: SUBJECT_DESC[subjectName] || `${subjectName} Study Materials`,
-    icon: SUBJECT_ICONS[subjectName] || <BookOpen size={35} strokeWidth={1.5} />,
-  }));
+  // Map DB subjects to frontend format
+  const displayedSubjects = subjects.map(subj => {
+    const iconName = subj.icon || 'BookOpen';
+    // Fallback to our existing mapping if available, otherwise use default BookOpen
+    let mappedIcon = SUBJECT_ICONS[subj.name.toUpperCase()] || <BookOpen size={35} strokeWidth={1.5} />;
+    
+    return {
+      heading: subj.name,
+      para: subj.description || `${subj.name} Study Materials`,
+      icon: mappedIcon,
+    };
+  });
 
   return (
     <div className="choose-subject-wrapper">
@@ -127,11 +103,24 @@ const ChooseSubject = () => {
             <h1 className="page-title">CHOOSE SUBJECT</h1>
             <p className="page-subtitle">Select a subject to explore all related resources, notes, previous papers and more.</p>
           </div>
-          <div className="semester-container">
-            <span className="semester-label">GROUP</span>
-            <div className="semester-buttons">
-              <button className={`sem-btn ${activeGroup === 'electrical' ? 'active' : ''}`} onClick={() => setActiveGroup('electrical')}>Electrical</button>
-              <button className={`sem-btn ${activeGroup === 'electronics' ? 'active' : ''}`} onClick={() => setActiveGroup('electronics')}>Electronics</button>
+          
+          <div className="filter-controls-container" style={{ display: 'flex', flexDirection: 'column', gap: '20px', alignItems: 'center' }}>
+            {/* Year Selector */}
+            <div className="semester-container">
+              <span className="semester-label">YEAR</span>
+              <div className="semester-buttons">
+                <button className={`sem-btn ${selectedYear === 1 ? 'active' : ''}`} onClick={() => setSelectedYear(1)}>YEAR 1</button>
+                <button className={`sem-btn ${selectedYear === 2 ? 'active' : ''}`} onClick={() => setSelectedYear(2)}>YEAR 2</button>
+              </div>
+            </div>
+
+            {/* Group Selector */}
+            <div className="semester-container">
+              <span className="semester-label">GROUP</span>
+              <div className="semester-buttons">
+                <button className={`sem-btn ${activeGroup === 'electrical' ? 'active' : ''}`} onClick={() => setActiveGroup('electrical')}>Electrical</button>
+                <button className={`sem-btn ${activeGroup === 'electronics' ? 'active' : ''}`} onClick={() => setActiveGroup('electronics')}>Electronics</button>
+              </div>
             </div>
           </div>
         </div>
@@ -142,7 +131,8 @@ const ChooseSubject = () => {
           </div>
         ) : displayedSubjects.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '60px 0', color: '#9ca3af' }}>
-            <p>No subjects found for this combination.</p>
+            <p>No subjects available for Year {selectedYear} {activeGroup} yet.</p>
+            <p>Please check back later.</p>
           </div>
         ) : (
           <div className="subject-grid">
@@ -152,7 +142,7 @@ const ChooseSubject = () => {
                 state={{
                   heading: subject.heading,
                   para: subject.para,
-                  year: year,
+                  year: selectedYear,
                   resourceType: resourceType,
                   branch: activeGroup,
                 }}
@@ -160,7 +150,9 @@ const ChooseSubject = () => {
                 key={index}
               >
                 <Unicard 
-                  key={index} heading={subject.heading} para={subject.para} icon={subject.icon}
+                  heading={subject.heading} 
+                  para={subject.para} 
+                  icon={subject.icon}
                   btnn={<div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>Explore <ArrowRight size={16} /></div>}
                 />
               </Link>
