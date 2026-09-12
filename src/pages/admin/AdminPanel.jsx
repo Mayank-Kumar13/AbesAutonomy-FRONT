@@ -7,6 +7,7 @@ import SubjectManagement from './SubjectManagement';
 
 const BRANCHES_Y1 = ['electrical', 'electronics', 'common'];
 const BRANCHES_Y2 = ['cse', 'ds', 'aiml', 'ece'];
+const BRANCHES = Array.from(new Set(['cse', 'it', 'me', 'aids', 'ds', 'aiml', 'ece', 'electrical', 'electronics', 'common']));
 const RESOURCE_TYPES = ['theory', 'assignment', 'lab_manual', 'pyq', 'handwritten', 'syllabus'];
 
 let fileEntryIdCounter = 0;
@@ -70,7 +71,7 @@ export default function AdminPanel() {
   const [searchQuery, setSearchQuery] = useState('');
   const [actionLoading, setActionLoading] = useState(null);
   
-  const { websiteStatus, setWebsiteStatus } = useAuth();
+  const { websiteStatus, setWebsiteStatus, user } = useAuth();
   const [statusLoading, setStatusLoading] = useState(false);
 
   // ─── Uploads tab state ────────────────────────────
@@ -216,6 +217,12 @@ export default function AdminPanel() {
     const interval = setInterval(loadAll, 60000);
     return () => clearInterval(interval);
   }, [loadAll]);
+
+  useEffect(() => {
+    if (user?.role === 'coordinator' && tab !== 'uploads') {
+      setTab('uploads');
+    }
+  }, [user, tab]);
 
   const loadSubjects = useCallback(async () => {
     setSubjectsLoading(true);
@@ -403,18 +410,34 @@ export default function AdminPanel() {
     }
   };
 
-  const handleToggleRole = async (user) => {
-    const newRole = user.role === 'admin' ? 'user' : 'admin';
-    if (!window.confirm(`Are you sure you want to make ${user.name} a ${newRole}?`)) return;
-    setActionLoading(`role-${user._id}`);
+  const [editingUserRole, setEditingUserRole] = useState(null);
+  const [editRoleForm, setEditRoleForm] = useState({ role: '', assignedBranches: [] });
+
+  const startEditRole = (u) => {
+    setEditingUserRole(u._id);
+    setEditRoleForm({ role: u.role, assignedBranches: u.assignedBranches || [] });
+  };
+
+  const handleSaveRole = async (u) => {
+    setActionLoading(`role-${u._id}`);
     try {
-      const res = await authApi.updateAdminUserRole(user._id, newRole);
-      setUsers((prev) => prev.map((u) => (u._id === user._id ? { ...u, role: res.data.role } : u)));
+      const res = await authApi.updateAdminUserRole(u._id, editRoleForm.role, editRoleForm.assignedBranches);
+      setUsers((prev) => prev.map((usr) => (usr._id === u._id ? { ...usr, role: res.data.role, assignedBranches: res.data.assignedBranches } : usr)));
+      setEditingUserRole(null);
     } catch (err) {
       alert(`Error updating role: ${err.message}`);
     } finally {
       setActionLoading(null);
     }
+  };
+
+  const toggleBranch = (b) => {
+    setEditRoleForm(prev => ({
+      ...prev,
+      assignedBranches: prev.assignedBranches.includes(b)
+        ? prev.assignedBranches.filter(branch => branch !== b)
+        : [...prev.assignedBranches, b]
+    }));
   };
 
   const handleClearLogs = async () => {
@@ -466,28 +489,30 @@ export default function AdminPanel() {
 
       {error && <p className="admin-error">{error}</p>}
 
-      <div className="admin-cards">
-        <div className="admin-card">
-          <span className="admin-card-label">Total Registered Users</span>
-          <span className="admin-card-value">{stats?.totalUsers ?? '—'}</span>
+      {user?.role !== 'coordinator' && (
+        <div className="admin-cards">
+          <div className="admin-card">
+            <span className="admin-card-label">Total Registered Users</span>
+            <span className="admin-card-value">{stats?.totalUsers ?? '—'}</span>
+          </div>
+          <div className="admin-card live">
+            <span className="admin-card-label">Live Users (last 5 min)</span>
+            <span className="admin-card-value">
+              <span className="live-dot" /> {stats?.liveUsers ?? '—'}
+            </span>
+          </div>
+          <div className="admin-card">
+            <span className="admin-card-label">Verified Users</span>
+            <span className="admin-card-value">{stats?.verifiedUsers ?? '—'}</span>
+          </div>
+          <div className="admin-card">
+            <span className="admin-card-label">Total Watch Time (all users)</span>
+            <span className="admin-card-value">{formatWatchTime(stats?.totalWatchTimeMs ?? 0)}</span>
+          </div>
         </div>
-        <div className="admin-card live">
-          <span className="admin-card-label">Live Users (last 5 min)</span>
-          <span className="admin-card-value">
-            <span className="live-dot" /> {stats?.liveUsers ?? '—'}
-          </span>
-        </div>
-        <div className="admin-card">
-          <span className="admin-card-label">Verified Users</span>
-          <span className="admin-card-value">{stats?.verifiedUsers ?? '—'}</span>
-        </div>
-        <div className="admin-card">
-          <span className="admin-card-label">Total Watch Time (all users)</span>
-          <span className="admin-card-value">{formatWatchTime(stats?.totalWatchTimeMs ?? 0)}</span>
-        </div>
-      </div>
+      )}
 
-      {emailQuota && (
+      {user?.role !== 'coordinator' && emailQuota && (
         <div className="quota-dashboard">
           <div className="quota-header">
             <h2 className="quota-title">Email Quota</h2>
@@ -537,53 +562,63 @@ export default function AdminPanel() {
         </div>
       )}
 
-      <div className="admin-table-wrap" style={{ padding: '1.5rem', marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div>
-          <h2 style={{ color: '#e2e8f0', margin: '0 0 0.5rem 0' }}>Website Status</h2>
-          <p style={{ color: '#a0aec0', margin: 0, fontSize: '0.9rem' }}>
-            Current Status: 
-            <span style={{ fontWeight: 'bold', marginLeft: '0.5rem', color: websiteStatus === 'LIVE' ? '#4ade80' : '#f97316' }}>
-              {websiteStatus === 'LIVE' ? '🟢 Live' : '🟠 Under Construction'}
-            </span>
-          </p>
+      {user?.role !== 'coordinator' && (
+        <div className="admin-table-wrap" style={{ padding: '1.5rem', marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div>
+            <h2 style={{ color: '#e2e8f0', margin: '0 0 0.5rem 0' }}>Website Status</h2>
+            <p style={{ color: '#a0aec0', margin: 0, fontSize: '0.9rem' }}>
+              Current Status: 
+              <span style={{ fontWeight: 'bold', marginLeft: '0.5rem', color: websiteStatus === 'LIVE' ? '#4ade80' : '#f97316' }}>
+                {websiteStatus === 'LIVE' ? '🟢 Live' : '🟠 Under Construction'}
+              </span>
+            </p>
+          </div>
+          <button 
+            className="upload-submit-btn" 
+            style={{ margin: 0, padding: '0.75rem 1.5rem', width: 'auto', backgroundColor: websiteStatus === 'LIVE' ? '#b91c1c' : '#15803d' }}
+            onClick={handleToggleStatus}
+            disabled={statusLoading}
+          >
+            {statusLoading ? 'Updating...' : websiteStatus === 'LIVE' ? 'Put Website Under Construction' : 'Make Website Live'}
+          </button>
         </div>
-        <button 
-          className="upload-submit-btn" 
-          style={{ margin: 0, padding: '0.75rem 1.5rem', width: 'auto', backgroundColor: websiteStatus === 'LIVE' ? '#b91c1c' : '#15803d' }}
-          onClick={handleToggleStatus}
-          disabled={statusLoading}
-        >
-          {statusLoading ? 'Updating...' : websiteStatus === 'LIVE' ? 'Put Website Under Construction' : 'Make Website Live'}
-        </button>
-      </div>
+      )}
 
 
 
       <div className="admin-tabs">
-        <button className={`admin-tab-btn ${tab === 'users' ? 'active' : ''}`} onClick={() => setTab('users')}>
-          Users
-        </button>
-        <button className={`admin-tab-btn ${tab === 'logs' ? 'active' : ''}`} onClick={() => setTab('logs')}>
-          Login Logs
-        </button>
+        {user?.role !== 'coordinator' && (
+          <>
+            <button className={`admin-tab-btn ${tab === 'users' ? 'active' : ''}`} onClick={() => setTab('users')}>
+              Users
+            </button>
+            <button className={`admin-tab-btn ${tab === 'logs' ? 'active' : ''}`} onClick={() => setTab('logs')}>
+              Login Logs
+            </button>
+          </>
+        )}
         <button className={`admin-tab-btn ${tab === 'uploads' ? 'active' : ''}`} onClick={() => setTab('uploads')}>
           Uploads
         </button>
-        <button className={`admin-tab-btn ${tab === 'reviews' ? 'active' : ''}`} onClick={() => setTab('reviews')}>
-          Reviews
-        </button>
-        <button className={`admin-tab-btn ${tab === 'activities' ? 'active' : ''}`} onClick={() => setTab('activities')}>
-          Activities
-        </button>
-        <button className={`admin-tab-btn ${tab === 'security' ? 'active' : ''}`} onClick={() => setTab('security')}>
-          Security
-        </button>
-        <button className={`admin-tab-btn ${tab === 'mailHistory' ? 'active' : ''}`} onClick={() => setTab('mailHistory')}>
-          Mail History
-        </button>
-        <button className={`admin-tab-btn ${tab === 'subjects' ? 'active' : ''}`} onClick={() => setTab('subjects')}>
-          Subjects
-        </button>
+        {user?.role !== 'coordinator' && (
+          <>
+            <button className={`admin-tab-btn ${tab === 'reviews' ? 'active' : ''}`} onClick={() => setTab('reviews')}>
+              Reviews
+            </button>
+            <button className={`admin-tab-btn ${tab === 'activities' ? 'active' : ''}`} onClick={() => setTab('activities')}>
+              Activities
+            </button>
+            <button className={`admin-tab-btn ${tab === 'security' ? 'active' : ''}`} onClick={() => setTab('security')}>
+              Security
+            </button>
+            <button className={`admin-tab-btn ${tab === 'mailHistory' ? 'active' : ''}`} onClick={() => setTab('mailHistory')}>
+              Mail History
+            </button>
+            <button className={`admin-tab-btn ${tab === 'subjects' ? 'active' : ''}`} onClick={() => setTab('subjects')}>
+              Subjects
+            </button>
+          </>
+        )}
       </div>
 
       {tab === 'subjects' && (
@@ -628,7 +663,7 @@ export default function AdminPanel() {
                   <td>{u.name}</td>
                   <td>{u.email}</td>
                   <td>
-                    {u.role === 'admin' ? <span className="badge" style={{backgroundColor: '#4f46e5', color: 'white'}}>Admin</span> : 'User'}
+                    {u.role === 'admin' ? <span className="badge" style={{backgroundColor: '#4f46e5', color: 'white'}}>Admin</span> : u.role === 'coordinator' ? <span className="badge" style={{backgroundColor: '#f59e0b', color: 'white'}}>Coordinator</span> : 'User'}
                   </td>
                   <td>{u.provider}</td>
                   <td>{u.emailVerified ? 'Yes' : 'No'}</td>
@@ -637,24 +672,53 @@ export default function AdminPanel() {
                   <td>{formatDate(u.lastActiveAt)}</td>
                   <td>{formatDate(u.createdAt)}</td>
                   <td style={{ display: 'flex', gap: '0.5rem' }}>
-                    <button
-                      type="button"
-                      className="admin-action-btn"
-                      style={{ padding: '4px 8px', fontSize: '0.8rem', backgroundColor: '#e2e8f0', color: '#1e293b', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
-                      onClick={() => handleToggleRole(u)}
-                      disabled={actionLoading === `role-${u._id}`}
-                    >
-                      {actionLoading === `role-${u._id}` ? '...' : (u.role === 'admin' ? 'Remove Admin' : 'Make Admin')}
-                    </button>
-                    <button
-                      type="button"
-                      className="delete-note-btn"
-                      style={{ padding: '4px 8px', fontSize: '0.8rem' }}
-                      onClick={() => handleDeleteUser(u)}
-                      disabled={actionLoading === `delete-${u._id}`}
-                    >
-                      {actionLoading === `delete-${u._id}` ? '...' : 'Delete'}
-                    </button>
+                    {editingUserRole === u._id ? (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', background: '#0b0d10', padding: '0.5rem', borderRadius: '4px', border: '1px solid #334155' }}>
+                        <select 
+                          value={editRoleForm.role} 
+                          onChange={(e) => setEditRoleForm({ ...editRoleForm, role: e.target.value })}
+                          style={{ padding: '4px', borderRadius: '4px', border: '1px solid #cbd5e1' }}
+                        >
+                          <option value="user">User</option>
+                          <option value="coordinator">Coordinator</option>
+                          <option value="admin">Admin</option>
+                        </select>
+                        {editRoleForm.role === 'coordinator' && (
+                          <div style={{ display: 'flex', gap: '0.25rem', flexWrap: 'wrap' }}>
+                            {BRANCHES.map(b => (
+                              <label key={b} style={{ fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.2rem' }}>
+                                <input type="checkbox" checked={editRoleForm.assignedBranches.includes(b)} onChange={() => toggleBranch(b)} /> {b.toUpperCase()}
+                              </label>
+                            ))}
+                          </div>
+                        )}
+                        <div style={{ display: 'flex', gap: '0.5rem' }}>
+                          <button type="button" onClick={() => handleSaveRole(u)} className="upload-submit-btn" style={{ padding: '2px 8px', fontSize: '0.75rem', margin: 0, width: 'auto' }} disabled={actionLoading === `role-${u._id}`}>Save</button>
+                          <button type="button" onClick={() => setEditingUserRole(null)} className="upload-reset-btn" style={{ padding: '2px 8px', fontSize: '0.75rem', margin: 0 }}>Cancel</button>
+                        </div>
+                      </div>
+                    ) : (
+                      <>
+                        <button
+                          type="button"
+                          className="admin-action-btn"
+                          style={{ padding: '4px 8px', fontSize: '0.8rem', backgroundColor: '#e2e8f0', color: '#1e293b', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+                          onClick={() => startEditRole(u)}
+                          disabled={actionLoading === `role-${u._id}`}
+                        >
+                          Manage Role
+                        </button>
+                        <button
+                          type="button"
+                          className="delete-note-btn"
+                          style={{ padding: '4px 8px', fontSize: '0.8rem' }}
+                          onClick={() => handleDeleteUser(u)}
+                          disabled={actionLoading === `delete-${u._id}`}
+                        >
+                          {actionLoading === `delete-${u._id}` ? '...' : 'Delete'}
+                        </button>
+                      </>
+                    )}
                   </td>
                 </tr>
               ))}
@@ -807,7 +871,7 @@ export default function AdminPanel() {
                           onChange={(e) => updateFileEntry(entry.id, 'branch', e.target.value)}
                           disabled={uploading}
                         >
-                          {(entry.year === 1 ? BRANCHES_Y1 : BRANCHES_Y2).map((b) => (
+                          {(user?.role === 'coordinator' ? (user?.assignedBranches || []) : (entry.year === 1 ? BRANCHES_Y1 : BRANCHES_Y2)).map((b) => (
                             <option key={b} value={b}>{b.toUpperCase()}</option>
                           ))}
                         </select>
@@ -1028,8 +1092,9 @@ export default function AdminPanel() {
             <thead>
               <tr>
                 <th>Admin Name</th>
-                <th>Email</th>
+                <th>Role</th>
                 <th>Action</th>
+                <th>Target</th>
                 <th>Details</th>
                 <th>Time</th>
               </tr>
@@ -1038,17 +1103,22 @@ export default function AdminPanel() {
               {activities.map((act) => (
                 <tr key={act._id}>
                   <td>{act.adminName}</td>
-                  <td>{act.adminEmail}</td>
+                  <td>{act.role || 'admin'}</td>
                   <td><span className="badge" style={{backgroundColor: '#334155', padding: '4px 8px', borderRadius: '4px', fontSize: '0.85em', color: 'white'}}>{act.action}</span></td>
-                  <td>{act.details}</td>
+                  <td>
+                    {act.branch && <span className="badge" style={{backgroundColor: '#1d4ed8', marginRight: '4px'}}>{act.branch}</span>}
+                    {act.subject && <span style={{fontSize: '0.8rem', color: '#94a3b8', display: 'block'}}>{act.subject}</span>}
+                    {act.fileName && <span style={{fontSize: '0.8rem', color: '#94a3b8', display: 'block'}}>{act.fileName}</span>}
+                  </td>
+                  <td style={{ maxWidth: '300px', whiteSpace: 'normal', wordBreak: 'break-word', lineHeight: '1.4' }}>{act.details}</td>
                   <td>{formatDate(act.createdAt)}</td>
                 </tr>
               ))}
               {!activitiesLoading && activities.length === 0 && (
-                <tr><td colSpan={5} className="admin-empty">No admin activities found</td></tr>
+                <tr><td colSpan={6} className="admin-empty">No admin activities found</td></tr>
               )}
               {activitiesLoading && (
-                <tr><td colSpan={5} className="admin-empty">Loading activities...</td></tr>
+                <tr><td colSpan={6} className="admin-empty">Loading activities...</td></tr>
               )}
             </tbody>
           </table>
