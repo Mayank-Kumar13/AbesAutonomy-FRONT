@@ -412,33 +412,24 @@ export default function AdminPanel() {
   };
 
   const [editingUserRole, setEditingUserRole] = useState(null);
-  const [editRoleForm, setEditRoleForm] = useState({ role: '', assignedBranches: [] });
+  const [editRoleForm, setEditRoleForm] = useState({ role: '' });
 
   const startEditRole = (u) => {
     setEditingUserRole(u._id);
-    setEditRoleForm({ role: u.role, assignedBranches: u.assignedBranches || [] });
+    setEditRoleForm({ role: u.role });
   };
 
   const handleSaveRole = async (u) => {
     setActionLoading(`role-${u._id}`);
     try {
-      const res = await authApi.updateAdminUserRole(u._id, editRoleForm.role, editRoleForm.assignedBranches);
-      setUsers((prev) => prev.map((usr) => (usr._id === u._id ? { ...usr, role: res.data.role, assignedBranches: res.data.assignedBranches } : usr)));
+      const res = await authApi.updateAdminUserRole(u._id, editRoleForm.role);
+      setUsers((prev) => prev.map((usr) => (usr._id === u._id ? { ...usr, role: res.data.role } : usr)));
       setEditingUserRole(null);
     } catch (err) {
       alert(`Error updating role: ${err.message}`);
     } finally {
       setActionLoading(null);
     }
-  };
-
-  const toggleBranch = (b) => {
-    setEditRoleForm(prev => ({
-      ...prev,
-      assignedBranches: prev.assignedBranches.includes(b)
-        ? prev.assignedBranches.filter(branch => branch !== b)
-        : [...prev.assignedBranches, b]
-    }));
   };
 
   const handleClearLogs = async () => {
@@ -684,15 +675,6 @@ export default function AdminPanel() {
                           <option value="coordinator">Coordinator</option>
                           <option value="admin">Admin</option>
                         </select>
-                        {editRoleForm.role === 'coordinator' && (
-                          <div style={{ display: 'flex', gap: '0.25rem', flexWrap: 'wrap' }}>
-                            {BRANCHES.map(b => (
-                              <label key={b} style={{ fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.2rem' }}>
-                                <input type="checkbox" checked={editRoleForm.assignedBranches.includes(b)} onChange={() => toggleBranch(b)} /> {b.toUpperCase()}
-                              </label>
-                            ))}
-                          </div>
-                        )}
                         <div style={{ display: 'flex', gap: '0.5rem' }}>
                           <button type="button" onClick={() => handleSaveRole(u)} className="upload-submit-btn" style={{ padding: '2px 8px', fontSize: '0.75rem', margin: 0, width: 'auto' }} disabled={actionLoading === `role-${u._id}`}>Save</button>
                           <button type="button" onClick={() => setEditingUserRole(null)} className="upload-reset-btn" style={{ padding: '2px 8px', fontSize: '0.75rem', margin: 0 }}>Cancel</button>
@@ -872,7 +854,7 @@ export default function AdminPanel() {
                           onChange={(e) => updateFileEntry(entry.id, 'branch', e.target.value)}
                           disabled={uploading}
                         >
-                          {(user?.role === 'coordinator' ? (user?.assignedBranches || []) : (entry.year === 1 ? BRANCHES_Y1 : BRANCHES_Y2)).map((b) => (
+                          {(entry.year === 1 ? BRANCHES_Y1 : BRANCHES_Y2).map((b) => (
                             <option key={b} value={b}>{b.toUpperCase()}</option>
                           ))}
                         </select>

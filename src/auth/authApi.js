@@ -103,7 +103,7 @@ export const authApi = {
   getAdminStats: () => request("/admin/stats"),
   getAdminUsers: () => request("/admin/users"),
   deleteAdminUser: (id) => request(`/admin/users/${id}`, { method: "DELETE" }),
-  updateAdminUserRole: (id, role, assignedBranches) => request(`/admin/users/${id}/role`, { method: "PATCH", body: JSON.stringify({ role, assignedBranches }) }),
+  updateAdminUserRole: (id, role) => request(`/admin/users/${id}/role`, { method: "PATCH", body: JSON.stringify({ role }) }),
   getAdminLogs: () => request("/admin/logs"),
   clearAdminLogs: () => request("/admin/logs", { method: "DELETE" }),
   getAdminReviews: (page = 1, limit = 50) => request(`/admin/reviews?page=${page}&limit=${limit}`),
