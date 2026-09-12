@@ -34,10 +34,10 @@ export default function PdfPreview() {
       return;
     }
 
-    // Set timer for 30 minutes (1800000 ms)
+    // Set timer for 5 minutes (300000 ms)
     const timer = setTimeout(() => {
       setShowReviewPrompt(true);
-    }, 1800000);
+    }, 300000);
 
     return () => clearTimeout(timer);
   }, [user]);
