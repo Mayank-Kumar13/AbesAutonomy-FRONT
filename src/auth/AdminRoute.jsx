@@ -8,7 +8,7 @@ export default function AdminRoute({ children }) {
     return <div style={{ padding: "2rem", textAlign: "center" }}>Loading...</div>;
   }
 
-  if (!user || user.role !== "admin") {
+  if (!user || (user.role !== "admin" && user.role !== "coordinator")) {
     return <Navigate to="/" replace />;
   }
 

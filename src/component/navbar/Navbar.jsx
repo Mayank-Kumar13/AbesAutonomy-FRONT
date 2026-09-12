@@ -238,6 +238,15 @@ const Navbar = () => {
                 >
                   My Profile
                 </Link>
+                {(user?.role === 'admin' || user?.role === 'coordinator') && (
+                  <Link
+                    to="/admin"
+                    onClick={() => setMenuOpen(false)}
+                    style={{ display: "block", padding: "10px 14px", textDecoration: "none", color: "#C5AC86", fontSize: "14px", fontFamily: "inherit", borderTop: "1px solid rgba(197, 172, 134, 0.2)" }}
+                  >
+                    Admin Panel
+                  </Link>
+                )}
                 <div
                   onClick={handleLogout}
                   style={{ padding: "10px 14px", cursor: "pointer", color: "#C5AC86", fontSize: "14px", fontFamily: "inherit" }}
