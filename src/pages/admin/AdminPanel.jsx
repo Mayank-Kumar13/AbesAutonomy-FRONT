@@ -33,6 +33,30 @@ const formatDate = (d) => {
   return new Date(d).toLocaleString();
 };
 
+const LiveTimer = ({ updatedAt, durationMs }) => {
+  const [timeLeft, setTimeLeft] = useState(durationMs - (Date.now() - new Date(updatedAt).getTime()));
+
+  useEffect(() => {
+    if (timeLeft <= 0) return;
+    const interval = setInterval(() => {
+      const remaining = durationMs - (Date.now() - new Date(updatedAt).getTime());
+      setTimeLeft(remaining);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [updatedAt, durationMs, timeLeft]);
+
+  if (timeLeft <= 0) {
+    return <span style={{ color: '#4ade80' }}>Reset / Lifted</span>;
+  }
+
+  const h = Math.floor(timeLeft / 3600000);
+  const m = Math.floor((timeLeft % 3600000) / 60000);
+  const s = Math.floor((timeLeft % 60000) / 1000);
+
+  if (h > 0) return <span style={{ color: '#fca5a5', fontVariantNumeric: 'tabular-nums' }}>{h}h {m}m {s}s</span>;
+  return <span style={{ color: '#fca5a5', fontVariantNumeric: 'tabular-nums' }}>{m}m {s}s</span>;
+};
+
 export default function AdminPanel() {
   const [stats, setStats] = useState(null);
   const [users, setUsers] = useState([]);
@@ -923,34 +947,47 @@ export default function AdminPanel() {
             </button>
           </div>
           <p style={{ padding: '0 1rem', color: '#a0aec0', fontSize: '0.9rem', marginBottom: '1rem' }}>
-            These IP addresses have exceeded the strict rate limit of 5 requests per 15 minutes on sensitive authentication routes.
+            These IP addresses have exceeded the rate limits on sensitive authentication or forgot password routes.
           </p>
           {securityError && <p className="admin-error">{securityError}</p>}
           <table className="admin-table">
             <thead>
               <tr>
+                <th>Device Name (User Agent)</th>
                 <th>IP Address</th>
                 <th>Endpoint Targeted</th>
                 <th>Method</th>
-                <th>Attempts Blocked</th>
-                <th>Last Blocked</th>
+                <th>Attempts</th>
+                <th>Time Left (Live)</th>
               </tr>
             </thead>
             <tbody>
-              {suspiciousIPs.map((ipRec) => (
-                <tr key={ipRec._id}>
-                  <td style={{ fontFamily: 'monospace', color: '#fca5a5' }}>{ipRec.ip}</td>
-                  <td>{ipRec.endpoint}</td>
-                  <td><span className="badge" style={{backgroundColor: '#334155'}}>{ipRec.method}</span></td>
-                  <td style={{ fontWeight: 'bold' }}>{ipRec.attemptCount}</td>
-                  <td>{formatDate(ipRec.updatedAt)}</td>
-                </tr>
-              ))}
+              {suspiciousIPs.map((ipRec) => {
+                let durationMs = 15 * 60 * 1000;
+                if (ipRec.endpoint && ipRec.endpoint.includes('/forgot-password')) {
+                  durationMs = 24 * 60 * 60 * 1000;
+                }
+                
+                return (
+                  <tr key={ipRec._id}>
+                    <td style={{ maxWidth: '250px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', color: '#94a3b8' }} title={ipRec.userAgent || 'Unknown'}>
+                      {ipRec.userAgent || 'Unknown'}
+                    </td>
+                    <td style={{ fontFamily: 'monospace', color: '#fca5a5' }}>{ipRec.ip}</td>
+                    <td>{ipRec.endpoint}</td>
+                    <td><span className="badge" style={{backgroundColor: '#334155'}}>{ipRec.method}</span></td>
+                    <td style={{ fontWeight: 'bold' }}>{ipRec.attemptCount}</td>
+                    <td>
+                      <LiveTimer updatedAt={ipRec.updatedAt} durationMs={durationMs} />
+                    </td>
+                  </tr>
+                );
+              })}
               {!securityLoading && suspiciousIPs.length === 0 && (
-                <tr><td colSpan={5} className="admin-empty" style={{ color: '#4ade80' }}>No suspicious IPs detected recently.</td></tr>
+                <tr><td colSpan={6} className="admin-empty" style={{ color: '#4ade80' }}>No suspicious IPs detected recently.</td></tr>
               )}
               {securityLoading && (
-                <tr><td colSpan={5} className="admin-empty">Loading security data...</td></tr>
+                <tr><td colSpan={6} className="admin-empty">Loading security data...</td></tr>
               )}
             </tbody>
           </table>
