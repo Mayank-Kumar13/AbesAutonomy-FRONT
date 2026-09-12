@@ -45,12 +45,19 @@ const HANDWRITTEN_CREDIT = {
 
 const ChooseSubject = () => {
   const location = useLocation();
-  const { year: initialYear = 1, resourceType = 'theory', resourceTitle = 'THEORY NOTES' } = location.state || {};
+  const { year: initialYear, resourceType = 'theory', resourceTitle = 'THEORY NOTES' } = location.state || {};
 
-  const [activeGroup, setActiveGroup] = useState('electrical');
-  const [selectedYear, setSelectedYear] = useState(initialYear);
+  const [activeGroup, setActiveGroup] = useState(() => sessionStorage.getItem('abes_activeGroup') || 'electrical');
+  const [selectedYear, setSelectedYear] = useState(() => initialYear || Number(sessionStorage.getItem('abes_selectedYear')) || 1);
   const [subjects, setSubjects] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const isHandwritten = resourceType === 'handwritten';
+
+  useEffect(() => {
+    sessionStorage.setItem('abes_selectedYear', selectedYear);
+    sessionStorage.setItem('abes_activeGroup', activeGroup);
+  }, [selectedYear, activeGroup]);
 
   const isHandwritten = resourceType === 'handwritten';
 
