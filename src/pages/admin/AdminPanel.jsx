@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { authApi } from '../../auth/authApi';
 import { useAuth } from '../../auth/AuthContext';
-import { uploadApi, notesApi, metaApi } from '../../services/api';
+import { uploadApi, notesApi, metaApi, subjectsApi } from '../../services/api';
 import './AdminPanel.css';
 import SubjectManagement from './SubjectManagement';
 
@@ -13,6 +13,7 @@ const makeFileEntry = (file) => ({
   id: `${Date.now()}-${fileEntryIdCounter++}`,
   file,
   title: file.name.replace(/\.pdf$/i, ''),
+  year: 1,
   subject: '',
   branch: 'common',
   resourceType: 'theory',
@@ -218,8 +219,8 @@ export default function AdminPanel() {
   const loadSubjects = useCallback(async () => {
     setSubjectsLoading(true);
     try {
-      const res = await metaApi.getSubjects();
-      setSubjects(res.data || res || []);
+      const res = await subjectsApi.getAllSubjects();
+      setSubjects(res.data || []);
       setSubjectsError('');
     } catch (err) {
       setSubjectsError(err.message || 'Failed to load subjects.');
@@ -314,6 +315,7 @@ export default function AdminPanel() {
           subject: entry.subject.trim(),
           branch: entry.branch,
           resourceType: entry.resourceType,
+          year: entry.year,
         };
         await uploadApi.uploadPdf(entry.file, metadata);
         succeeded += 1;
@@ -751,6 +753,25 @@ export default function AdminPanel() {
                       </div>
 
                       <div className="upload-field">
+                        <label>Year *</label>
+                        <select
+                          value={entry.year}
+                          onChange={(e) => {
+                            const newYear = Number(e.target.value);
+                            updateFileEntry(entry.id, 'year', newYear);
+                            updateFileEntry(entry.id, 'subject', '');
+                            if (newYear === 2) {
+                              updateFileEntry(entry.id, 'branch', 'common');
+                            }
+                          }}
+                          disabled={uploading}
+                        >
+                          <option value={1}>Year 1</option>
+                          <option value={2}>Year 2</option>
+                        </select>
+                      </div>
+
+                      <div className="upload-field">
                         <label>Subject *</label>
                         {subjectsLoading ? (
                           <select disabled value="">
@@ -765,23 +786,23 @@ export default function AdminPanel() {
                             disabled={uploading}
                           >
                             <option value="" disabled>Select Subject ▼</option>
-                            {Array.from(new Set([
-                              'DSA', 'MATHS', 'PHYSICS', 'EVS', 'AI', 
-                              'ELECTRICAL', 'SOFT SKILL', 'DT', 'MECHANICS', 'ELECTRONICS',
-                              ...subjects.map(s => s.subject || s._id || s.name)
-                            ])).filter(Boolean).map((s) => (
-                              <option key={s} value={s}>{s}</option>
-                            ))}
+                            {subjects
+                              .filter((s) => s.year === entry.year)
+                              .map((s) => (
+                                <option key={s._id || s.name} value={s.name}>
+                                  {s.name}
+                                </option>
+                              ))}
                           </select>
                         )}
                       </div>
 
                       <div className="upload-field">
-                        <label>Branch</label>
+                        <label>Group</label>
                         <select
                           value={entry.branch}
                           onChange={(e) => updateFileEntry(entry.id, 'branch', e.target.value)}
-                          disabled={uploading}
+                          disabled={uploading || entry.year === 2}
                         >
                           {BRANCHES.map((b) => (
                             <option key={b} value={b}>{b}</option>
