@@ -10,11 +10,11 @@ import {
   Monitor, 
   Code, 
   ArrowRight,
-  Atom,     // For Physics
-  Zap,      // For Electrical
-  Cpu,      // For Electronics
-  Leaf,     // For EVS
-  BookOpen, // Fallback icon
+  Atom,     
+  Zap,      
+  Cpu,      
+  Leaf,     
+  BookOpen, 
 } from 'lucide-react';
 import { subjectsApi } from '../../services/api';
 
@@ -146,7 +146,6 @@ const ChooseSubject = () => {
                   <button className={`sem-btn ${activeGroup === 'ds' ? 'active' : ''}`} onClick={() => setActiveGroup('ds')}>DS</button>
                   <button className={`sem-btn ${activeGroup === 'aiml' ? 'active' : ''}`} onClick={() => setActiveGroup('aiml')}>AIML</button>
                   <button className={`sem-btn ${activeGroup === 'ece' ? 'active' : ''}`} onClick={() => setActiveGroup('ece')}>ECE</button>
-                  <button className={`sem-btn ${activeGroup === 'common' ? 'active' : ''}`} onClick={() => setActiveGroup('common')}>Common</button>
                 </div>
               </div>
             )}
