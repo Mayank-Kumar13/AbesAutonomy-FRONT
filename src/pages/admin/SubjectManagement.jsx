@@ -41,9 +41,20 @@ const SubjectManagement = () => {
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
+    
+    if (name === 'year') {
+      const yearVal = Number(value);
+      setFormData({
+        ...formData,
+        year: yearVal,
+        group: yearVal === 1 ? 'common' : 'cse'
+      });
+      return;
+    }
+
     setFormData({
       ...formData,
-      [name]: type === 'checkbox' ? checked : (name === 'year' || name === 'displayOrder' ? Number(value) : value)
+      [name]: type === 'checkbox' ? checked : (name === 'displayOrder' ? Number(value) : value)
     });
   };
 
@@ -221,13 +232,22 @@ const SubjectManagement = () => {
                 </div>
 
                 <div className="form-group">
-                  <label>Group*</label>
+                  <label>Group / Branch*</label>
                   <select name="group" value={formData.group} onChange={handleInputChange} required>
-                    <option value="common">Common</option>
-                    <option value="electrical">Electrical</option>
-                    <option value="electronics">Electronics</option>
-                    <option value="cs">Computer Science</option>
-                    <option value="it">Information Technology</option>
+                    {formData.year === 1 ? (
+                      <>
+                        <option value="common">Common</option>
+                        <option value="electrical">Electrical</option>
+                        <option value="electronics">Electronics</option>
+                      </>
+                    ) : (
+                      <>
+                        <option value="cse">CSE</option>
+                        <option value="ds">DS</option>
+                        <option value="aiml">AIML</option>
+                        <option value="ece">ECE</option>
+                      </>
+                    )}
                   </select>
                 </div>
               </div>

@@ -64,7 +64,7 @@ const ChooseSubject = () => {
     const controller = new AbortController();
     
     setLoading(true);
-    subjectsApi.getSubjects({ year: selectedYear, group: selectedYear === 1 ? activeGroup : undefined }, { signal: controller.signal })
+    subjectsApi.getSubjects({ year: selectedYear, group: activeGroup }, { signal: controller.signal })
       .then(res => {
         if (isMounted) {
           setSubjects(res.data || []);
@@ -113,18 +113,31 @@ const ChooseSubject = () => {
             <div className="semester-container">
               <span className="semester-label">YEAR</span>
               <div className="semester-buttons">
-                <button className={`sem-btn ${selectedYear === 1 ? 'active' : ''}`} onClick={() => setSelectedYear(1)}>YEAR 1</button>
-                <button className={`sem-btn ${selectedYear === 2 ? 'active' : ''}`} onClick={() => setSelectedYear(2)}>YEAR 2</button>
+                <button className={`sem-btn ${selectedYear === 1 ? 'active' : ''}`} onClick={() => { setSelectedYear(1); setActiveGroup('electrical'); }}>YEAR 1</button>
+                <button className={`sem-btn ${selectedYear === 2 ? 'active' : ''}`} onClick={() => { setSelectedYear(2); setActiveGroup('cse'); }}>YEAR 2</button>
               </div>
             </div>
 
-            {/* Group Selector - Only show for Year 1 or if you explicitly want it for other years */}
+            {/* Group Selector - Year 1 */}
             {selectedYear === 1 && (
               <div className="semester-container">
                 <span className="semester-label">GROUP</span>
                 <div className="semester-buttons">
                   <button className={`sem-btn ${activeGroup === 'electrical' ? 'active' : ''}`} onClick={() => setActiveGroup('electrical')}>Electrical</button>
                   <button className={`sem-btn ${activeGroup === 'electronics' ? 'active' : ''}`} onClick={() => setActiveGroup('electronics')}>Electronics</button>
+                </div>
+              </div>
+            )}
+
+            {/* Group Selector - Year 2 */}
+            {selectedYear === 2 && (
+              <div className="semester-container">
+                <span className="semester-label">BRANCH</span>
+                <div className="semester-buttons">
+                  <button className={`sem-btn ${activeGroup === 'cse' ? 'active' : ''}`} onClick={() => setActiveGroup('cse')}>CSE</button>
+                  <button className={`sem-btn ${activeGroup === 'ds' ? 'active' : ''}`} onClick={() => setActiveGroup('ds')}>DS</button>
+                  <button className={`sem-btn ${activeGroup === 'aiml' ? 'active' : ''}`} onClick={() => setActiveGroup('aiml')}>AIML</button>
+                  <button className={`sem-btn ${activeGroup === 'ece' ? 'active' : ''}`} onClick={() => setActiveGroup('ece')}>ECE</button>
                 </div>
               </div>
             )}

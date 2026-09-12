@@ -5,7 +5,8 @@ import { uploadApi, notesApi, metaApi, subjectsApi } from '../../services/api';
 import './AdminPanel.css';
 import SubjectManagement from './SubjectManagement';
 
-const BRANCHES = ['electrical', 'electronics', 'common'];
+const BRANCHES_Y1 = ['electrical', 'electronics', 'common'];
+const BRANCHES_Y2 = ['cse', 'ds', 'aiml', 'ece'];
 const RESOURCE_TYPES = ['theory', 'assignment', 'lab_manual', 'pyq', 'handwritten', 'syllabus'];
 
 let fileEntryIdCounter = 0;
@@ -761,6 +762,8 @@ export default function AdminPanel() {
                             updateFileEntry(entry.id, 'year', newYear);
                             updateFileEntry(entry.id, 'subject', '');
                             if (newYear === 2) {
+                              updateFileEntry(entry.id, 'branch', 'cse');
+                            } else {
                               updateFileEntry(entry.id, 'branch', 'common');
                             }
                           }}
@@ -798,14 +801,14 @@ export default function AdminPanel() {
                       </div>
 
                       <div className="upload-field">
-                        <label>Group</label>
+                        <label>Group / Branch</label>
                         <select
                           value={entry.branch}
                           onChange={(e) => updateFileEntry(entry.id, 'branch', e.target.value)}
-                          disabled={uploading || entry.year === 2}
+                          disabled={uploading}
                         >
-                          {BRANCHES.map((b) => (
-                            <option key={b} value={b}>{b}</option>
+                          {(entry.year === 1 ? BRANCHES_Y1 : BRANCHES_Y2).map((b) => (
+                            <option key={b} value={b}>{b.toUpperCase()}</option>
                           ))}
                         </select>
                       </div>
