@@ -109,16 +109,30 @@ export default function AdminPanel() {
   const [securityError, setSecurityError] = useState('');
   const securityLoadedRef = useRef(false);
 
+  // ─── Mail History state ────────────────────────────
+  const [emailLogs, setEmailLogs] = useState([]);
+  const [emailLogsLoading, setEmailLogsLoading] = useState(false);
+  const [emailLogsError, setEmailLogsError] = useState('');
+  const [emailQuota, setEmailQuota] = useState(null);
+  
+  const [mailSearch, setMailSearch] = useState('');
+  const [mailStatusFilter, setMailStatusFilter] = useState('');
+  const [mailTemplateFilter, setMailTemplateFilter] = useState('');
+  const [mailPage, setMailPage] = useState(1);
+  const [mailTotalPages, setMailTotalPages] = useState(1);
+
   const loadAll = useCallback(async () => {
     try {
-      const [statsRes, usersRes, logsRes] = await Promise.all([
+      const [statsRes, usersRes, logsRes, quotaRes] = await Promise.all([
         authApi.getAdminStats(),
         authApi.getAdminUsers(),
         authApi.getAdminLogs(),
+        authApi.getAdminEmailQuota()
       ]);
       setStats(statsRes.data);
       setUsers(usersRes.data);
       setLogs(logsRes.data);
+      setEmailQuota(quotaRes.data || quotaRes);
       setError('');
     } catch (err) {
       setError(err.message);
@@ -179,6 +193,21 @@ export default function AdminPanel() {
     }
   }, []);
 
+  const loadEmailLogs = useCallback(async (page = 1) => {
+    setEmailLogsLoading(true);
+    try {
+      const res = await authApi.getAdminEmailLogs(page, 20, mailSearch, mailStatusFilter, mailTemplateFilter);
+      setEmailLogs(res.data || []);
+      setMailPage(res.page || 1);
+      setMailTotalPages(res.totalPages || 1);
+      setEmailLogsError('');
+    } catch (err) {
+      setEmailLogsError(err.message);
+    } finally {
+      setEmailLogsLoading(false);
+    }
+  }, [mailSearch, mailStatusFilter, mailTemplateFilter]);
+
   useEffect(() => {
     loadAll();
     const interval = setInterval(loadAll, 60000);
@@ -216,7 +245,10 @@ export default function AdminPanel() {
       securityLoadedRef.current = true;
       loadSuspiciousIPs();
     }
-  }, [tab, loadNotes, loadReviews, loadActivities, loadSuspiciousIPs]);
+    if (tab === 'mailHistory') {
+      loadEmailLogs(mailPage);
+    }
+  }, [tab, loadNotes, loadReviews, loadActivities, loadSuspiciousIPs, loadEmailLogs, mailPage]);
 
   const handleFilesChange = (e) => {
     const selected = Array.from(e.target.files || []);
@@ -451,6 +483,56 @@ export default function AdminPanel() {
         </div>
       </div>
 
+      {emailQuota && (
+        <div className="quota-dashboard">
+          <div className="quota-header">
+            <h2 className="quota-title">Email Quota</h2>
+            {emailQuota.lastReset && (
+              <span style={{ fontSize: '0.8rem', color: '#a0aec0' }}>
+                Resets in: {Math.floor((new Date(new Date(emailQuota.lastReset).setHours(24,0,0,0)).getTime() - Date.now()) / 3600000)}h {Math.floor(((new Date(new Date(emailQuota.lastReset).setHours(24,0,0,0)).getTime() - Date.now()) % 3600000) / 60000)}m
+              </span>
+            )}
+          </div>
+          
+          <div className="quota-stats">
+            <div className="quota-stat">
+              <span className="quota-stat-label">Daily Limit</span>
+              <span className="quota-stat-val">{emailQuota.dailyLimit}</span>
+            </div>
+            <div className="quota-stat">
+              <span className="quota-stat-label">Used Today</span>
+              <span className="quota-stat-val">{emailQuota.usedToday}</span>
+            </div>
+            <div className="quota-stat">
+              <span className="quota-stat-label">Remaining</span>
+              <span className="quota-stat-val">{Math.max(0, emailQuota.dailyLimit - emailQuota.usedToday)}</span>
+            </div>
+            <div className="quota-stat">
+              <span className="quota-stat-label">Sent</span>
+              <span className="quota-stat-val" style={{ color: '#4ade80' }}>{emailQuota.sent}</span>
+            </div>
+            <div className="quota-stat">
+              <span className="quota-stat-label">Failed</span>
+              <span className="quota-stat-val" style={{ color: '#ef4444' }}>{emailQuota.failed}</span>
+            </div>
+            <div className="quota-stat">
+              <span className="quota-stat-label">Blocked by Quota</span>
+              <span className="quota-stat-val" style={{ color: '#f59e0b' }}>{emailQuota.blocked}</span>
+            </div>
+          </div>
+
+          <div className="quota-progress-wrapper">
+            <div 
+              className={`quota-progress-bar ${emailQuota.usedToday >= emailQuota.dailyLimit * 0.9 ? 'warning' : ''}`} 
+              style={{ width: `${Math.min(100, (emailQuota.usedToday / emailQuota.dailyLimit) * 100)}%` }}
+            ></div>
+            <div className="quota-progress-text">
+              {Math.min(100, Math.round((emailQuota.usedToday / emailQuota.dailyLimit) * 100))}%
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="admin-table-wrap" style={{ padding: '1.5rem', marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
           <h2 style={{ color: '#e2e8f0', margin: '0 0 0.5rem 0' }}>Website Status</h2>
@@ -491,6 +573,9 @@ export default function AdminPanel() {
         </button>
         <button className={`admin-tab-btn ${tab === 'security' ? 'active' : ''}`} onClick={() => setTab('security')}>
           Security
+        </button>
+        <button className={`admin-tab-btn ${tab === 'mailHistory' ? 'active' : ''}`} onClick={() => setTab('mailHistory')}>
+          Mail History
         </button>
       </div>
 
@@ -993,6 +1078,116 @@ export default function AdminPanel() {
           </table>
         </div>
       )}
+
+      {tab === 'mailHistory' && (
+        <div className="admin-table-wrap">
+          <div className="admin-table-header" style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', marginBottom: '1rem', padding: '1rem 1rem 0' }}>
+            <h2 className="upload-form-title" style={{ margin: 0, width: '100%' }}>Mail History</h2>
+            
+            <input
+              type="text"
+              placeholder="Search recipient or subject..."
+              value={mailSearch}
+              onChange={(e) => setMailSearch(e.target.value)}
+              className="admin-search-input"
+              style={{ padding: '0.5rem', borderRadius: '4px', border: '1px solid #cbd5e1', flex: '1', minWidth: '200px' }}
+            />
+            
+            <select 
+              value={mailStatusFilter} 
+              onChange={(e) => setMailStatusFilter(e.target.value)}
+              style={{ padding: '0.5rem', borderRadius: '4px', border: '1px solid #cbd5e1', background: '#0b0d10', color: '#e2e8f0' }}
+            >
+              <option value="">All Statuses</option>
+              <option value="SENT">Sent</option>
+              <option value="FAILED">Failed</option>
+              <option value="QUOTA_EXCEEDED">Quota Exceeded</option>
+              <option value="EXPIRED">Expired</option>
+            </select>
+
+            <select 
+              value={mailTemplateFilter} 
+              onChange={(e) => setMailTemplateFilter(e.target.value)}
+              style={{ padding: '0.5rem', borderRadius: '4px', border: '1px solid #cbd5e1', background: '#0b0d10', color: '#e2e8f0' }}
+            >
+              <option value="">All Templates</option>
+              <option value="OTP">OTP</option>
+              <option value="Password Reset">Password Reset</option>
+              <option value="Login Notification">Login Notification</option>
+              <option value="Review Appreciation">Review Appreciation</option>
+            </select>
+
+            <button 
+              className="upload-submit-btn" 
+              style={{ padding: '0.5rem 1rem' }}
+              onClick={() => { setMailPage(1); loadEmailLogs(1); }}
+            >
+              Search
+            </button>
+          </div>
+
+          {emailLogsError && <p className="admin-error" style={{ padding: '0 1rem' }}>{emailLogsError}</p>}
+          
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th>Date & Time</th>
+                <th>Recipient</th>
+                <th>Template</th>
+                <th>Subject</th>
+                <th>Status</th>
+                <th>Brevo Msg ID</th>
+                <th>Error Reason</th>
+              </tr>
+            </thead>
+            <tbody>
+              {emailLogsLoading ? (
+                <tr><td colSpan={7} className="admin-empty">Loading logs...</td></tr>
+              ) : emailLogs.map((log) => (
+                <tr key={log._id}>
+                  <td>{formatDate(log.createdAt)}</td>
+                  <td>{log.recipient}</td>
+                  <td>{log.template}</td>
+                  <td>{log.subject}</td>
+                  <td>
+                    <span className={`status-badge status-${log.status}`}>{log.status}</span>
+                  </td>
+                  <td>{log.messageId || '—'}</td>
+                  <td style={{ color: '#ef4444' }}>{log.errorReason || '—'}</td>
+                </tr>
+              ))}
+              {!emailLogsLoading && emailLogs.length === 0 && (
+                <tr><td colSpan={7} className="admin-empty">No email logs found</td></tr>
+              )}
+            </tbody>
+          </table>
+
+          {mailTotalPages > 1 && (
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', padding: '1rem' }}>
+              <button 
+                onClick={() => setMailPage(p => Math.max(1, p - 1))}
+                disabled={mailPage === 1}
+                className="upload-reset-btn"
+                style={{ padding: '0.3rem 0.8rem' }}
+              >
+                Previous
+              </button>
+              <span style={{ color: '#a0aec0', display: 'flex', alignItems: 'center' }}>
+                Page {mailPage} of {mailTotalPages}
+              </span>
+              <button 
+                onClick={() => setMailPage(p => Math.min(mailTotalPages, p + 1))}
+                disabled={mailPage === mailTotalPages}
+                className="upload-reset-btn"
+                style={{ padding: '0.3rem 0.8rem' }}
+              >
+                Next
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
     </div>
   );
 }

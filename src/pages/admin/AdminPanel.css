@@ -385,3 +385,115 @@
     width: 100% !important;
   }
 }
+
+/* ---------------- EMAIL QUOTA & MAIL HISTORY ---------------- */
+
+.quota-dashboard {
+  background: #121418;
+  border: 1px solid #2d3748;
+  border-radius: 10px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.quota-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.quota-title {
+  font-family: "Times New Roman", Georgia, serif;
+  font-size: 1.2rem;
+  letter-spacing: 0.02em;
+  color: #e2e8f0;
+  margin: 0;
+}
+
+.quota-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.quota-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.quota-stat-label {
+  font-size: 0.75rem;
+  color: #a0aec0;
+  text-transform: uppercase;
+}
+
+.quota-stat-val {
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: #e2e8f0;
+}
+
+.quota-progress-wrapper {
+  background: #0b0d10;
+  border-radius: 10px;
+  height: 20px;
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+}
+
+.quota-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #4ade80 0%, #3b82f6 100%);
+  transition: width 0.5s ease-out;
+}
+
+.quota-progress-bar.warning {
+  background: linear-gradient(90deg, #f59e0b 0%, #ef4444 100%);
+}
+
+.quota-progress-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 0.75rem;
+  font-weight: bold;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+}
+
+.status-badge {
+  padding: 0.3rem 0.6rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: bold;
+}
+
+.status-SENT {
+  background: rgba(74, 222, 128, 0.2);
+  color: #4ade80;
+}
+
+.status-FAILED {
+  background: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+}
+
+.status-QUOTA_EXCEEDED {
+  background: rgba(245, 158, 11, 0.2);
+  color: #f59e0b;
+}
+
+.status-EXPIRED {
+  background: rgba(107, 114, 128, 0.2);
+  color: #9ca3af;
+}
+
+.status-PENDING {
+  background: rgba(59, 130, 246, 0.2);
+  color: #60a5fa;
+}

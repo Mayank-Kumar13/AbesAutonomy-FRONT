@@ -112,4 +112,12 @@ export const authApi = {
   updateSettings: (websiteStatus) => request('/settings', { method: "PATCH", body: JSON.stringify({ websiteStatus }) }),
   getAdminActivities: (limit = 50) => request(`/admin/activities?limit=${limit}`),
   getAdminSuspiciousIPs: (limit = 50) => request(`/admin/suspicious-ips?limit=${limit}`),
+  getAdminEmailLogs: (page = 1, limit = 50, search = '', status = '', template = '') => {
+    const params = new URLSearchParams({ page, limit });
+    if (search) params.append('search', search);
+    if (status) params.append('status', status);
+    if (template) params.append('template', template);
+    return request(`/admin/email-logs?${params.toString()}`);
+  },
+  getAdminEmailQuota: () => request('/admin/email-quota'),
 };
