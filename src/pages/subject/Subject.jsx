@@ -3,6 +3,7 @@ import "./Subject.css";
 import { useLocation, useNavigate } from "react-router-dom";
 import { FileText, Download } from "lucide-react";
 import { notesApi } from "../../services/api";
+import { useAuth } from "../../auth/AuthContext";
 
 const Subject = () => {
   const location = useLocation();
@@ -19,6 +20,7 @@ const Subject = () => {
   const [notes, setNotes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { refreshTrigger } = useAuth();
 
   useEffect(() => {
     const controller = new AbortController();
@@ -49,7 +51,7 @@ const Subject = () => {
     fetchNotes();
 
     return () => controller.abort();
-  }, [heading, year, resourceType, branch]);
+  }, [heading, year, resourceType, branch, refreshTrigger]);
 
   const handlePreview = (note) => {
     navigate("/pdfpreview", {
