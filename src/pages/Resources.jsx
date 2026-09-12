@@ -191,7 +191,6 @@ const Resources = () => {
         <Link
           to="/ChooseSubject"
           state={{
-            year: selectedYear,
             resourceType: RESOURCE_TYPE_MAP[card.id],
             resourceTitle: card.title,
           }}

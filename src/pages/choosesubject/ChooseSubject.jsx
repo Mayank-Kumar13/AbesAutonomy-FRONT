@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './ChooseSubject.css';
 import Unicard from "../../component/universal_card/Unicard";
 import Credit_Card from "../../component/credit_card/Credit_Card";
-import {Link, useLocation} from 'react-router-dom';
+import {Link, useLocation, useNavigate} from 'react-router-dom';
 import { 
   LineChart, 
   BrainCircuit, 
@@ -45,6 +45,7 @@ const HANDWRITTEN_CREDIT = {
 
 const ChooseSubject = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const { year: initialYear, resourceType = 'theory', resourceTitle = 'THEORY NOTES' } = location.state || {};
 
   const [activeGroup, setActiveGroup] = useState(() => sessionStorage.getItem('abes_activeGroup') || 'electrical');
@@ -57,7 +58,14 @@ const ChooseSubject = () => {
   useEffect(() => {
     sessionStorage.setItem('abes_selectedYear', selectedYear);
     sessionStorage.setItem('abes_activeGroup', activeGroup);
-  }, [selectedYear, activeGroup]);
+    
+    if (location.state && location.state.year) {
+      navigate(location.pathname, {
+        replace: true,
+        state: { ...location.state, year: undefined }
+      });
+    }
+  }, [selectedYear, activeGroup, location.state, location.pathname, navigate]);
 
   useEffect(() => {
     let isMounted = true;
