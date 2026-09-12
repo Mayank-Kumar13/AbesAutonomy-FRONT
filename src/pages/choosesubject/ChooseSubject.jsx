@@ -59,8 +59,7 @@ const ChooseSubject = () => {
     const controller = new AbortController();
     
     setLoading(true);
-    
-    subjectsApi.getSubjects({ year: selectedYear, group: activeGroup }, { signal: controller.signal })
+    subjectsApi.getSubjects({ year: selectedYear, group: selectedYear === 1 ? activeGroup : undefined }, { signal: controller.signal })
       .then(res => {
         if (isMounted) {
           setSubjects(res.data || []);
@@ -104,9 +103,9 @@ const ChooseSubject = () => {
             <p className="page-subtitle">Select a subject to explore all related resources, notes, previous papers and more.</p>
           </div>
           
-          <div className="filter-controls-container" style={{ display: 'flex', flexDirection: 'column', gap: '20px', alignItems: 'center' }}>
+          <div className="filter-controls-container" style={{ position: 'absolute', right: 0, top: 0, display: 'flex', flexDirection: 'column', gap: '15px', alignItems: 'flex-end' }}>
             {/* Year Selector */}
-            <div className="semester-container">
+            <div className="semester-container" style={{ position: 'relative', top: 'auto', right: 'auto' }}>
               <span className="semester-label">YEAR</span>
               <div className="semester-buttons">
                 <button className={`sem-btn ${selectedYear === 1 ? 'active' : ''}`} onClick={() => setSelectedYear(1)}>YEAR 1</button>
@@ -114,14 +113,16 @@ const ChooseSubject = () => {
               </div>
             </div>
 
-            {/* Group Selector */}
-            <div className="semester-container">
-              <span className="semester-label">GROUP</span>
-              <div className="semester-buttons">
-                <button className={`sem-btn ${activeGroup === 'electrical' ? 'active' : ''}`} onClick={() => setActiveGroup('electrical')}>Electrical</button>
-                <button className={`sem-btn ${activeGroup === 'electronics' ? 'active' : ''}`} onClick={() => setActiveGroup('electronics')}>Electronics</button>
+            {/* Group Selector - Only show for Year 1 or if you explicitly want it for other years */}
+            {selectedYear === 1 && (
+              <div className="semester-container" style={{ position: 'relative', top: 'auto', right: 'auto' }}>
+                <span className="semester-label">GROUP</span>
+                <div className="semester-buttons">
+                  <button className={`sem-btn ${activeGroup === 'electrical' ? 'active' : ''}`} onClick={() => setActiveGroup('electrical')}>Electrical</button>
+                  <button className={`sem-btn ${activeGroup === 'electronics' ? 'active' : ''}`} onClick={() => setActiveGroup('electronics')}>Electronics</button>
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
 
