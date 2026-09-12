@@ -8,44 +8,7 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [websiteStatus, setWebsiteStatus] = useState('UNDER_CONSTRUCTION');
-  const [refreshTrigger, setRefreshTrigger] = useState(0);
   const heartbeatRef = useRef(null);
-  const versionRef = useRef(null);
-
-  // Poll for code version changes and data refresh
-  useEffect(() => {
-    // 1. Initial version load
-    fetch('/version.json?t=' + Date.now())
-      .then(res => res.json())
-      .then(data => { versionRef.current = data.version; })
-      .catch(() => {});
-
-    // 2. Window focus listener to refresh data immediately when user returns
-    const onFocus = () => {
-      setRefreshTrigger(prev => prev + 1);
-    };
-    window.addEventListener('focus', onFocus);
-
-    // 3. Background interval (every 30 seconds)
-    const interval = setInterval(() => {
-      setRefreshTrigger(prev => prev + 1);
-      
-      // Check version.json for code updates
-      fetch('/version.json?t=' + Date.now())
-        .then(res => res.json())
-        .then(data => {
-          if (versionRef.current && data.version !== versionRef.current) {
-            window.location.reload(true);
-          }
-        })
-        .catch(() => {});
-    }, 30000);
-
-    return () => {
-      window.removeEventListener('focus', onFocus);
-      clearInterval(interval);
-    };
-  }, []);
 
   const loadProfile = useCallback(async () => {
     const token = localStorage.getItem("token");
@@ -138,7 +101,6 @@ export function AuthProvider({ children }) {
     loading,
     websiteStatus,
     setWebsiteStatus,
-    refreshTrigger,
     isAuthenticated: !!user,
     login,
     register,

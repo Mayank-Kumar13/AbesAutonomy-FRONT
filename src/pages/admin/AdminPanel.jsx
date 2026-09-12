@@ -71,7 +71,7 @@ export default function AdminPanel() {
   const [searchQuery, setSearchQuery] = useState('');
   const [actionLoading, setActionLoading] = useState(null);
   
-  const { websiteStatus, setWebsiteStatus, user, refreshTrigger } = useAuth();
+  const { websiteStatus, setWebsiteStatus, user } = useAuth();
   const [statusLoading, setStatusLoading] = useState(false);
 
   // ─── Uploads tab state ────────────────────────────
@@ -218,17 +218,6 @@ export default function AdminPanel() {
     const interval = setInterval(loadAll, 60000);
     return () => clearInterval(interval);
   }, [loadAll]);
-
-  useEffect(() => {
-    if (refreshTrigger > 0) {
-      loadAll();
-      if (tab === 'uploads') { loadNotes(); loadSubjects(); }
-      if (tab === 'reviews') loadReviews();
-      if (tab === 'activities') loadActivities();
-      if (tab === 'security') loadSuspiciousIPs();
-      if (tab === 'mailHistory') loadEmailLogs(mailPage);
-    }
-  }, [refreshTrigger, tab, loadAll, loadNotes, loadSubjects, loadReviews, loadActivities, loadSuspiciousIPs, loadEmailLogs, mailPage]);
 
   useEffect(() => {
     if (user?.role === 'coordinator' && tab !== 'uploads') {
