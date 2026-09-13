@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { authApi } from '../../auth/authApi';
 import { useAuth } from '../../auth/AuthContext';
-import { uploadApi, notesApi, metaApi, subjectsApi } from '../../services/api';
+import { uploadApi, notesApi, metaApi, subjectsApi, trackingApi } from '../../services/api';
 import './AdminPanel.css';
 import SubjectManagement from './SubjectManagement';
 
@@ -136,14 +136,7 @@ export default function AdminPanel() {
     if (tab === 'liveTracking') {
       const fetchPdfLogs = async () => {
         try {
-          let apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-          if (apiUrl.includes('abes.work') && !apiUrl.endsWith('/api')) {
-            apiUrl = `${apiUrl}/api`;
-          }
-          const res = await fetch(`${apiUrl}/tracking/logs`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-          });
-          const json = await res.json();
+          const json = await trackingApi.getLogs();
           if (json.success) setPdfLogs(json.data);
         } catch (err) {}
       };

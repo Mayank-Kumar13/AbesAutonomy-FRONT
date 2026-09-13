@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
+import { trackingApi } from '../services/api';
 
 const LiveTracker = () => {
   const { user, token } = useAuth();
@@ -10,30 +11,26 @@ const LiveTracker = () => {
     if (!user || !token) return;
 
     let pdfTitle = null;
+    let pdfId = null;
+
     if (location.pathname === '/pdfpreview') {
-      if (location.state && location.state.title) {
+      if (location.state) {
         pdfTitle = location.state.title;
+        pdfId = location.state.url;
       }
+      
+      const searchParams = new URLSearchParams(location.search);
+      if (!pdfTitle) pdfTitle = searchParams.get('title');
+      if (!pdfId) pdfId = searchParams.get('url');
     }
 
     const ping = async () => {
       try {
-        let apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-        if (apiUrl.includes('abes.work') && !apiUrl.endsWith('/api')) {
-          apiUrl = `${apiUrl}/api`;
-        }
-        await fetch(`${apiUrl}/tracking/ping`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify({
-            location: location.pathname + location.search,
-            pdfId: new URLSearchParams(location.search).get('url') || null,
-            pdfTitle: pdfTitle
-          })
-        });
+        await trackingApi.ping(
+          location.pathname + location.search,
+          pdfId || null,
+          pdfTitle || null
+        );
       } catch (err) {}
     };
 

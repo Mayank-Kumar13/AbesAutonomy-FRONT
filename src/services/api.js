@@ -400,3 +400,20 @@ export const reviewApi = {
     });
   },
 };
+
+// ─────────────────────────────────────────────────────
+// Tracking API
+// ─────────────────────────────────────────────────────
+
+export const trackingApi = {
+  async ping(location, pdfId, pdfTitle) {
+    return request('/tracking/ping', {
+      method: 'POST',
+      body: JSON.stringify({ location, pdfId, pdfTitle }),
+    });
+  },
+
+  async getLogs() {
+    return request('/tracking/logs');
+  },
+};
