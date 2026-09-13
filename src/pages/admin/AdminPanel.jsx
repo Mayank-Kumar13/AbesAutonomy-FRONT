@@ -91,6 +91,9 @@ export default function AdminPanel() {
   const [deletingId, setDeletingId] = useState(null);
   const notesLoadedRef = useRef(false);
 
+  const [uploadsSearchQuery, setUploadsSearchQuery] = useState('');
+  const [uploadsBranchFilter, setUploadsBranchFilter] = useState('all');
+  const [uploadsYearFilter, setUploadsYearFilter] = useState('all');
   // ─── Edit Note State ────────────────────────────
   const [editingNoteId, setEditingNoteId] = useState(null);
   const [editingNoteTitle, setEditingNoteTitle] = useState('');
@@ -530,6 +533,31 @@ export default function AdminPanel() {
       // default: recent (descending _id or createdAt)
       return new Date(b.createdAt || b.lastActiveAt || 0) - new Date(a.createdAt || a.lastActiveAt || 0);
     });
+
+  const filteredNotes = notes.filter((n) => {
+    // Branch Filter
+    if (uploadsBranchFilter !== 'all') {
+      const g = n.group || 'common';
+      if (g !== uploadsBranchFilter && g !== 'common') return false;
+    }
+    
+    // Year Filter
+    if (uploadsYearFilter !== 'all') {
+      if (n.year !== Number(uploadsYearFilter)) return false;
+    }
+
+    // Search Query
+    if (uploadsSearchQuery) {
+      const q = uploadsSearchQuery.toLowerCase();
+      if (
+        !(n.title && n.title.toLowerCase().includes(q)) &&
+        !(n.subject && n.subject.toLowerCase().includes(q))
+      ) {
+        return false;
+      }
+    }
+    return true;
+  });
 
   if (loading) {
     return <div className="admin-wrapper"><p className="admin-loading">Loading admin panel...</p></div>;
@@ -1093,11 +1121,38 @@ export default function AdminPanel() {
           </form>
 
           <div className="upload-list-section">
-            <div className="upload-list-header">
-              <h2 className="upload-form-title">Uploaded Notes ({notes.length})</h2>
-              <button type="button" className="upload-reset-btn" onClick={() => { notesLoadedRef.current = true; loadNotes(); }} disabled={notesLoading}>
-                Refresh
-              </button>
+            <div className="admin-toolbar" style={{ marginBottom: '1.5rem' }}>
+              <div className="admin-toolbar-left">
+                <h2 className="upload-form-title" style={{ margin: 0 }}>Uploaded Notes ({filteredNotes.length})</h2>
+                <input
+                  type="text"
+                  placeholder="Search notes by title or subject..."
+                  value={uploadsSearchQuery}
+                  onChange={(e) => setUploadsSearchQuery(e.target.value)}
+                  className="admin-search-input"
+                  style={{ padding: '0.6rem 1rem', borderRadius: '8px', border: '1px solid #2d3748', background: '#0b0d10', color: '#fff', width: '250px' }}
+                />
+              </div>
+              <div className="admin-toolbar-right">
+                <select className="admin-filter-select" value={uploadsYearFilter} onChange={(e) => setUploadsYearFilter(e.target.value)}>
+                  <option value="all">All Years</option>
+                  <option value="1">Year 1</option>
+                  <option value="2">Year 2</option>
+                </select>
+                <select className="admin-filter-select" value={uploadsBranchFilter} onChange={(e) => setUploadsBranchFilter(e.target.value)}>
+                  <option value="all">All Branches</option>
+                  <option value="cse">CSE</option>
+                  <option value="ds">DS</option>
+                  <option value="aiml">AIML</option>
+                  <option value="ece">ECE</option>
+                  <option value="elce">ELCE</option>
+                  <option value="electrical">Electrical</option>
+                  <option value="electronics">Electronics</option>
+                </select>
+                <button type="button" className="upload-reset-btn" onClick={() => { notesLoadedRef.current = true; loadNotes(); }} disabled={notesLoading}>
+                  Refresh
+                </button>
+              </div>
             </div>
 
             {notesError && <p className="admin-error">{notesError}</p>}
@@ -1117,7 +1172,7 @@ export default function AdminPanel() {
                   </tr>
                 </thead>
                 <tbody>
-                  {notes.map((n) => (
+                  {filteredNotes.map((n) => (
                     <tr key={n._id}>
                       <td>
                         {editingNoteId === n._id ? (
