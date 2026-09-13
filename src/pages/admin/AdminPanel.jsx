@@ -72,6 +72,9 @@ export default function AdminPanel() {
   const [error, setError] = useState('');
   const [tab, setTab] = useState('users');
   const [searchQuery, setSearchQuery] = useState('');
+  const [userRoleFilter, setUserRoleFilter] = useState('all'); // 'all', 'admin', 'coordinator', 'user'
+  const [userStatusFilter, setUserStatusFilter] = useState('all'); // 'all', 'live', 'offline'
+  const [userSortBy, setUserSortBy] = useState('recent'); // 'recent', 'watchTime', 'logins'
   const [actionLoading, setActionLoading] = useState(null);
   
   const { websiteStatus, setWebsiteStatus, user, token } = useAuth();
@@ -493,14 +496,40 @@ export default function AdminPanel() {
     }
   };
 
-  const filteredUsers = users.filter((u) => {
-    if (!searchQuery) return true;
-    const lowerQuery = searchQuery.toLowerCase();
-    return (
-      (u.name && u.name.toLowerCase().includes(lowerQuery)) ||
-      (u.email && u.email.toLowerCase().includes(lowerQuery))
-    );
-  });
+  const filteredUsers = users
+    .filter((u) => {
+      // Role Filter
+      if (userRoleFilter !== 'all') {
+        const uRole = u.role || 'user';
+        if (uRole !== userRoleFilter) return false;
+      }
+      
+      // Status Filter
+      if (userStatusFilter === 'live' && !u.isLive) return false;
+      if (userStatusFilter === 'offline' && u.isLive) return false;
+
+      // Search Query
+      if (searchQuery) {
+        const lowerQuery = searchQuery.toLowerCase();
+        if (
+          !(u.name && u.name.toLowerCase().includes(lowerQuery)) &&
+          !(u.email && u.email.toLowerCase().includes(lowerQuery))
+        ) {
+          return false;
+        }
+      }
+      return true;
+    })
+    .sort((a, b) => {
+      if (userSortBy === 'watchTime') {
+        return (b.totalWatchTime || 0) - (a.totalWatchTime || 0);
+      }
+      if (userSortBy === 'logins') {
+        return (b.loginCount || 0) - (a.loginCount || 0);
+      }
+      // default: recent (descending _id or createdAt)
+      return new Date(b.createdAt || b.lastActiveAt || 0) - new Date(a.createdAt || a.lastActiveAt || 0);
+    });
 
   if (loading) {
     return <div className="admin-wrapper"><p className="admin-loading">Loading admin panel...</p></div>;
@@ -701,16 +730,36 @@ export default function AdminPanel() {
 
       {tab === 'users' && (
         <div className="admin-table-wrap">
-          <div className="admin-table-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', padding: '0 1rem' }}>
-            <h2 className="upload-form-title" style={{ margin: 0 }}>Users ({filteredUsers.length})</h2>
-            <input
-              type="text"
-              placeholder="Search by name or email..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="admin-search-input"
-              style={{ padding: '0.5rem 1rem', borderRadius: '4px', border: '1px solid #cbd5e1', width: '300px' }}
-            />
+          <div className="admin-toolbar">
+            <div className="admin-toolbar-left">
+              <h2 className="upload-form-title" style={{ margin: 0 }}>Users ({filteredUsers.length})</h2>
+              <input
+                type="text"
+                placeholder="Search by name or email..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="admin-search-input"
+                style={{ padding: '0.6rem 1rem', borderRadius: '8px', border: '1px solid #2d3748', background: '#0b0d10', color: '#fff', width: '250px' }}
+              />
+            </div>
+            <div className="admin-toolbar-right">
+              <select className="admin-filter-select" value={userRoleFilter} onChange={(e) => setUserRoleFilter(e.target.value)}>
+                <option value="all">All Roles</option>
+                <option value="user">Users</option>
+                <option value="coordinator">Coordinators</option>
+                <option value="admin">Admins</option>
+              </select>
+              <select className="admin-filter-select" value={userStatusFilter} onChange={(e) => setUserStatusFilter(e.target.value)}>
+                <option value="all">All Status</option>
+                <option value="live">Live Now</option>
+                <option value="offline">Offline</option>
+              </select>
+              <select className="admin-filter-select" value={userSortBy} onChange={(e) => setUserSortBy(e.target.value)}>
+                <option value="recent">Sort: Recent</option>
+                <option value="watchTime">Sort: Watch Time</option>
+                <option value="logins">Sort: Logins</option>
+              </select>
+            </div>
           </div>
           <table className="admin-table">
             <thead>
@@ -737,7 +786,7 @@ export default function AdminPanel() {
                   <td>{u.name}</td>
                   <td>{u.email}</td>
                   <td>
-                    {u.role === 'admin' ? <span className="badge" style={{backgroundColor: '#4f46e5', color: 'white'}}>Admin</span> : u.role === 'coordinator' ? <span className="badge" style={{backgroundColor: '#f59e0b', color: 'white'}}>Coordinator</span> : 'User'}
+                    {u.role === 'admin' ? <span className="badge admin-badge">Admin</span> : u.role === 'coordinator' ? <span className="badge coordinator-badge">Coordinator</span> : <span className="badge user-badge">User</span>}
                   </td>
                   <td>{u.provider}</td>
                   <td>{u.emailVerified ? 'Yes' : 'No'}</td>
