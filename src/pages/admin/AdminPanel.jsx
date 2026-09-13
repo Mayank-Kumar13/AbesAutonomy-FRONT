@@ -328,37 +328,16 @@ export default function AdminPanel() {
           throw new Error('No branch selected for ' + entry.file.name);
         }
 
-        let firstNoteCreated = null;
+        const metadata = {
+          title: entry.title.trim(),
+          description: entry.description.trim(),
+          subject: entry.subject.trim(),
+          branch: branchList,
+          resourceType: entry.resourceType,
+          year: entry.year,
+        };
 
-        for (let i = 0; i < branchList.length; i++) {
-          const currentBranch = branchList[i];
-          const metadata = {
-            title: entry.title.trim(),
-            description: entry.description.trim(),
-            subject: entry.subject.trim(),
-            branch: currentBranch,
-            resourceType: entry.resourceType,
-            year: entry.year,
-          };
-
-          if (i === 0) {
-            // First branch - upload the actual PDF
-            const response = await uploadApi.uploadPdf(entry.file, metadata);
-            firstNoteCreated = response.data; 
-          } else {
-            // Subsequent branches - register using the existing ImageKit details
-            if (firstNoteCreated) {
-              const registerData = {
-                ...metadata,
-                pdfUrl: firstNoteCreated.pdfUrl,
-                imagekitFileId: firstNoteCreated.imagekitFileId,
-                imagekitFilePath: firstNoteCreated.imagekitFilePath,
-                thumbnailUrl: firstNoteCreated.thumbnailUrl,
-              };
-              await uploadApi.registerExisting(registerData);
-            }
-          }
-        }
+        await uploadApi.uploadPdf(entry.file, metadata);
         succeeded += 1;
       } catch (err) {
         failed.push({ name: entry.file.name, error: err.message || 'Upload failed.' });
@@ -1068,7 +1047,7 @@ export default function AdminPanel() {
                             ))}
                           </select>
                         ) : (
-                          n.branch
+                          Array.isArray(n.branch) ? n.branch.join(', ') : n.branch
                         )}
                       </td>
                       <td>{n.year}</td>
