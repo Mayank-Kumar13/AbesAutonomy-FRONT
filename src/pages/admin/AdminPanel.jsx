@@ -129,30 +129,30 @@ export default function AdminPanel() {
   const [mailPage, setMailPage] = useState(1);
   const [mailTotalPages, setMailTotalPages] = useState(1);
 
-  // ─── Live Tracking state ────────────────────────────
-  const [liveUsers, setLiveUsers] = useState([]);
+  // ─── PDF Read Logs state ────────────────────────────
+  const [pdfLogs, setPdfLogs] = useState([]);
 
   useEffect(() => {
     if (tab === 'liveTracking') {
-      const fetchLiveUsers = async () => {
+      const fetchPdfLogs = async () => {
         try {
           let apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
           if (apiUrl.includes('abes.work') && !apiUrl.endsWith('/api')) {
             apiUrl = `${apiUrl}/api`;
           }
-          const res = await fetch(`${apiUrl}/tracking/live`, {
+          const res = await fetch(`${apiUrl}/tracking/logs`, {
             headers: { 'Authorization': `Bearer ${token}` }
           });
           const json = await res.json();
-          if (json.success) setLiveUsers(json.data);
+          if (json.success) setPdfLogs(json.data);
         } catch (err) {}
       };
       
-      fetchLiveUsers();
-      const interval = setInterval(fetchLiveUsers, 5000);
+      fetchPdfLogs();
+      const interval = setInterval(fetchPdfLogs, 5000);
       return () => clearInterval(interval);
     } else {
-      setLiveUsers([]);
+      setPdfLogs([]);
     }
   }, [tab, token]);
 
@@ -648,7 +648,7 @@ export default function AdminPanel() {
               Subjects
             </button>
             <button className={`admin-tab-btn ${tab === 'liveTracking' ? 'active' : ''}`} onClick={() => setTab('liveTracking')}>
-              Live Tracking
+              PDF Read Logs
             </button>
           </>
         )}
@@ -661,35 +661,45 @@ export default function AdminPanel() {
       {tab === 'liveTracking' && (
         <div className="admin-table-wrap">
           <div className="admin-table-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', padding: '0 1rem' }}>
-            <h2 className="upload-form-title" style={{ margin: 0 }}>Live User Tracking</h2>
+            <h2 className="upload-form-title" style={{ margin: 0 }}>PDF Read Logs</h2>
           </div>
           <table className="admin-table">
             <thead>
               <tr>
-                <th>Name</th>
-                <th>Role</th>
-                <th>Current Location</th>
+                <th>User Details</th>
                 <th>Viewing PDF</th>
-                <th>Last Updated</th>
+                <th>Started At</th>
+                <th>Duration (mins)</th>
+                <th>Status</th>
               </tr>
             </thead>
             <tbody>
-              {liveUsers.map((u) => (
-                <tr key={u.userId}>
-                  <td>
-                    <span className="live-dot" style={{ display: 'inline-block', width: '8px', height: '8px', backgroundColor: '#4ade80', borderRadius: '50%', marginRight: '8px' }}></span>
-                    {u.name}
-                  </td>
-                  <td>
-                    {u.role === 'admin' ? <span className="badge" style={{backgroundColor: '#4f46e5', color: 'white'}}>Admin</span> : u.role === 'coordinator' ? <span className="badge" style={{backgroundColor: '#f59e0b', color: 'white'}}>Coordinator</span> : <span className="badge" style={{backgroundColor: '#3b82f6', color: 'white'}}>User</span>}
-                  </td>
-                  <td style={{ fontFamily: 'monospace', color: '#94a3b8' }}>{u.location}</td>
-                  <td>{u.pdfTitle ? <span style={{ color: '#38bdf8' }}>{u.pdfTitle}</span> : '—'}</td>
-                  <td>{new Date(u.updatedAt).toLocaleTimeString()}</td>
-                </tr>
-              ))}
-              {liveUsers.length === 0 && (
-                <tr><td colSpan={5} className="admin-empty">No users are currently online</td></tr>
+              {pdfLogs.map((log) => {
+                // Calculate rough duration in minutes
+                const durationMins = Math.floor(log.durationMs / 60000);
+                const isReadingNow = (Date.now() - new Date(log.endTime).getTime()) < (2 * 60 * 1000);
+
+                return (
+                  <tr key={log._id}>
+                    <td>
+                      <div style={{ fontWeight: 600, color: '#f8fafc' }}>{log.userName}</div>
+                      <div style={{ fontSize: '0.85rem', color: '#94a3b8' }}>{log.userEmail}</div>
+                    </td>
+                    <td>{log.pdfTitle ? <span style={{ color: '#38bdf8' }}>{log.pdfTitle}</span> : '—'}</td>
+                    <td>{new Date(log.startTime).toLocaleString()}</td>
+                    <td>{durationMins} mins</td>
+                    <td>
+                      {isReadingNow ? (
+                        <span style={{ color: '#4ade80', fontWeight: 'bold' }}>Reading Now</span>
+                      ) : (
+                        <span style={{ color: '#94a3b8' }}>Finished</span>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
+              {pdfLogs.length === 0 && (
+                <tr><td colSpan={5} className="admin-empty">No PDF reading logs found</td></tr>
               )}
             </tbody>
           </table>
