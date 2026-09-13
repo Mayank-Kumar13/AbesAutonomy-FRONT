@@ -16,12 +16,17 @@ const LiveTracker = () => {
     if (location.pathname === '/pdfpreview') {
       if (location.state) {
         pdfTitle = location.state.title;
-        pdfId = location.state.url;
+        pdfId = location.state.url || location.state.pdfUrl;
       }
       
       const searchParams = new URLSearchParams(location.search);
       if (!pdfTitle) pdfTitle = searchParams.get('title');
       if (!pdfId) pdfId = searchParams.get('url');
+
+      // Guarantee that a title exists so backend creates the log
+      if (!pdfTitle) {
+        pdfTitle = "Untitled PDF";
+      }
     }
 
     const ping = async () => {
