@@ -1,73 +1,51 @@
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { io } from 'socket.io-client';
 import { useAuth } from '../auth/AuthContext';
-
-// Global socket instance exported so other components (like AdminPanel) can use it
-export let socket = null;
 
 const LiveTracker = () => {
   const { user, token } = useAuth();
   const location = useLocation();
-  const socketRef = useRef(null);
 
   useEffect(() => {
-    // Connect if the user exists
-    if (user && token) {
-      if (!socketRef.current) {
-        let socketUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-        socketUrl = socketUrl.replace(/\/api\/?$/, '');
-        socketRef.current = io(socketUrl, {
-          withCredentials: true,
-        });
-        socket = socketRef.current;
+    if (!user || !token) return;
 
-        socketRef.current.on('connect', () => {
-          socketRef.current.emit('register_user', {
-            token,
+    let pdfTitle = null;
+    if (location.pathname === '/pdfpreview') {
+      if (location.state && location.state.title) {
+        pdfTitle = location.state.title;
+      }
+    }
+
+    const ping = async () => {
+      try {
+        let apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+        if (apiUrl.includes('abes.work') && !apiUrl.endsWith('/api')) {
+          apiUrl = `${apiUrl}/api`;
+        }
+        await fetch(`${apiUrl}/tracking/ping`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
             location: location.pathname + location.search,
-            pdfId: new URLSearchParams(location.search).get('url') || null, // Assuming pdfpreview uses ?url=...
-            pdfTitle: new URLSearchParams(location.search).get('title') || null,
-          });
+            pdfId: new URLSearchParams(location.search).get('url') || null,
+            pdfTitle: pdfTitle
+          })
         });
-      }
-    } else {
-      if (socketRef.current) {
-        socketRef.current.disconnect();
-        socketRef.current = null;
-        socket = null;
-      }
-    }
-
-    return () => {
-      if (socketRef.current) {
-        socketRef.current.disconnect();
-        socketRef.current = null;
-        socket = null;
-      }
+      } catch (err) {}
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, token]); // Re-run if user/token changes
 
-  useEffect(() => {
-    if (socketRef.current && socketRef.current.connected) {
-      let pdfTitle = null;
-      if (location.pathname === '/pdfpreview') {
-          // If we pass title in state instead of URL
-          if (location.state && location.state.title) {
-              pdfTitle = location.state.title;
-          }
-      }
+    // Ping immediately when location changes
+    ping();
 
-      socketRef.current.emit('update_location', {
-        location: location.pathname + location.search,
-        pdfId: new URLSearchParams(location.search).get('url') || null,
-        pdfTitle: pdfTitle,
-      });
-    }
-  }, [location]);
+    // Then ping every 15 seconds to keep alive
+    const interval = setInterval(ping, 15000);
+    return () => clearInterval(interval);
+  }, [location, user, token]);
 
-  return null; // This component doesn't render anything
+  return null;
 };
 
 export default LiveTracker;

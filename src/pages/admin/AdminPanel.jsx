@@ -2,7 +2,6 @@ import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { authApi } from '../../auth/authApi';
 import { useAuth } from '../../auth/AuthContext';
 import { uploadApi, notesApi, metaApi, subjectsApi } from '../../services/api';
-import { io } from 'socket.io-client';
 import './AdminPanel.css';
 import SubjectManagement from './SubjectManagement';
 
@@ -75,7 +74,7 @@ export default function AdminPanel() {
   const [searchQuery, setSearchQuery] = useState('');
   const [actionLoading, setActionLoading] = useState(null);
   
-  const { websiteStatus, setWebsiteStatus, user } = useAuth();
+  const { websiteStatus, setWebsiteStatus, user, token } = useAuth();
   const [statusLoading, setStatusLoading] = useState(false);
 
   // ─── Uploads tab state ────────────────────────────
@@ -132,33 +131,30 @@ export default function AdminPanel() {
 
   // ─── Live Tracking state ────────────────────────────
   const [liveUsers, setLiveUsers] = useState([]);
-  const socketRef = useRef(null);
 
   useEffect(() => {
     if (tab === 'liveTracking') {
-      if (!socketRef.current) {
-        let socketUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-        socketUrl = socketUrl.replace(/\/api\/?$/, '');
-        socketRef.current = io(socketUrl, {
-          withCredentials: true,
-        });
-        socketRef.current.on('active_user_update', (userList) => {
-          setLiveUsers(userList);
-        });
-      }
+      const fetchLiveUsers = async () => {
+        try {
+          let apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+          if (apiUrl.includes('abes.work') && !apiUrl.endsWith('/api')) {
+            apiUrl = `${apiUrl}/api`;
+          }
+          const res = await fetch(`${apiUrl}/tracking/live`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+          const json = await res.json();
+          if (json.success) setLiveUsers(json.data);
+        } catch (err) {}
+      };
+      
+      fetchLiveUsers();
+      const interval = setInterval(fetchLiveUsers, 5000);
+      return () => clearInterval(interval);
     } else {
-      if (socketRef.current) {
-        socketRef.current.disconnect();
-        socketRef.current = null;
-      }
+      setLiveUsers([]);
     }
-    return () => {
-      if (socketRef.current) {
-        socketRef.current.disconnect();
-        socketRef.current = null;
-      }
-    };
-  }, [tab]);
+  }, [tab, token]);
 
   const loadAll = useCallback(async () => {
     try {
