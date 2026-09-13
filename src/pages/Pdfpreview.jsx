@@ -1,19 +1,38 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import Pdfviewer from "../component/Pdfviewer";
 import { useEffect, useState } from "react";
-import { notesApi } from "../services/api";
+import { notesApi, trackingApi } from "../services/api";
 import { useAuth } from "../auth/AuthContext";
 import ReviewModal from "../component/home/ReviewModal";
 
 export default function PdfPreview() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user } = useAuth();
+  const { user, token } = useAuth();
 
   const { pdfUrl, title = "PDF Preview", noteId } = location.state || {};
   
   const [showReviewPrompt, setShowReviewPrompt] = useState(false);
   const [showActualReviewModal, setShowActualReviewModal] = useState(false);
+
+  // Live Tracking for PDFs
+  useEffect(() => {
+    if (!user || !token) return;
+
+    const ping = async () => {
+      try {
+        await trackingApi.ping(
+          "/pdfpreview",
+          pdfUrl || null,
+          title || "Untitled PDF"
+        );
+      } catch (err) {}
+    };
+
+    ping();
+    const interval = setInterval(ping, 15000);
+    return () => clearInterval(interval);
+  }, [user, token, pdfUrl, title]);
 
   // Increment view count when a note is viewed
   useEffect(() => {

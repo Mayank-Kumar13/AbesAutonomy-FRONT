@@ -10,39 +10,21 @@ const LiveTracker = () => {
   useEffect(() => {
     if (!user || !token) return;
 
-    let pdfTitle = null;
-    let pdfId = null;
-
-    if (location.pathname === '/pdfpreview') {
-      if (location.state) {
-        pdfTitle = location.state.title;
-        pdfId = location.state.url || location.state.pdfUrl;
-      }
-      
-      const searchParams = new URLSearchParams(location.search);
-      if (!pdfTitle) pdfTitle = searchParams.get('title');
-      if (!pdfId) pdfId = searchParams.get('url');
-
-      // Guarantee that a title exists so backend creates the log
-      if (!pdfTitle) {
-        pdfTitle = "Untitled PDF";
-      }
-    }
+    // Only ping for normal pages (non-PDF). 
+    // PDF tracking is handled directly in Pdfpreview.jsx now.
+    if (location.pathname === '/pdfpreview') return;
 
     const ping = async () => {
       try {
         await trackingApi.ping(
           location.pathname + location.search,
-          pdfId || null,
-          pdfTitle || null
+          null,
+          null
         );
       } catch (err) {}
     };
 
-    // Ping immediately when location changes
     ping();
-
-    // Then ping every 15 seconds to keep alive
     const interval = setInterval(ping, 15000);
     return () => clearInterval(interval);
   }, [location, user, token]);
