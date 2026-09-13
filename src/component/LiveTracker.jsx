@@ -12,8 +12,8 @@ const LiveTracker = () => {
   const socketRef = useRef(null);
 
   useEffect(() => {
-    // Only connect if the user is an admin or coordinator
-    if (user && token && (user.role === 'admin' || user.role === 'coordinator')) {
+    // Connect if the user exists
+    if (user && token) {
       if (!socketRef.current) {
         socketRef.current = io(import.meta.env.VITE_API_URL || 'http://localhost:5000', {
           withCredentials: true,
@@ -21,7 +21,7 @@ const LiveTracker = () => {
         socket = socketRef.current;
 
         socketRef.current.on('connect', () => {
-          socketRef.current.emit('register_staff', {
+          socketRef.current.emit('register_user', {
             token,
             location: location.pathname + location.search,
             pdfId: new URLSearchParams(location.search).get('url') || null, // Assuming pdfpreview uses ?url=...

@@ -131,7 +131,7 @@ export default function AdminPanel() {
   const [mailTotalPages, setMailTotalPages] = useState(1);
 
   // ─── Live Tracking state ────────────────────────────
-  const [liveStaff, setLiveStaff] = useState([]);
+  const [liveUsers, setLiveUsers] = useState([]);
   const socketRef = useRef(null);
 
   useEffect(() => {
@@ -140,8 +140,8 @@ export default function AdminPanel() {
         socketRef.current = io(import.meta.env.VITE_API_URL || 'http://localhost:5000', {
           withCredentials: true,
         });
-        socketRef.current.on('active_staff_update', (staffList) => {
-          setLiveStaff(staffList);
+        socketRef.current.on('active_user_update', (userList) => {
+          setLiveUsers(userList);
         });
       }
     } else {
@@ -663,7 +663,7 @@ export default function AdminPanel() {
       {tab === 'liveTracking' && (
         <div className="admin-table-wrap">
           <div className="admin-table-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', padding: '0 1rem' }}>
-            <h2 className="upload-form-title" style={{ margin: 0 }}>Live Staff Tracking</h2>
+            <h2 className="upload-form-title" style={{ margin: 0 }}>Live User Tracking</h2>
           </div>
           <table className="admin-table">
             <thead>
@@ -676,22 +676,22 @@ export default function AdminPanel() {
               </tr>
             </thead>
             <tbody>
-              {liveStaff.map((staff) => (
-                <tr key={staff.userId}>
+              {liveUsers.map((u) => (
+                <tr key={u.userId}>
                   <td>
                     <span className="live-dot" style={{ display: 'inline-block', width: '8px', height: '8px', backgroundColor: '#4ade80', borderRadius: '50%', marginRight: '8px' }}></span>
-                    {staff.name}
+                    {u.name}
                   </td>
                   <td>
-                    {staff.role === 'admin' ? <span className="badge" style={{backgroundColor: '#4f46e5', color: 'white'}}>Admin</span> : <span className="badge" style={{backgroundColor: '#f59e0b', color: 'white'}}>Coordinator</span>}
+                    {u.role === 'admin' ? <span className="badge" style={{backgroundColor: '#4f46e5', color: 'white'}}>Admin</span> : u.role === 'coordinator' ? <span className="badge" style={{backgroundColor: '#f59e0b', color: 'white'}}>Coordinator</span> : <span className="badge" style={{backgroundColor: '#3b82f6', color: 'white'}}>User</span>}
                   </td>
-                  <td style={{ fontFamily: 'monospace', color: '#94a3b8' }}>{staff.location}</td>
-                  <td>{staff.pdfTitle ? <span style={{ color: '#38bdf8' }}>{staff.pdfTitle}</span> : '—'}</td>
-                  <td>{new Date(staff.updatedAt).toLocaleTimeString()}</td>
+                  <td style={{ fontFamily: 'monospace', color: '#94a3b8' }}>{u.location}</td>
+                  <td>{u.pdfTitle ? <span style={{ color: '#38bdf8' }}>{u.pdfTitle}</span> : '—'}</td>
+                  <td>{new Date(u.updatedAt).toLocaleTimeString()}</td>
                 </tr>
               ))}
-              {liveStaff.length === 0 && (
-                <tr><td colSpan={5} className="admin-empty">No staff members are currently online</td></tr>
+              {liveUsers.length === 0 && (
+                <tr><td colSpan={5} className="admin-empty">No users are currently online</td></tr>
               )}
             </tbody>
           </table>
