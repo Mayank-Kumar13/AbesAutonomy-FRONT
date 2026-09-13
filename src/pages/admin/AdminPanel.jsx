@@ -884,6 +884,17 @@ export default function AdminPanel() {
 
       {tab === 'uploads' && (
         <div className="admin-uploads">
+          <div className="coordinator-guide">
+            <h3>📝 Coordinator Upload Guide</h3>
+            <p>Welcome Coordinators! Please follow these rules before uploading notes:</p>
+            <ul>
+              <li><strong>Compress Files:</strong> The database has a strict file size limit. Please compress your PDFs to <strong>under 15MB</strong> before uploading. You can use <a href="https://www.ilovepdf.com/compress_pdf" target="_blank" rel="noreferrer">iLovePDF</a> to compress them easily.</li>
+              <li><strong>Select Branch Carefully:</strong> Ensure you are only uploading files for your assigned branch/subject. If a subject belongs to multiple branches, check "Allow multiple groups".</li>
+              <li><strong>Naming Convention:</strong> Give the file a clear, descriptive title (e.g., "Unit 1: Quantum Physics").</li>
+              <li><strong>Need Help?</strong> If you face any issues or errors while uploading, please contact the ABES Autonomy Admins/Creators immediately.</li>
+            </ul>
+          </div>
+
           <form className="upload-form" onSubmit={handleUploadSubmit}>
             <h2 className="upload-form-title">Upload New PDFs</h2>
 

@@ -764,3 +764,53 @@
   color: #c89b63;
   border-bottom-color: #c89b63;
 }
+
+/* ---------------- COORDINATOR GUIDE ---------------- */
+.coordinator-guide {
+  background: rgba(245, 158, 11, 0.05);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-left: 4px solid #f59e0b;
+  border-radius: 8px;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.5rem;
+  color: #e2e8f0;
+}
+
+.coordinator-guide h3 {
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+  color: #fbbf24;
+  font-family: "Times New Roman", Georgia, serif;
+  letter-spacing: 0.02em;
+}
+
+.coordinator-guide p {
+  margin: 0 0 0.75rem 0;
+  font-size: 0.9rem;
+  color: #cbd5e1;
+}
+
+.coordinator-guide ul {
+  margin: 0;
+  padding-left: 1.5rem;
+  font-size: 0.85rem;
+  color: #94a3b8;
+  line-height: 1.6;
+}
+
+.coordinator-guide li {
+  margin-bottom: 0.5rem;
+}
+
+.coordinator-guide strong {
+  color: #e2e8f0;
+}
+
+.coordinator-guide a {
+  color: #60a5fa;
+  text-decoration: none;
+}
+
+.coordinator-guide a:hover {
+  text-decoration: underline;
+}
