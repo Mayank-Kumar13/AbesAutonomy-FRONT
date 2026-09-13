@@ -16,6 +16,8 @@ const SubjectManagement = () => {
     description: '',
     year: 1,
     group: 'common',
+    allowMultipleGroups: false,
+    groups: ['common'],
     icon: 'BookOpen',
     displayOrder: 0,
     isActive: true
@@ -47,7 +49,8 @@ const SubjectManagement = () => {
       setFormData({
         ...formData,
         year: yearVal,
-        group: yearVal === 1 ? 'common' : 'cse'
+        group: yearVal === 1 ? 'common' : 'cse',
+        groups: yearVal === 1 ? ['common'] : ['cse']
       });
       return;
     }
@@ -65,6 +68,8 @@ const SubjectManagement = () => {
       description: '',
       year: 1,
       group: 'common',
+      allowMultipleGroups: false,
+      groups: ['common'],
       icon: 'BookOpen',
       displayOrder: 0,
       isActive: true
@@ -79,6 +84,8 @@ const SubjectManagement = () => {
       description: subject.description || '',
       year: subject.year,
       group: subject.group,
+      allowMultipleGroups: false,
+      groups: [subject.group],
       icon: subject.icon || 'BookOpen',
       displayOrder: subject.displayOrder,
       isActive: subject.isActive
@@ -92,7 +99,11 @@ const SubjectManagement = () => {
       if (editingSubject) {
         await subjectsApi.updateSubject(editingSubject._id, formData);
       } else {
-        await subjectsApi.createSubject(formData);
+        const isMultiple = formData.allowMultipleGroups && formData.groups && formData.groups.length > 0;
+        const branchList = isMultiple ? formData.groups : [formData.group];
+        for (const branch of branchList) {
+          await subjectsApi.createSubject({ ...formData, group: branch });
+        }
       }
       setIsModalOpen(false);
       fetchSubjects();
@@ -231,25 +242,61 @@ const SubjectManagement = () => {
                   </select>
                 </div>
 
-                <div className="form-group">
-                  <label>Group / Branch*</label>
-                  <select name="group" value={formData.group} onChange={handleInputChange} required>
-                    {formData.year === 1 ? (
-                      <>
-                        <option value="common">Common</option>
-                        <option value="electrical">Electrical</option>
-                        <option value="electronics">Electronics</option>
-                      </>
-                    ) : (
-                      <>
-                        <option value="cse">CSE</option>
-                        <option value="ds">DS</option>
-                        <option value="aiml">AIML</option>
-                        <option value="ece">ECE</option>
-                        <option value="common">Common</option>
-                      </>
-                    )}
-                  </select>
+                <div className="form-group" style={{ flex: 1 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                    <label style={{ margin: 0 }}>Group / Branch*</label>
+                    <label style={{ fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer', fontWeight: 'normal', margin: 0 }}>
+                      <input 
+                        type="checkbox" 
+                        name="allowMultipleGroups"
+                        checked={formData.allowMultipleGroups || false} 
+                        onChange={handleInputChange} 
+                      />
+                      Allow Multiple Branch
+                    </label>
+                  </div>
+                  {formData.allowMultipleGroups ? (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', background: '#0b0d10', padding: '0.5rem', borderRadius: '4px', border: '1px solid #2d3748' }}>
+                      {(formData.year === 1 ? ['common', 'electrical', 'electronics'] : ['cse', 'ds', 'aiml', 'ece', 'common']).map((b) => (
+                        <label key={b} style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.85rem', cursor: 'pointer' }}>
+                          <input
+                            type="checkbox"
+                            value={b}
+                            checked={(formData.groups || []).includes(b)}
+                            onChange={(e) => {
+                              const checked = e.target.checked;
+                              let newGroups = [...(formData.groups || [])];
+                              if (checked) {
+                                newGroups.push(b);
+                              } else {
+                                newGroups = newGroups.filter((branch) => branch !== b);
+                              }
+                              setFormData({ ...formData, groups: newGroups });
+                            }}
+                          />
+                          {b.toUpperCase()}
+                        </label>
+                      ))}
+                    </div>
+                  ) : (
+                    <select name="group" value={formData.group} onChange={handleInputChange} required>
+                      {formData.year === 1 ? (
+                        <>
+                          <option value="common">Common</option>
+                          <option value="electrical">Electrical</option>
+                          <option value="electronics">Electronics</option>
+                        </>
+                      ) : (
+                        <>
+                          <option value="cse">CSE</option>
+                          <option value="ds">DS</option>
+                          <option value="aiml">AIML</option>
+                          <option value="ece">ECE</option>
+                          <option value="common">Common</option>
+                        </>
+                      )}
+                    </select>
+                  )}
                 </div>
               </div>
 
