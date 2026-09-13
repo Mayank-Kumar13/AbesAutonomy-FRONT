@@ -266,7 +266,7 @@ const SubjectManagement = () => {
                   </div>
                   {formData.allowMultipleGroups ? (
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', background: '#0b0d10', padding: '0.5rem', borderRadius: '4px', border: '1px solid #2d3748' }}>
-                      {(formData.year === 1 ? ['common', 'electrical', 'electronics'] : ['cse', 'ds', 'aiml', 'ece', 'common']).map((b) => (
+                      {(formData.year === 1 ? ['common', 'electrical', 'electronics'] : ['cse', 'ds', 'aiml', 'ece', 'elce', 'common']).map((b) => (
                         <label key={b} style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.85rem', cursor: 'pointer' }}>
                           <input
                             type="checkbox"
@@ -301,6 +301,7 @@ const SubjectManagement = () => {
                           <option value="ds">DS</option>
                           <option value="aiml">AIML</option>
                           <option value="ece">ECE</option>
+                          <option value="elce">ELCE</option>
                           <option value="common">Common</option>
                         </>
                       )}

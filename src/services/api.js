@@ -407,13 +407,15 @@ export const reviewApi = {
 
 export const trackingApi = {
   async ping(location, pdfId, pdfTitle) {
-    return request('/tracking/ping', {
+    return request('/reader/status', {
       method: 'POST',
       body: JSON.stringify({ location, pdfId, pdfTitle }),
     });
   },
-
+  async getLiveUsers() {
+    return request('/reader/active');
+  },
   async getLogs() {
-    return request('/tracking/logs');
+    return request('/reader/history');
   },
 };
