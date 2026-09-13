@@ -15,7 +15,9 @@ const LiveTracker = () => {
     // Connect if the user exists
     if (user && token) {
       if (!socketRef.current) {
-        socketRef.current = io(import.meta.env.VITE_API_URL || 'http://localhost:5000', {
+        let socketUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+        socketUrl = socketUrl.replace(/\/api\/?$/, '');
+        socketRef.current = io(socketUrl, {
           withCredentials: true,
         });
         socket = socketRef.current;

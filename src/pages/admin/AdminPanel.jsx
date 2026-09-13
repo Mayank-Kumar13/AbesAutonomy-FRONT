@@ -137,7 +137,9 @@ export default function AdminPanel() {
   useEffect(() => {
     if (tab === 'liveTracking') {
       if (!socketRef.current) {
-        socketRef.current = io(import.meta.env.VITE_API_URL || 'http://localhost:5000', {
+        let socketUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+        socketUrl = socketUrl.replace(/\/api\/?$/, '');
+        socketRef.current = io(socketUrl, {
           withCredentials: true,
         });
         socketRef.current.on('active_user_update', (userList) => {
