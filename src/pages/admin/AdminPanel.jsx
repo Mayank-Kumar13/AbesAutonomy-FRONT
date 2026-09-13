@@ -13,11 +13,14 @@ const RESOURCE_TYPES = ['theory', 'assignment', 'lab_manual', 'pyq', 'handwritte
 let fileEntryIdCounter = 0;
 const makeFileEntry = (file) => ({
   id: `${Date.now()}-${fileEntryIdCounter++}`,
+  
   file,
   title: file.name.replace(/\.pdf$/i, ''),
   year: 1,
   subject: '',
   branch: 'common',
+  allowMultipleBranches: false,
+  branches: ['common'],
   resourceType: 'theory',
   description: '',
 });
@@ -318,15 +321,44 @@ export default function AdminPanel() {
     // many large file uploads simultaneously.
     for (const entry of fileEntries) {
       try {
-        const metadata = {
-          title: entry.title.trim(),
-          description: entry.description.trim(),
-          subject: entry.subject.trim(),
-          branch: entry.branch,
-          resourceType: entry.resourceType,
-          year: entry.year,
-        };
-        await uploadApi.uploadPdf(entry.file, metadata);
+        const isMultiple = entry.allowMultipleBranches && entry.branches && entry.branches.length > 0;
+        const branchList = isMultiple ? entry.branches : [entry.branch];
+
+        if (branchList.length === 0) {
+          throw new Error('No branch selected for ' + entry.file.name);
+        }
+
+        let firstNoteCreated = null;
+
+        for (let i = 0; i < branchList.length; i++) {
+          const currentBranch = branchList[i];
+          const metadata = {
+            title: entry.title.trim(),
+            description: entry.description.trim(),
+            subject: entry.subject.trim(),
+            branch: currentBranch,
+            resourceType: entry.resourceType,
+            year: entry.year,
+          };
+
+          if (i === 0) {
+            // First branch - upload the actual PDF
+            const response = await uploadApi.uploadPdf(entry.file, metadata);
+            firstNoteCreated = response.data; 
+          } else {
+            // Subsequent branches - register using the existing ImageKit details
+            if (firstNoteCreated) {
+              const registerData = {
+                ...metadata,
+                pdfUrl: firstNoteCreated.pdfUrl,
+                imagekitFileId: firstNoteCreated.imagekitFileId,
+                imagekitFilePath: firstNoteCreated.imagekitFilePath,
+                thumbnailUrl: firstNoteCreated.thumbnailUrl,
+              };
+              await uploadApi.registerExisting(registerData);
+            }
+          }
+        }
         succeeded += 1;
       } catch (err) {
         failed.push({ name: entry.file.name, error: err.message || 'Upload failed.' });
@@ -810,8 +842,10 @@ export default function AdminPanel() {
                             updateFileEntry(entry.id, 'subject', '');
                             if (newYear === 2) {
                               updateFileEntry(entry.id, 'branch', 'cse');
+                              updateFileEntry(entry.id, 'branches', ['cse']);
                             } else {
                               updateFileEntry(entry.id, 'branch', 'common');
+                              updateFileEntry(entry.id, 'branches', ['common']);
                             }
                           }}
                           disabled={uploading}
@@ -848,16 +882,53 @@ export default function AdminPanel() {
                       </div>
 
                       <div className="upload-field">
-                        <label>Group / Branch</label>
-                        <select
-                          value={entry.branch}
-                          onChange={(e) => updateFileEntry(entry.id, 'branch', e.target.value)}
-                          disabled={uploading}
-                        >
-                          {(entry.year === 1 ? BRANCHES_Y1 : BRANCHES_Y2).map((b) => (
-                            <option key={b} value={b}>{b.toUpperCase()}</option>
-                          ))}
-                        </select>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <label>Group / Branch</label>
+                          <label style={{ fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer', fontWeight: 'normal' }}>
+                            <input
+                              type="checkbox"
+                              checked={entry.allowMultipleBranches || false}
+                              onChange={(e) => updateFileEntry(entry.id, 'allowMultipleBranches', e.target.checked)}
+                              disabled={uploading}
+                            />
+                            Allow Multiple Branch
+                          </label>
+                        </div>
+                        {entry.allowMultipleBranches ? (
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', background: '#0b0d10', padding: '0.5rem', borderRadius: '4px', border: '1px solid #2d3748' }}>
+                            {(entry.year === 1 ? BRANCHES_Y1 : BRANCHES_Y2).map((b) => (
+                              <label key={b} style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.85rem', cursor: 'pointer' }}>
+                                <input
+                                  type="checkbox"
+                                  value={b}
+                                  checked={(entry.branches || []).includes(b)}
+                                  onChange={(e) => {
+                                    const checked = e.target.checked;
+                                    let newBranches = [...(entry.branches || [])];
+                                    if (checked) {
+                                      newBranches.push(b);
+                                    } else {
+                                      newBranches = newBranches.filter((branch) => branch !== b);
+                                    }
+                                    updateFileEntry(entry.id, 'branches', newBranches);
+                                  }}
+                                  disabled={uploading}
+                                />
+                                {b.toUpperCase()}
+                              </label>
+                            ))}
+                          </div>
+                        ) : (
+                          <select
+                            value={entry.branch}
+                            onChange={(e) => updateFileEntry(entry.id, 'branch', e.target.value)}
+                            disabled={uploading}
+                          >
+                            {(entry.year === 1 ? BRANCHES_Y1 : BRANCHES_Y2).map((b) => (
+                              <option key={b} value={b}>{b.toUpperCase()}</option>
+                            ))}
+                          </select>
+                        )}
                       </div>
 
                       <div className="upload-field">
