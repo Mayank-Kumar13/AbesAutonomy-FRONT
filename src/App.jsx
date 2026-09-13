@@ -1,6 +1,7 @@
 import React from 'react';
 import Navbar from './component/navbar/Navbar';
 import IntroOverlay from './component/intro/IntroOverlay';
+import LiveTracker from './component/LiveTracker';
 import Credits from './pages/Credits';
 import HomeContent from './component/home/HomeContent';
 import { Routes, Route } from "react-router-dom";
@@ -31,6 +32,7 @@ import GlobalStatusGuard from './auth/GlobalStatusGuard';
 const App = () => {
   return (
     <GlobalStatusGuard>
+      <LiveTracker />
       <IntroOverlay />
       {useLocation().pathname !== "/pdfpreview" && <Navbar />} 
       <Scroll />

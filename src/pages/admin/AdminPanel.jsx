@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { authApi } from '../../auth/authApi';
 import { useAuth } from '../../auth/AuthContext';
 import { uploadApi, notesApi, metaApi, subjectsApi } from '../../services/api';
+import { io } from 'socket.io-client';
 import './AdminPanel.css';
 import SubjectManagement from './SubjectManagement';
 
@@ -128,6 +129,34 @@ export default function AdminPanel() {
   const [mailTemplateFilter, setMailTemplateFilter] = useState('');
   const [mailPage, setMailPage] = useState(1);
   const [mailTotalPages, setMailTotalPages] = useState(1);
+
+  // ─── Live Tracking state ────────────────────────────
+  const [liveStaff, setLiveStaff] = useState([]);
+  const socketRef = useRef(null);
+
+  useEffect(() => {
+    if (tab === 'liveTracking') {
+      if (!socketRef.current) {
+        socketRef.current = io(import.meta.env.VITE_API_URL || 'http://localhost:5000', {
+          withCredentials: true,
+        });
+        socketRef.current.on('active_staff_update', (staffList) => {
+          setLiveStaff(staffList);
+        });
+      }
+    } else {
+      if (socketRef.current) {
+        socketRef.current.disconnect();
+        socketRef.current = null;
+      }
+    }
+    return () => {
+      if (socketRef.current) {
+        socketRef.current.disconnect();
+        socketRef.current = null;
+      }
+    };
+  }, [tab]);
 
   const loadAll = useCallback(async () => {
     try {
@@ -620,12 +649,53 @@ export default function AdminPanel() {
             <button className={`admin-tab-btn ${tab === 'subjects' ? 'active' : ''}`} onClick={() => setTab('subjects')}>
               Subjects
             </button>
+            <button className={`admin-tab-btn ${tab === 'liveTracking' ? 'active' : ''}`} onClick={() => setTab('liveTracking')}>
+              Live Tracking
+            </button>
           </>
         )}
       </div>
 
       {tab === 'subjects' && (
         <SubjectManagement />
+      )}
+
+      {tab === 'liveTracking' && (
+        <div className="admin-table-wrap">
+          <div className="admin-table-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', padding: '0 1rem' }}>
+            <h2 className="upload-form-title" style={{ margin: 0 }}>Live Staff Tracking</h2>
+          </div>
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Role</th>
+                <th>Current Location</th>
+                <th>Viewing PDF</th>
+                <th>Last Updated</th>
+              </tr>
+            </thead>
+            <tbody>
+              {liveStaff.map((staff) => (
+                <tr key={staff.userId}>
+                  <td>
+                    <span className="live-dot" style={{ display: 'inline-block', width: '8px', height: '8px', backgroundColor: '#4ade80', borderRadius: '50%', marginRight: '8px' }}></span>
+                    {staff.name}
+                  </td>
+                  <td>
+                    {staff.role === 'admin' ? <span className="badge" style={{backgroundColor: '#4f46e5', color: 'white'}}>Admin</span> : <span className="badge" style={{backgroundColor: '#f59e0b', color: 'white'}}>Coordinator</span>}
+                  </td>
+                  <td style={{ fontFamily: 'monospace', color: '#94a3b8' }}>{staff.location}</td>
+                  <td>{staff.pdfTitle ? <span style={{ color: '#38bdf8' }}>{staff.pdfTitle}</span> : '—'}</td>
+                  <td>{new Date(staff.updatedAt).toLocaleTimeString()}</td>
+                </tr>
+              ))}
+              {liveStaff.length === 0 && (
+                <tr><td colSpan={5} className="admin-empty">No staff members are currently online</td></tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       )}
 
       {tab === 'users' && (
