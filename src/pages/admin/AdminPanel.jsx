@@ -137,16 +137,19 @@ export default function AdminPanel() {
 
   // ─── PDF Read Logs state ────────────────────────────
   const [pdfLogs, setPdfLogs] = useState([]);
+  const [pdfLogsSearch, setPdfLogsSearch] = useState('');
+  const [pdfLogsStatusFilter, setPdfLogsStatusFilter] = useState('all');
+  const [pdfLogsSort, setPdfLogsSort] = useState('recent');
+
+  const fetchPdfLogs = async () => {
+    try {
+      const json = await trackingApi.getLogs();
+      if (json.success) setPdfLogs(json.data);
+    } catch (err) { console.error("[admin] failed to fetch PDF read logs:", err); }
+  };
 
   useEffect(() => {
     if (tab === 'liveTracking') {
-      const fetchPdfLogs = async () => {
-        try {
-          const json = await trackingApi.getLogs();
-          if (json.success) setPdfLogs(json.data);
-        } catch (err) { console.error("[admin] failed to fetch PDF read logs:", err); }
-      };
-      
       fetchPdfLogs();
       const interval = setInterval(fetchPdfLogs, 5000);
       return () => clearInterval(interval);
@@ -708,53 +711,102 @@ export default function AdminPanel() {
         <SubjectManagement />
       )}
 
-      {tab === 'liveTracking' && (
-        <div className="admin-table-wrap">
-          <div className="admin-table-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', padding: '0 1rem' }}>
-            <h2 className="upload-form-title" style={{ margin: 0 }}>PDF Read Logs</h2>
-          </div>
-          <table className="admin-table">
-            <thead>
-              <tr>
-                <th>User Details</th>
-                <th>Viewing PDF</th>
-                <th>Started At</th>
-                <th>Duration (mins)</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {pdfLogs.map((log) => {
-                // Calculate rough duration in minutes
-                const durationMins = Math.floor(log.durationMs / 60000);
-                const isReadingNow = (Date.now() - new Date(log.endTime).getTime()) < (2 * 60 * 1000);
+      {tab === 'liveTracking' && (() => {
+        const filteredPdfLogs = pdfLogs.filter(log => {
+          const isReadingNow = (Date.now() - new Date(log.endTime).getTime()) < 30000;
+          
+          if (pdfLogsStatusFilter === 'live' && !isReadingNow) return false;
+          if (pdfLogsStatusFilter === 'finished' && isReadingNow) return false;
 
-                return (
-                  <tr key={log._id}>
-                    <td>
-                      <div style={{ fontWeight: 600, color: '#f8fafc' }}>{log.userName}</div>
-                      <div style={{ fontSize: '0.85rem', color: '#94a3b8' }}>{log.userEmail}</div>
-                    </td>
-                    <td>{log.pdfTitle ? <span style={{ color: '#38bdf8' }}>{log.pdfTitle}</span> : '—'}</td>
-                    <td>{new Date(log.startTime).toLocaleString()}</td>
-                    <td>{durationMins} mins</td>
-                    <td>
-                      {isReadingNow ? (
-                        <span style={{ color: '#4ade80', fontWeight: 'bold' }}>Reading Now</span>
-                      ) : (
-                        <span style={{ color: '#94a3b8' }}>Finished</span>
-                      )}
-                    </td>
-                  </tr>
-                );
-              })}
-              {pdfLogs.length === 0 && (
-                <tr><td colSpan={5} className="admin-empty">No PDF reading logs found</td></tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      )}
+          if (pdfLogsSearch) {
+            const q = pdfLogsSearch.toLowerCase();
+            if (
+              !(log.userName && log.userName.toLowerCase().includes(q)) &&
+              !(log.userEmail && log.userEmail.toLowerCase().includes(q)) &&
+              !(log.pdfTitle && log.pdfTitle.toLowerCase().includes(q))
+            ) {
+              return false;
+            }
+          }
+          return true;
+        }).sort((a, b) => {
+          if (pdfLogsSort === 'duration') {
+            return (b.durationMs || 0) - (a.durationMs || 0);
+          }
+          return new Date(b.endTime).getTime() - new Date(a.endTime).getTime();
+        });
+
+        return (
+          <div className="admin-table-wrap">
+            <div className="admin-toolbar">
+              <div className="admin-toolbar-left">
+                <h2 className="upload-form-title" style={{ margin: 0 }}>PDF Read Logs ({filteredPdfLogs.length})</h2>
+                <input
+                  type="text"
+                  placeholder="Search by user or PDF..."
+                  value={pdfLogsSearch}
+                  onChange={(e) => setPdfLogsSearch(e.target.value)}
+                  className="admin-search-input"
+                  style={{ padding: '0.6rem 1rem', borderRadius: '8px', border: '1px solid #2d3748', background: '#0b0d10', color: '#fff', width: '250px' }}
+                />
+              </div>
+              <div className="admin-toolbar-right">
+                <select className="admin-filter-select" value={pdfLogsStatusFilter} onChange={(e) => setPdfLogsStatusFilter(e.target.value)}>
+                  <option value="all">All Status</option>
+                  <option value="live">Reading Now</option>
+                  <option value="finished">Finished</option>
+                </select>
+                <select className="admin-filter-select" value={pdfLogsSort} onChange={(e) => setPdfLogsSort(e.target.value)}>
+                  <option value="recent">Sort: Recent</option>
+                  <option value="duration">Sort: Longest Duration</option>
+                </select>
+                <button className="upload-submit-btn" style={{ margin: 0, padding: '0.6rem 1rem', width: 'auto' }} onClick={fetchPdfLogs}>
+                  Refresh
+                </button>
+              </div>
+            </div>
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th>User Details</th>
+                  <th>Viewing PDF</th>
+                  <th>Started At</th>
+                  <th>Duration (mins)</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredPdfLogs.map((log) => {
+                  const durationMins = Math.floor(log.durationMs / 60000);
+                  const isReadingNow = (Date.now() - new Date(log.endTime).getTime()) < 30000;
+
+                  return (
+                    <tr key={log._id}>
+                      <td>
+                        <div style={{ fontWeight: 600, color: '#f8fafc' }}>{log.userName}</div>
+                        <div style={{ fontSize: '0.85rem', color: '#94a3b8' }}>{log.userEmail}</div>
+                      </td>
+                      <td>{log.pdfTitle ? <span style={{ color: '#38bdf8' }}>{log.pdfTitle}</span> : '—'}</td>
+                      <td>{new Date(log.startTime).toLocaleString()}</td>
+                      <td>{durationMins} mins</td>
+                      <td>
+                        {isReadingNow ? (
+                          <span style={{ color: '#4ade80', fontWeight: 'bold' }}>Reading Now</span>
+                        ) : (
+                          <span style={{ color: '#94a3b8' }}>Finished</span>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+                {filteredPdfLogs.length === 0 && (
+                  <tr><td colSpan={5} className="admin-empty">No PDF reading logs found</td></tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        );
+      })()}
 
       {tab === 'users' && (
         <div className="admin-table-wrap">
