@@ -134,6 +134,9 @@ function App() {
             <p style={{ textAlign: 'center', fontSize: '0.9rem', marginBottom: '1rem', color: '#e2e8f0' }}>
               We sent a 6-digit code to <strong>{otpEmail}</strong>
             </p>
+            <p style={{ textAlign: 'center', fontSize: '0.85rem', marginBottom: '1.5rem', color: '#94a3b8' }}>
+              If you don't see the email, please check your <strong>Spam or Junk folder</strong> (especially for college emails).
+            </p>
 
             <form className="auth-form" onSubmit={handleOtpSubmit}>
               <div className="input-group">
