@@ -78,14 +78,18 @@ const SubjectManagement = () => {
   };
 
   const openEditModal = (subject) => {
+    const isArray = Array.isArray(subject.group);
+    const primaryGroup = isArray ? (subject.group[0] || 'common') : (subject.group || 'common');
+    const isMultiple = isArray && subject.group.length > 1;
+    
     setEditingSubject(subject);
     setFormData({
       name: subject.name,
       description: subject.description || '',
       year: subject.year,
-      group: subject.group,
-      allowMultipleGroups: false,
-      groups: [subject.group],
+      group: primaryGroup,
+      allowMultipleGroups: isMultiple,
+      groups: isArray ? subject.group : [primaryGroup],
       icon: subject.icon || 'BookOpen',
       displayOrder: subject.displayOrder,
       isActive: subject.isActive
@@ -96,14 +100,13 @@ const SubjectManagement = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      const isMultiple = formData.allowMultipleGroups && formData.groups && formData.groups.length > 0;
+      const dataToSubmit = { ...formData, group: isMultiple ? formData.groups : [formData.group] };
+
       if (editingSubject) {
-        await subjectsApi.updateSubject(editingSubject._id, formData);
+        await subjectsApi.updateSubject(editingSubject._id, dataToSubmit);
       } else {
-        const isMultiple = formData.allowMultipleGroups && formData.groups && formData.groups.length > 0;
-        const branchList = isMultiple ? formData.groups : [formData.group];
-        for (const branch of branchList) {
-          await subjectsApi.createSubject({ ...formData, group: branch });
-        }
+        await subjectsApi.createSubject(dataToSubmit);
       }
       setIsModalOpen(false);
       fetchSubjects();
@@ -171,7 +174,13 @@ const SubjectManagement = () => {
                     </div>
                   </td>
                   <td>Year {subject.year}</td>
-                  <td><span className={`badge group-${subject.group}`}>{subject.group}</span></td>
+                  <td>
+                    <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+                      {(Array.isArray(subject.group) ? subject.group : [subject.group]).map(g => (
+                        <span key={g} className={`badge group-${g}`}>{g}</span>
+                      ))}
+                    </div>
+                  </td>
                   <td>{subject.displayOrder}</td>
                   <td>
                     <button 
