@@ -6,6 +6,7 @@ const HEARTBEAT_INTERVAL_MS = 20000;
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
+  const [token, setToken] = useState(() => localStorage.getItem("token"));
   const [loading, setLoading] = useState(true);
   const [websiteStatus, setWebsiteStatus] = useState('UNDER_CONSTRUCTION');
   const heartbeatRef = useRef(null);
@@ -24,6 +25,7 @@ export function AuthProvider({ children }) {
         setUser(profileRes.data);
       } else {
         if (token) localStorage.removeItem("token");
+        setToken(null);
         setUser(null);
       }
 
@@ -32,6 +34,7 @@ export function AuthProvider({ children }) {
       }
     } catch (err) {
       if (token) localStorage.removeItem("token");
+      setToken(null);
       setUser(null);
     } finally {
       setLoading(false);
@@ -60,6 +63,10 @@ export function AuthProvider({ children }) {
 
   const login = async (email, password) => {
     const res = await authApi.login(email, password);
+    if (res.data && res.data.token) {
+      localStorage.setItem("token", res.data.token);
+      setToken(res.data.token);
+    }
     return res.data;
   };
 
@@ -71,6 +78,7 @@ export function AuthProvider({ children }) {
   const verifyOtp = async (userId, otp, purpose = "signup") => {
     const res = await authApi.verifyOtp(userId, otp, purpose);
     localStorage.setItem("token", res.data.token);
+    setToken(res.data.token);
     setUser(res.data.user);
     return res.data.user;
   };
@@ -82,11 +90,13 @@ export function AuthProvider({ children }) {
 
   const setTokenAndLoad = async (token) => {
     localStorage.setItem("token", token);
+    setToken(token);
     await loadProfile();
   };
 
   const logout = () => {
     localStorage.removeItem("token");
+    setToken(null);
     setUser(null);
   };
 
@@ -98,6 +108,7 @@ export function AuthProvider({ children }) {
 
   const value = {
     user,
+    token,
     loading,
     websiteStatus,
     setWebsiteStatus,

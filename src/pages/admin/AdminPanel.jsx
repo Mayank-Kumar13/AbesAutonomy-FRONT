@@ -144,7 +144,7 @@ export default function AdminPanel() {
         try {
           const json = await trackingApi.getLogs();
           if (json.success) setPdfLogs(json.data);
-        } catch (err) {}
+        } catch (err) { console.error("[admin] failed to fetch PDF read logs:", err); }
       };
       
       fetchPdfLogs();

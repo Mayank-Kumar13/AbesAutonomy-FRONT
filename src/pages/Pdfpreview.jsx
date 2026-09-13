@@ -26,7 +26,7 @@ export default function PdfPreview() {
           pdfUrl || null,
           title || "Untitled PDF"
         );
-      } catch (err) {}
+      } catch (err) { console.error("[tracking] ping failed:", err); }
     };
 
     ping();

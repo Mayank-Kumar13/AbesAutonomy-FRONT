@@ -21,7 +21,7 @@ const LiveTracker = () => {
           null,
           null
         );
-      } catch (err) {}
+      } catch (err) { console.error("[tracking] ping failed:", err); }
     };
 
     ping();
