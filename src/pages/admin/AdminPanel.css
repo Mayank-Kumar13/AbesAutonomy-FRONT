@@ -371,18 +371,48 @@
 
 @media (max-width: 768px) {
   .admin-wrapper {
-    padding: 3rem 1rem 2rem;
+    padding: 5rem 0.75rem 2rem;
   }
   .admin-tabs {
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    white-space: nowrap;
+    padding-bottom: 5px;
+  }
+  .admin-tab-btn {
+    flex: 0 0 auto;
+    padding: 0.6rem 0.8rem;
+    font-size: 0.85rem;
   }
   .admin-table-header {
     flex-direction: column;
     gap: 1rem;
-    align-items: flex-start !important;
+    align-items: stretch !important;
   }
-  .admin-search-input {
+  .admin-toolbar {
+    flex-direction: column;
+    align-items: stretch !important;
+    padding: 1rem;
+  }
+  .admin-toolbar-left, .admin-toolbar-right {
+    flex-direction: column;
+    align-items: stretch !important;
+    width: 100%;
+  }
+  .admin-search-input, .admin-filter-select, .upload-reset-btn {
     width: 100% !important;
+    margin-bottom: 0.5rem;
+  }
+  .admin-table-wrap {
+    -webkit-overflow-scrolling: touch;
+    margin: 0 -0.75rem;
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+  }
+  .admin-table th, .admin-table td {
+    padding: 0.5rem 0.75rem;
   }
 }
 
