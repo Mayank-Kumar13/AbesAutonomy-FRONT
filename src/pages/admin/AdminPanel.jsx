@@ -1219,7 +1219,8 @@ export default function AdminPanel() {
                     <th>Year</th>
                     <th>Type</th>
                     <th>Views</th>
-                    <th>Uploaded</th>
+                    <th>Uploaded Date</th>
+                    <th>Uploader</th>
                     <th></th>
                   </tr>
                 </thead>
@@ -1292,6 +1293,11 @@ export default function AdminPanel() {
                       <td>{n.resourceType}</td>
                       <td>{n.viewCount || 0}</td>
                       <td>{formatDate(n.createdAt)}</td>
+                      <td>
+                        <span style={{ color: '#38bdf8', fontSize: '0.85rem' }}>
+                          {n.uploadedBy?.name || 'Unknown'}
+                        </span>
+                      </td>
                       <td style={{ display: 'flex', gap: '0.5rem' }}>
                         {editingNoteId !== n._id && (
                           <button
