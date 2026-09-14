@@ -10,7 +10,7 @@ export default function PdfPreview() {
   const location = useLocation();
   const { user, token } = useAuth();
 
-  const { pdfUrl, title = "PDF Preview", noteId } = location.state || {};
+  const { pdfUrl, title = "PDF Preview", noteId, subject = "" } = location.state || {};
   
   const [showReviewPrompt, setShowReviewPrompt] = useState(false);
   const [showActualReviewModal, setShowActualReviewModal] = useState(false);
@@ -24,7 +24,8 @@ export default function PdfPreview() {
         await trackingApi.ping(
           "/pdfpreview",
           pdfUrl || null,
-          title || "Untitled PDF"
+          title || "Untitled PDF",
+          subject || "Unknown Subject"
         );
       } catch (err) { console.error("[tracking] ping failed:", err); }
     };

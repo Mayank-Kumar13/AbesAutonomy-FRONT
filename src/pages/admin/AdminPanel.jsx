@@ -770,6 +770,7 @@ export default function AdminPanel() {
                 <tr>
                   <th>User Details</th>
                   <th>Viewing PDF</th>
+                  <th>Subject</th>
                   <th>Started At</th>
                   <th>Duration (mins)</th>
                   <th>Status</th>
@@ -787,6 +788,7 @@ export default function AdminPanel() {
                         <div style={{ fontSize: '0.85rem', color: '#94a3b8' }}>{log.userEmail}</div>
                       </td>
                       <td>{log.pdfTitle ? <span style={{ color: '#38bdf8' }}>{log.pdfTitle}</span> : '—'}</td>
+                      <td>{log.subject ? <span style={{ color: '#a78bfa' }}>{log.subject}</span> : '—'}</td>
                       <td>{new Date(log.startTime).toLocaleString()}</td>
                       <td>{durationMins} mins</td>
                       <td>
@@ -800,7 +802,7 @@ export default function AdminPanel() {
                   );
                 })}
                 {filteredPdfLogs.length === 0 && (
-                  <tr><td colSpan={5} className="admin-empty">No PDF reading logs found</td></tr>
+                  <tr><td colSpan={6} className="admin-empty">No PDF reading logs found</td></tr>
                 )}
               </tbody>
             </table>

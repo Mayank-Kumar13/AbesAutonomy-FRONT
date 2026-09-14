@@ -406,10 +406,10 @@ export const reviewApi = {
 // ─────────────────────────────────────────────────────
 
 export const trackingApi = {
-  async ping(location, pdfId, pdfTitle) {
+  async ping(location, pdfId, pdfTitle, subject) {
     return request('/reader/status', {
       method: 'POST',
-      body: JSON.stringify({ location, pdfId, pdfTitle }),
+      body: JSON.stringify({ location, pdfId, pdfTitle, subject }),
     });
   },
   async getLiveUsers() {

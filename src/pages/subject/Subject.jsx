@@ -57,6 +57,7 @@ const Subject = () => {
         pdfUrl: note.pdfUrl,
         title: note.title,
         noteId: note._id,
+        subject: note.subject,
       },
     });
   };
