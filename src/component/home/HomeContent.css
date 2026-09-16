@@ -373,6 +373,90 @@
     color: #0a0c10;
 }
 
+/* ─── Rating Summary ───────────────────────────── */
+
+.rating-summary {
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.rating-average-container {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.rating-average-number {
+    font-size: 3.5rem;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1;
+}
+
+.rating-average-details {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.rating-average-stars {
+    display: flex;
+    gap: 2px;
+}
+
+.rating-total-count {
+    color: #9ca3af;
+    font-size: 0.875rem;
+}
+
+.rating-distribution {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    max-width: 250px;
+}
+
+.rating-bar-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.rating-bar-label {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: #fff;
+    font-size: 0.875rem;
+    font-weight: 500;
+    width: 32px;
+}
+
+.rating-bar-track {
+    flex: 1;
+    height: 8px;
+    background: #1f2937;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.rating-bar-fill {
+    height: 100%;
+    background: #d4a373;
+    border-radius: 4px;
+    transition: width 0.5s ease-out;
+}
+
+.rating-bar-count {
+    color: #9ca3af;
+    font-size: 0.875rem;
+    width: 24px;
+    text-align: right;
+}
+
 /* ─── Right Panel ──────────────────────────── */
 
 .reviews-right-panel {
