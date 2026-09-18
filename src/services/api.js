@@ -418,4 +418,9 @@ export const trackingApi = {
   async getLogs() {
     return request('/reader/history');
   },
+  async recordVisit() {
+    return request('/tracking/visit', {
+      method: 'POST',
+    });
+  },
 };

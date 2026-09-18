@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Navbar from './component/navbar/Navbar';
 import IntroOverlay from './component/intro/IntroOverlay';
 import LiveTracker from './component/LiveTracker';
@@ -28,8 +28,13 @@ import ProtectedRoute from './auth/ProtectedRoute';
 import AdminPanel from './pages/admin/AdminPanel';
 import AdminRoute from './auth/AdminRoute';
 import GlobalStatusGuard from './auth/GlobalStatusGuard';
+import { trackingApi } from './services/api';
 
 const App = () => {
+  useEffect(() => {
+    trackingApi.recordVisit().catch(console.error);
+  }, []);
+
   return (
     <GlobalStatusGuard>
       <LiveTracker />

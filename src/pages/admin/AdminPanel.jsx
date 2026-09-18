@@ -592,6 +592,10 @@ export default function AdminPanel() {
             <span className="admin-card-label">Total Watch Time (all users)</span>
             <span className="admin-card-value">{formatWatchTime(stats?.totalWatchTimeMs ?? 0)}</span>
           </div>
+          <div className="admin-card">
+            <span className="admin-card-label">Website Visitors (Unique)</span>
+            <span className="admin-card-value">{stats?.totalVisitors ?? '—'}</span>
+          </div>
         </div>
       )}
 
