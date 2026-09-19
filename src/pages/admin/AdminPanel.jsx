@@ -599,6 +599,30 @@ export default function AdminPanel() {
         </div>
       )}
 
+      {user?.role !== 'coordinator' && (
+        <div className="quota-dashboard" style={{ marginTop: '2rem' }}>
+          <div className="quota-header">
+            <h2 className="quota-title">Load Test Statistics (Synthetic Traffic)</h2>
+          </div>
+          <div className="quota-stats">
+            <div className="quota-stat">
+              <span className="quota-stat-label">Synthetic Unique VUs</span>
+              <span className="quota-stat-val">{stats?.syntheticVisitors ?? 0}</span>
+            </div>
+            <div className="quota-stat">
+              <span className="quota-stat-label">Synthetic Requests</span>
+              <span className="quota-stat-val">{stats?.syntheticRequests ?? 0}</span>
+            </div>
+            <div className="quota-stat">
+              <span className="quota-stat-label">Synthetic Last Activity</span>
+              <span className="quota-stat-val">
+                {stats?.syntheticLastActive ? new Date(stats.syntheticLastActive).toLocaleString() : 'Never'}
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
+
       {user?.role !== 'coordinator' && emailQuota && (
         <div className="quota-dashboard">
           <div className="quota-header">
