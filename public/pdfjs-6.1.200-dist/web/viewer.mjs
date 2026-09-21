@@ -19044,6 +19044,13 @@ const PDFViewerApplication = {
     if (!this.downloadManager) {
       return;
     }
+    // CUSTOM INTERCEPT: Download watermarked PDF if backendUrl is provided
+    const urlParams = new URLSearchParams(window.location.search);
+    const backendUrl = urlParams.get('backendUrl');
+    if (backendUrl) {
+      window.open(backendUrl, '_blank');
+      return;
+    }
     let data;
     try {
       data = await (this.pdfDocument ? this.pdfDocument.getData() : this.pdfLoadingTask.getData());

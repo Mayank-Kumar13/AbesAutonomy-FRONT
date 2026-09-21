@@ -78,48 +78,23 @@ export default function PdfPreview() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
-      <div style={{ display: 'flex', width: '100%' }}>
-        <button
-          onClick={() => navigate(-1)}
-          style={{
-            flex: 1,
-            padding: "8px",
-            cursor: "pointer",
-            color: "black",
-            backgroundColor: "#d9a441",
-            border: "none",
-            borderRight: "1px solid #000",
-            fontSize: "16px",
-            fontWeight: "bold",
-          }}
-        >
-          ← Back — {title}
-        </button>
-        {noteId && (
-          <a
-            href={`${API_BASE}/notes/${noteId}/pdf`}
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              padding: "8px 20px",
-              cursor: "pointer",
-              color: "white",
-              backgroundColor: "#2c3e50",
-              border: "none",
-              fontSize: "16px",
-              fontWeight: "bold",
-              textDecoration: "none",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            Download Note (Watermarked)
-          </a>
-        )}
-      </div>
+      <button
+        onClick={() => navigate(-1)}
+        style={{
+          width: "100%",
+          padding: "8px",
+          cursor: "pointer",
+          color: "black",
+          backgroundColor: "#d9a441",
+          border: "none",
+          fontSize: "16px",
+          fontWeight: "bold",
+        }}
+      >
+        ← Back — {title}
+      </button>
 
-      <Pdfviewer file={viewerFileUrl} />
+      <Pdfviewer file={viewerFileUrl} backendUrl={noteId ? `${API_BASE}/notes/${noteId}/pdf` : ''} />
 
       {/* Custom Review Prompt Modal */}
       {showReviewPrompt && (
