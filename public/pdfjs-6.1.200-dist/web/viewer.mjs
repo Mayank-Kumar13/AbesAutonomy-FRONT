@@ -19882,11 +19882,8 @@ PDFPrintServiceFactory.initGlobals(PDFViewerApplication);
     if (fileOrigin === viewerOrigin) {
       return;
     }
-    const ex = new Error("file origin does not match viewer's");
-    PDFViewerApplication._documentError("pdfjs-loading-error", {
-      message: ex.message
-    });
-    throw ex;
+    // Bypass cross-origin check for CDN hosted files
+    return;
   };
   var onFileInputChange = function (evt) {
     if (this.pdfViewer?.isInPresentationMode) {
