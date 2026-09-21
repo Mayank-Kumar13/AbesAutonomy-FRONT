@@ -73,7 +73,8 @@ export default function PdfPreview() {
   };
 
   const API_BASE = import.meta.env.VITE_API_URL || "/api";
-  const viewerFileUrl = noteId ? `${API_BASE}/notes/${noteId}/pdf` : pdfUrl;
+  // Directly use pdfUrl to load from CDN fast, rather than going through the backend which does slow dynamic watermarking on the fly.
+  const viewerFileUrl = pdfUrl || (noteId ? `${API_BASE}/notes/${noteId}/pdf` : "");
 
   return (
     <div>
