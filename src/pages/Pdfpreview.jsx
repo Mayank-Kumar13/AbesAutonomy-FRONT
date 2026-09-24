@@ -55,23 +55,75 @@ export default function PdfPreview() {
   const API_BASE = import.meta.env.VITE_API_URL || "/api";
   const viewerFileUrl = noteId ? `${API_BASE}/notes/${noteId}/pdf` : pdfUrl;
 
+  const [isDownloading, setIsDownloading] = useState(false);
+
+  const handleDownload = async () => {
+    if (!noteId) {
+      alert("Cannot download this file securely.");
+      return;
+    }
+    
+    setIsDownloading(true);
+    try {
+      const token = localStorage.getItem("token");
+      const headers = token ? { "Authorization": `Bearer ${token}` } : {};
+      const downloadUrl = `${API_BASE}/notes/${noteId}/download`;
+      
+      const response = await fetch(downloadUrl, { headers });
+      if (!response.ok) throw new Error("Download failed");
+      
+      const blob = await response.blob();
+      const blobUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = blobUrl;
+      link.download = `${title}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      setTimeout(() => window.URL.revokeObjectURL(blobUrl), 1000);
+    } catch (error) {
+      console.error(error);
+      alert("Failed to download watermarked PDF.");
+    } finally {
+      setIsDownloading(false);
+    }
+  };
+
   return (
     <div>
-      <button
-        onClick={() => navigate(-1)}
-        style={{
-          width: "100%",
-          padding: "4px",
-          cursor: "pointer",
-          color: "black",
-          backgroundColor: "#d9a441",
-          border: "none",
-          fontSize: "16px",
-          fontWeight: "bold",
-        }}
-      >
-        ← Back — {title}
-      </button>
+      <div style={{ display: "flex", width: "100%" }}>
+        <button
+          onClick={() => navigate(-1)}
+          style={{
+            flex: 1,
+            padding: "8px",
+            cursor: "pointer",
+            color: "black",
+            backgroundColor: "#d9a441",
+            border: "none",
+            fontSize: "16px",
+            fontWeight: "bold",
+          }}
+        >
+          ← Back — {title}
+        </button>
+        <button
+          onClick={handleDownload}
+          disabled={isDownloading || !noteId}
+          style={{
+            padding: "8px 20px",
+            cursor: isDownloading || !noteId ? "not-allowed" : "pointer",
+            color: "white",
+            backgroundColor: isDownloading ? "#555" : "#2c3e50",
+            border: "none",
+            fontSize: "16px",
+            fontWeight: "bold",
+            borderLeft: "1px solid #1a252f"
+          }}
+        >
+          {isDownloading ? "Generating..." : "Download (Watermarked)"}
+        </button>
+      </div>
 
       <Pdfviewer file={viewerFileUrl} />
 

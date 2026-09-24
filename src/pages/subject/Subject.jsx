@@ -67,11 +67,16 @@ const Subject = () => {
       return;
     }
 
+    const token = localStorage.getItem("token");
+    const headers = token ? { "Authorization": `Bearer ${token}` } : {};
+
     notes.forEach(async (note, index) => {
-      if (note.pdfUrl) {
+      if (note._id) {
+        const downloadUrl = `${import.meta.env.VITE_API_URL || "http://localhost:5000/api"}/notes/${note._id}/download`;
         try {
           // Fetch the PDF as a blob to bypass pop-up blockers for multiple files
-          const response = await fetch(note.pdfUrl);
+          const response = await fetch(downloadUrl, { headers });
+          if (!response.ok) throw new Error("Download failed");
           const blob = await response.blob();
           const blobUrl = window.URL.createObjectURL(blob);
           
@@ -86,16 +91,7 @@ const Subject = () => {
           setTimeout(() => window.URL.revokeObjectURL(blobUrl), 1000);
         } catch (error) {
           console.error("Blob download failed for:", note.title, error);
-          // Fallback if fetch fails (e.g., due to CORS)
-          setTimeout(() => {
-            const link = document.createElement("a");
-            link.href = note.pdfUrl;
-            link.target = "_blank";
-            link.download = note.title ? `${note.title}.pdf` : `document_${index + 1}.pdf`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-          }, index * 300);
+          alert(`Failed to download ${note.title}`);
         }
       }
     });
