@@ -29,9 +29,14 @@ export default function ForgotPassword() {
           <h2 className="modal-title">FORGOT<br />PASSWORD</h2>
 
           {status === "sent" ? (
-            <p style={{ textAlign: "center", color: "#e2e8f0", fontSize: "0.9rem" }}>
-              If that email exists, a reset link has been sent. Check your inbox.
-            </p>
+            <>
+              <p style={{ textAlign: "center", color: "#e2e8f0", fontSize: "0.9rem", marginBottom: "1rem" }}>
+                If that email exists, a reset link has been sent. Check your inbox.
+              </p>
+              <p style={{ textAlign: 'center', fontSize: '0.85rem', marginBottom: '1.5rem', color: '#94a3b8' }}>
+                If you don't see the email, please check your <strong>Spam or Junk folder</strong> (especially for college emails).
+              </p>
+            </>
           ) : (
             <form className="auth-form" onSubmit={handleSubmit}>
               <div className="input-group">

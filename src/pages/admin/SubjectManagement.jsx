@@ -8,6 +8,10 @@ const SubjectManagement = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   
+  const [searchQuery, setSearchQuery] = useState('');
+  const [yearFilter, setYearFilter] = useState('all');
+  const [branchFilter, setBranchFilter] = useState('all');
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingSubject, setEditingSubject] = useState(null);
   
@@ -138,13 +142,61 @@ const SubjectManagement = () => {
   if (loading && subjects.length === 0) return <div className="admin-loading">Loading subjects...</div>;
   if (error) return <div className="admin-error">{error}</div>;
 
+  const filteredSubjects = subjects.filter(subject => {
+    // Year filter
+    if (yearFilter !== 'all' && subject.year !== Number(yearFilter)) return false;
+    
+    // Branch filter
+    if (branchFilter !== 'all') {
+      const groups = Array.isArray(subject.group) ? subject.group : [subject.group];
+      if (!groups.includes(branchFilter) && !groups.includes('common')) return false;
+    }
+    
+    // Search query
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      if (!subject.name.toLowerCase().includes(q) && !(subject.description && subject.description.toLowerCase().includes(q))) {
+        return false;
+      }
+    }
+    
+    return true;
+  });
+
   return (
     <div className="admin-section subjects-management">
-      <div className="admin-section-header">
-        <h2>Subject Management</h2>
-        <button className="admin-btn-primary" onClick={openAddModal}>
-          <Plus size={16} /> Add Subject
-        </button>
+      <div className="admin-toolbar" style={{ marginBottom: '1.5rem' }}>
+        <div className="admin-toolbar-left">
+          <h2 className="upload-form-title" style={{ margin: 0 }}>Subjects ({filteredSubjects.length})</h2>
+          <input
+            type="text"
+            placeholder="Search subjects..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="admin-search-input"
+            style={{ padding: '0.6rem 1rem', borderRadius: '8px', border: '1px solid #2d3748', background: '#0b0d10', color: '#fff', width: '220px' }}
+          />
+        </div>
+        <div className="admin-toolbar-right">
+          <select className="admin-filter-select" value={yearFilter} onChange={(e) => setYearFilter(e.target.value)}>
+            <option value="all">All Years</option>
+            <option value="1">Year 1</option>
+            <option value="2">Year 2</option>
+          </select>
+          <select className="admin-filter-select" value={branchFilter} onChange={(e) => setBranchFilter(e.target.value)}>
+            <option value="all">All Branches</option>
+            <option value="cse">CSE</option>
+            <option value="ds">DS</option>
+            <option value="aiml">AIML</option>
+            <option value="ece">ECE</option>
+            <option value="elce">ELCE</option>
+            <option value="electrical">Electrical</option>
+            <option value="electronics">Electronics</option>
+          </select>
+          <button className="admin-btn-primary" onClick={openAddModal}>
+            <Plus size={16} /> Add Subject
+          </button>
+        </div>
       </div>
 
       <div className="admin-table-container">
@@ -160,12 +212,12 @@ const SubjectManagement = () => {
             </tr>
           </thead>
           <tbody>
-            {subjects.length === 0 ? (
+            {filteredSubjects.length === 0 ? (
               <tr>
-                <td colSpan="6" className="admin-empty-state">No subjects found.</td>
+                <td colSpan="6" className="admin-empty-state">No subjects found matching your criteria.</td>
               </tr>
             ) : (
-              subjects.map(subject => (
+              filteredSubjects.map(subject => (
                 <tr key={subject._id}>
                   <td>
                     <div className="subject-name-cell">
@@ -266,7 +318,7 @@ const SubjectManagement = () => {
                   </div>
                   {formData.allowMultipleGroups ? (
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', background: '#0b0d10', padding: '0.5rem', borderRadius: '4px', border: '1px solid #2d3748' }}>
-                      {(formData.year === 1 ? ['common', 'electrical', 'electronics'] : ['cse', 'ds', 'aiml', 'ece', 'common']).map((b) => (
+                      {(formData.year === 1 ? ['common', 'electrical', 'electronics'] : ['cse', 'ds', 'aiml', 'ece', 'elce', 'common']).map((b) => (
                         <label key={b} style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.85rem', cursor: 'pointer' }}>
                           <input
                             type="checkbox"
@@ -301,6 +353,7 @@ const SubjectManagement = () => {
                           <option value="ds">DS</option>
                           <option value="aiml">AIML</option>
                           <option value="ece">ECE</option>
+                          <option value="elce">ELCE</option>
                           <option value="common">Common</option>
                         </>
                       )}

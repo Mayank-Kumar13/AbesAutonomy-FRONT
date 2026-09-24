@@ -82,6 +82,22 @@ const HomeContent = () => {
   const { isAuthenticated } = useAuth();
   const scrollRef = useRef(null);
 
+  const stats = React.useMemo(() => {
+    const total = reviews.length;
+    const dist = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
+    let sum = 0;
+    reviews.forEach(r => {
+      const rating = Math.floor(r.rating) || 5;
+      if (dist[rating] !== undefined) dist[rating]++;
+      sum += r.rating || 5;
+    });
+    return {
+      total,
+      average: total ? (sum / total).toFixed(1) : "0.0",
+      dist
+    };
+  }, [reviews]);
+
   const fetchReviews = useCallback(async () => {
     try {
       const res = await reviewApi.list(1, 50);
@@ -223,14 +239,52 @@ const HomeContent = () => {
           <div className="reviews-left-panel">
             <span className="reviews-badge">REVIEWS</span>
             <h2 className="reviews-heading">
-              Your feedback<br />
-              <span className="reviews-accent">means a lot!</span>
+              Student <span className="reviews-accent">Feedback</span>
             </h2>
-            <p className="reviews-description">
-              If you like ABES Autonomy, send your review to us and see
-              <span className="reviews-accent"> your name </span>
-              here!
-            </p>
+            
+            {stats.total > 0 ? (
+              <div className="rating-summary">
+                <div className="rating-average-container">
+                  <span className="rating-average-number">{stats.average}</span>
+                  <div className="rating-average-details">
+                    <div className="rating-average-stars">
+                      {[1, 2, 3, 4, 5].map((s) => (
+                        <Star
+                          key={s}
+                          size={18}
+                          fill={s <= Math.round(stats.average) ? "#d4a373" : "none"}
+                          color={s <= Math.round(stats.average) ? "#d4a373" : "#374151"}
+                        />
+                      ))}
+                    </div>
+                    <span className="rating-total-count">{stats.total} reviews</span>
+                  </div>
+                </div>
+                
+                <div className="rating-distribution">
+                  {[5, 4, 3, 2, 1].map(star => {
+                    const count = stats.dist[star];
+                    const percentage = stats.total ? (count / stats.total) * 100 : 0;
+                    return (
+                      <div key={star} className="rating-bar-row">
+                        <span className="rating-bar-label">{star} <Star size={12} fill="#d4a373" color="#d4a373" /></span>
+                        <div className="rating-bar-track">
+                          <div className="rating-bar-fill" style={{ width: `${percentage}%` }}></div>
+                        </div>
+                        <span className="rating-bar-count">{count}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ) : (
+              <p className="reviews-description">
+                If you like ABES Autonomy, send your review to us and see
+                <span className="reviews-accent"> your name </span>
+                here!
+              </p>
+            )}
+
             <button className="write-review-btn" onClick={handleWriteReview}>
               <Pen size={16} />
               Write a Review

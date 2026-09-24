@@ -1,13 +1,13 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { authApi } from '../../auth/authApi';
 import { useAuth } from '../../auth/AuthContext';
-import { uploadApi, notesApi, metaApi, subjectsApi } from '../../services/api';
+import { uploadApi, notesApi, metaApi, subjectsApi, trackingApi } from '../../services/api';
 import './AdminPanel.css';
 import SubjectManagement from './SubjectManagement';
 
 const BRANCHES_Y1 = ['electrical', 'electronics', 'common'];
-const BRANCHES_Y2 = ['cse', 'ds', 'aiml', 'ece', 'common'];
-const BRANCHES = Array.from(new Set(['cse', 'it', 'me', 'aids', 'ds', 'aiml', 'ece', 'electrical', 'electronics', 'common']));
+const BRANCHES_Y2 = ['cse', 'ds', 'aiml', 'ece', 'elce', 'common'];
+const BRANCHES = Array.from(new Set(['cse', 'it', 'me', 'aids', 'ds', 'aiml', 'ece', 'elce', 'electrical', 'electronics', 'common']));
 const RESOURCE_TYPES = ['theory', 'assignment', 'lab_manual', 'pyq', 'handwritten', 'syllabus'];
 
 let fileEntryIdCounter = 0;
@@ -72,9 +72,12 @@ export default function AdminPanel() {
   const [error, setError] = useState('');
   const [tab, setTab] = useState('users');
   const [searchQuery, setSearchQuery] = useState('');
+  const [userRoleFilter, setUserRoleFilter] = useState('all'); // 'all', 'admin', 'coordinator', 'user'
+  const [userStatusFilter, setUserStatusFilter] = useState('all'); // 'all', 'live', 'offline'
+  const [userSortBy, setUserSortBy] = useState('recent'); // 'recent', 'watchTime', 'logins'
   const [actionLoading, setActionLoading] = useState(null);
   
-  const { websiteStatus, setWebsiteStatus, user } = useAuth();
+  const { websiteStatus, setWebsiteStatus, user, token } = useAuth();
   const [statusLoading, setStatusLoading] = useState(false);
 
   // ─── Uploads tab state ────────────────────────────
@@ -88,6 +91,9 @@ export default function AdminPanel() {
   const [deletingId, setDeletingId] = useState(null);
   const notesLoadedRef = useRef(false);
 
+  const [uploadsSearchQuery, setUploadsSearchQuery] = useState('');
+  const [uploadsBranchFilter, setUploadsBranchFilter] = useState('all');
+  const [uploadsYearFilter, setUploadsYearFilter] = useState('all');
   // ─── Edit Note State ────────────────────────────
   const [editingNoteId, setEditingNoteId] = useState(null);
   const [editingNoteTitle, setEditingNoteTitle] = useState('');
@@ -128,6 +134,29 @@ export default function AdminPanel() {
   const [mailTemplateFilter, setMailTemplateFilter] = useState('');
   const [mailPage, setMailPage] = useState(1);
   const [mailTotalPages, setMailTotalPages] = useState(1);
+
+  // ─── PDF Read Logs state ────────────────────────────
+  const [pdfLogs, setPdfLogs] = useState([]);
+  const [pdfLogsSearch, setPdfLogsSearch] = useState('');
+  const [pdfLogsStatusFilter, setPdfLogsStatusFilter] = useState('all');
+  const [pdfLogsSort, setPdfLogsSort] = useState('recent');
+
+  const fetchPdfLogs = async () => {
+    try {
+      const json = await trackingApi.getLogs();
+      if (json.success) setPdfLogs(json.data);
+    } catch (err) { console.error("[admin] failed to fetch PDF read logs:", err); }
+  };
+
+  useEffect(() => {
+    if (tab === 'liveTracking') {
+      fetchPdfLogs();
+      const interval = setInterval(fetchPdfLogs, 5000);
+      return () => clearInterval(interval);
+    } else {
+      setPdfLogs([]);
+    }
+  }, [tab, token]);
 
   const loadAll = useCallback(async () => {
     try {
@@ -473,13 +502,64 @@ export default function AdminPanel() {
     }
   };
 
-  const filteredUsers = users.filter((u) => {
-    if (!searchQuery) return true;
-    const lowerQuery = searchQuery.toLowerCase();
-    return (
-      (u.name && u.name.toLowerCase().includes(lowerQuery)) ||
-      (u.email && u.email.toLowerCase().includes(lowerQuery))
-    );
+  const filteredUsers = users
+    .filter((u) => {
+      // Role Filter
+      if (userRoleFilter !== 'all') {
+        const uRole = u.role || 'user';
+        if (uRole !== userRoleFilter) return false;
+      }
+      
+      // Status Filter
+      if (userStatusFilter === 'live' && !u.isLive) return false;
+      if (userStatusFilter === 'offline' && u.isLive) return false;
+
+      // Search Query
+      if (searchQuery) {
+        const lowerQuery = searchQuery.toLowerCase();
+        if (
+          !(u.name && u.name.toLowerCase().includes(lowerQuery)) &&
+          !(u.email && u.email.toLowerCase().includes(lowerQuery))
+        ) {
+          return false;
+        }
+      }
+      return true;
+    })
+    .sort((a, b) => {
+      if (userSortBy === 'watchTime') {
+        return (b.totalWatchTime || 0) - (a.totalWatchTime || 0);
+      }
+      if (userSortBy === 'logins') {
+        return (b.loginCount || 0) - (a.loginCount || 0);
+      }
+      // default: recent (descending _id or createdAt)
+      return new Date(b.createdAt || b.lastActiveAt || 0) - new Date(a.createdAt || a.lastActiveAt || 0);
+    });
+
+  const filteredNotes = notes.filter((n) => {
+    // Branch Filter
+    if (uploadsBranchFilter !== 'all') {
+      const g = n.group || 'common';
+      if (g !== uploadsBranchFilter && g !== 'common') return false;
+    }
+    
+    // Year Filter
+    if (uploadsYearFilter !== 'all') {
+      if (n.year !== Number(uploadsYearFilter)) return false;
+    }
+
+    // Search Query
+    if (uploadsSearchQuery) {
+      const q = uploadsSearchQuery.toLowerCase();
+      if (
+        !(n.title && n.title.toLowerCase().includes(q)) &&
+        !(n.subject && n.subject.toLowerCase().includes(q))
+      ) {
+        return false;
+      }
+    }
+    return true;
   });
 
   if (loading) {
@@ -511,6 +591,34 @@ export default function AdminPanel() {
           <div className="admin-card">
             <span className="admin-card-label">Total Watch Time (all users)</span>
             <span className="admin-card-value">{formatWatchTime(stats?.totalWatchTimeMs ?? 0)}</span>
+          </div>
+          <div className="admin-card">
+            <span className="admin-card-label">Website Visitors (Unique)</span>
+            <span className="admin-card-value">{stats?.totalVisitors ?? '—'}</span>
+          </div>
+        </div>
+      )}
+
+      {user?.role !== 'coordinator' && (
+        <div className="quota-dashboard" style={{ marginTop: '2rem' }}>
+          <div className="quota-header">
+            <h2 className="quota-title">Load Test Statistics (Synthetic Traffic)</h2>
+          </div>
+          <div className="quota-stats">
+            <div className="quota-stat">
+              <span className="quota-stat-label">Synthetic Unique VUs</span>
+              <span className="quota-stat-val">{stats?.syntheticVisitors ?? 0}</span>
+            </div>
+            <div className="quota-stat">
+              <span className="quota-stat-label">Synthetic Requests</span>
+              <span className="quota-stat-val">{stats?.syntheticRequests ?? 0}</span>
+            </div>
+            <div className="quota-stat">
+              <span className="quota-stat-label">Synthetic Last Activity</span>
+              <span className="quota-stat-val">
+                {stats?.syntheticLastActive ? new Date(stats.syntheticLastActive).toLocaleString() : 'Never'}
+              </span>
+            </div>
           </div>
         </div>
       )}
@@ -620,6 +728,9 @@ export default function AdminPanel() {
             <button className={`admin-tab-btn ${tab === 'subjects' ? 'active' : ''}`} onClick={() => setTab('subjects')}>
               Subjects
             </button>
+            <button className={`admin-tab-btn ${tab === 'liveTracking' ? 'active' : ''}`} onClick={() => setTab('liveTracking')}>
+              PDF Read Logs
+            </button>
           </>
         )}
       </div>
@@ -628,18 +739,137 @@ export default function AdminPanel() {
         <SubjectManagement />
       )}
 
+      {tab === 'liveTracking' && (() => {
+        const filteredPdfLogs = pdfLogs.filter(log => {
+          const isReadingNow = (Date.now() - new Date(log.endTime).getTime()) < 30000;
+          
+          if (pdfLogsStatusFilter === 'live' && !isReadingNow) return false;
+          if (pdfLogsStatusFilter === 'finished' && isReadingNow) return false;
+
+          if (pdfLogsSearch) {
+            const q = pdfLogsSearch.toLowerCase();
+            if (
+              !(log.userName && log.userName.toLowerCase().includes(q)) &&
+              !(log.userEmail && log.userEmail.toLowerCase().includes(q)) &&
+              !(log.pdfTitle && log.pdfTitle.toLowerCase().includes(q))
+            ) {
+              return false;
+            }
+          }
+          return true;
+        }).sort((a, b) => {
+          if (pdfLogsSort === 'duration') {
+            return (b.durationMs || 0) - (a.durationMs || 0);
+          }
+          return new Date(b.endTime).getTime() - new Date(a.endTime).getTime();
+        });
+
+        return (
+          <div className="admin-table-wrap">
+            <div className="admin-toolbar">
+              <div className="admin-toolbar-left">
+                <h2 className="upload-form-title" style={{ margin: 0 }}>PDF Read Logs ({filteredPdfLogs.length})</h2>
+                <input
+                  type="text"
+                  placeholder="Search by user or PDF..."
+                  value={pdfLogsSearch}
+                  onChange={(e) => setPdfLogsSearch(e.target.value)}
+                  className="admin-search-input"
+                  style={{ padding: '0.6rem 1rem', borderRadius: '8px', border: '1px solid #2d3748', background: '#0b0d10', color: '#fff', width: '250px' }}
+                />
+              </div>
+              <div className="admin-toolbar-right">
+                <select className="admin-filter-select" value={pdfLogsStatusFilter} onChange={(e) => setPdfLogsStatusFilter(e.target.value)}>
+                  <option value="all">All Status</option>
+                  <option value="live">Reading Now</option>
+                  <option value="finished">Finished</option>
+                </select>
+                <select className="admin-filter-select" value={pdfLogsSort} onChange={(e) => setPdfLogsSort(e.target.value)}>
+                  <option value="recent">Sort: Recent</option>
+                  <option value="duration">Sort: Longest Duration</option>
+                </select>
+                <button className="upload-submit-btn" style={{ margin: 0, padding: '0.6rem 1rem', width: 'auto' }} onClick={fetchPdfLogs}>
+                  Refresh
+                </button>
+              </div>
+            </div>
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th>User Details</th>
+                  <th>Viewing PDF</th>
+                  <th>Subject</th>
+                  <th>Started At</th>
+                  <th>Duration (mins)</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredPdfLogs.map((log) => {
+                  const durationMins = Math.floor(log.durationMs / 60000);
+                  const isReadingNow = (Date.now() - new Date(log.endTime).getTime()) < 30000;
+
+                  return (
+                    <tr key={log._id}>
+                      <td>
+                        <div style={{ fontWeight: 600, color: '#f8fafc' }}>{log.userName}</div>
+                        <div style={{ fontSize: '0.85rem', color: '#94a3b8' }}>{log.userEmail}</div>
+                      </td>
+                      <td>{log.pdfTitle ? <span style={{ color: '#38bdf8' }}>{log.pdfTitle}</span> : '—'}</td>
+                      <td>{log.subject ? <span style={{ color: '#a78bfa' }}>{log.subject}</span> : '—'}</td>
+                      <td>{new Date(log.startTime).toLocaleString()}</td>
+                      <td>{durationMins} mins</td>
+                      <td>
+                        {isReadingNow ? (
+                          <span style={{ color: '#4ade80', fontWeight: 'bold' }}>Reading Now</span>
+                        ) : (
+                          <span style={{ color: '#94a3b8' }}>Finished</span>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+                {filteredPdfLogs.length === 0 && (
+                  <tr><td colSpan={6} className="admin-empty">No PDF reading logs found</td></tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        );
+      })()}
+
       {tab === 'users' && (
         <div className="admin-table-wrap">
-          <div className="admin-table-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', padding: '0 1rem' }}>
-            <h2 className="upload-form-title" style={{ margin: 0 }}>Users ({filteredUsers.length})</h2>
-            <input
-              type="text"
-              placeholder="Search by name or email..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="admin-search-input"
-              style={{ padding: '0.5rem 1rem', borderRadius: '4px', border: '1px solid #cbd5e1', width: '300px' }}
-            />
+          <div className="admin-toolbar">
+            <div className="admin-toolbar-left">
+              <h2 className="upload-form-title" style={{ margin: 0 }}>Users ({filteredUsers.length})</h2>
+              <input
+                type="text"
+                placeholder="Search by name or email..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="admin-search-input"
+                style={{ padding: '0.6rem 1rem', borderRadius: '8px', border: '1px solid #2d3748', background: '#0b0d10', color: '#fff', width: '250px' }}
+              />
+            </div>
+            <div className="admin-toolbar-right">
+              <select className="admin-filter-select" value={userRoleFilter} onChange={(e) => setUserRoleFilter(e.target.value)}>
+                <option value="all">All Roles</option>
+                <option value="user">Users</option>
+                <option value="coordinator">Coordinators</option>
+                <option value="admin">Admins</option>
+              </select>
+              <select className="admin-filter-select" value={userStatusFilter} onChange={(e) => setUserStatusFilter(e.target.value)}>
+                <option value="all">All Status</option>
+                <option value="live">Live Now</option>
+                <option value="offline">Offline</option>
+              </select>
+              <select className="admin-filter-select" value={userSortBy} onChange={(e) => setUserSortBy(e.target.value)}>
+                <option value="recent">Sort: Recent</option>
+                <option value="watchTime">Sort: Watch Time</option>
+                <option value="logins">Sort: Logins</option>
+              </select>
+            </div>
           </div>
           <table className="admin-table">
             <thead>
@@ -666,7 +896,7 @@ export default function AdminPanel() {
                   <td>{u.name}</td>
                   <td>{u.email}</td>
                   <td>
-                    {u.role === 'admin' ? <span className="badge" style={{backgroundColor: '#4f46e5', color: 'white'}}>Admin</span> : u.role === 'coordinator' ? <span className="badge" style={{backgroundColor: '#f59e0b', color: 'white'}}>Coordinator</span> : 'User'}
+                    {u.role === 'admin' ? <span className="badge admin-badge">Admin</span> : u.role === 'coordinator' ? <span className="badge coordinator-badge">Coordinator</span> : <span className="badge user-badge">User</span>}
                   </td>
                   <td>{u.provider}</td>
                   <td>{u.emailVerified ? 'Yes' : 'No'}</td>
@@ -764,6 +994,17 @@ export default function AdminPanel() {
 
       {tab === 'uploads' && (
         <div className="admin-uploads">
+          <div className="coordinator-guide">
+            <h3>📝 Coordinator Upload Guide</h3>
+            <p>Welcome Coordinators! Please follow these rules before uploading notes:</p>
+            <ul>
+              <li><strong>Compress Files:</strong> The database has a strict file size limit. Please compress your PDFs to <strong>under 15MB</strong> before uploading. You can use <a href="https://www.ilovepdf.com/compress_pdf" target="_blank" rel="noreferrer">iLovePDF</a> to compress them easily.</li>
+              <li><strong>Select Branch Carefully:</strong> Ensure you are only uploading files for your assigned branch/subject. If a subject belongs to multiple branches, check "Allow multiple groups".</li>
+              <li><strong>Naming Convention:</strong> Give the file a clear, descriptive title (e.g., "Unit 1: Quantum Physics").</li>
+              <li><strong>Need Help?</strong> If you face any issues or errors while uploading, please contact the ABES Autonomy Admins/Creators immediately.</li>
+            </ul>
+          </div>
+
           <form className="upload-form" onSubmit={handleUploadSubmit}>
             <h2 className="upload-form-title">Upload New PDFs</h2>
 
@@ -962,11 +1203,38 @@ export default function AdminPanel() {
           </form>
 
           <div className="upload-list-section">
-            <div className="upload-list-header">
-              <h2 className="upload-form-title">Uploaded Notes ({notes.length})</h2>
-              <button type="button" className="upload-reset-btn" onClick={() => { notesLoadedRef.current = true; loadNotes(); }} disabled={notesLoading}>
-                Refresh
-              </button>
+            <div className="admin-toolbar" style={{ marginBottom: '1.5rem' }}>
+              <div className="admin-toolbar-left">
+                <h2 className="upload-form-title" style={{ margin: 0 }}>Uploaded Notes ({filteredNotes.length})</h2>
+                <input
+                  type="text"
+                  placeholder="Search notes by title or subject..."
+                  value={uploadsSearchQuery}
+                  onChange={(e) => setUploadsSearchQuery(e.target.value)}
+                  className="admin-search-input"
+                  style={{ padding: '0.6rem 1rem', borderRadius: '8px', border: '1px solid #2d3748', background: '#0b0d10', color: '#fff', width: '250px' }}
+                />
+              </div>
+              <div className="admin-toolbar-right">
+                <select className="admin-filter-select" value={uploadsYearFilter} onChange={(e) => setUploadsYearFilter(e.target.value)}>
+                  <option value="all">All Years</option>
+                  <option value="1">Year 1</option>
+                  <option value="2">Year 2</option>
+                </select>
+                <select className="admin-filter-select" value={uploadsBranchFilter} onChange={(e) => setUploadsBranchFilter(e.target.value)}>
+                  <option value="all">All Branches</option>
+                  <option value="cse">CSE</option>
+                  <option value="ds">DS</option>
+                  <option value="aiml">AIML</option>
+                  <option value="ece">ECE</option>
+                  <option value="elce">ELCE</option>
+                  <option value="electrical">Electrical</option>
+                  <option value="electronics">Electronics</option>
+                </select>
+                <button type="button" className="upload-reset-btn" onClick={() => { notesLoadedRef.current = true; loadNotes(); }} disabled={notesLoading}>
+                  Refresh
+                </button>
+              </div>
             </div>
 
             {notesError && <p className="admin-error">{notesError}</p>}
@@ -981,12 +1249,13 @@ export default function AdminPanel() {
                     <th>Year</th>
                     <th>Type</th>
                     <th>Views</th>
-                    <th>Uploaded</th>
+                    <th>Uploaded Date</th>
+                    <th>Uploader</th>
                     <th></th>
                   </tr>
                 </thead>
                 <tbody>
-                  {notes.map((n) => (
+                  {filteredNotes.map((n) => (
                     <tr key={n._id}>
                       <td>
                         {editingNoteId === n._id ? (
@@ -1054,6 +1323,11 @@ export default function AdminPanel() {
                       <td>{n.resourceType}</td>
                       <td>{n.viewCount || 0}</td>
                       <td>{formatDate(n.createdAt)}</td>
+                      <td>
+                        <span style={{ color: '#38bdf8', fontSize: '0.85rem' }}>
+                          {n.uploadedBy?.name || 'Unknown'}
+                        </span>
+                      </td>
                       <td style={{ display: 'flex', gap: '0.5rem' }}>
                         {editingNoteId !== n._id && (
                           <button

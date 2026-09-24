@@ -19044,6 +19044,13 @@ const PDFViewerApplication = {
     if (!this.downloadManager) {
       return;
     }
+    // CUSTOM INTERCEPT: Download watermarked PDF if backendUrl is provided
+    const urlParams = new URLSearchParams(window.location.search);
+    const backendUrl = urlParams.get('backendUrl');
+    if (backendUrl) {
+      window.open(backendUrl, '_blank');
+      return;
+    }
     let data;
     try {
       data = await (this.pdfDocument ? this.pdfDocument.getData() : this.pdfLoadingTask.getData());
@@ -19882,11 +19889,8 @@ PDFPrintServiceFactory.initGlobals(PDFViewerApplication);
     if (fileOrigin === viewerOrigin) {
       return;
     }
-    const ex = new Error("file origin does not match viewer's");
-    PDFViewerApplication._documentError("pdfjs-loading-error", {
-      message: ex.message
-    });
-    throw ex;
+    // Bypass cross-origin check for CDN hosted files
+    return;
   };
   var onFileInputChange = function (evt) {
     if (this.pdfViewer?.isInPresentationMode) {

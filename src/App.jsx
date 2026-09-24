@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Navbar from './component/navbar/Navbar';
 import IntroOverlay from './component/intro/IntroOverlay';
+import LiveTracker from './component/LiveTracker';
 import Credits from './pages/Credits';
 import HomeContent from './component/home/HomeContent';
 import { Routes, Route } from "react-router-dom";
@@ -27,10 +28,16 @@ import ProtectedRoute from './auth/ProtectedRoute';
 import AdminPanel from './pages/admin/AdminPanel';
 import AdminRoute from './auth/AdminRoute';
 import GlobalStatusGuard from './auth/GlobalStatusGuard';
+import { trackingApi } from './services/api';
 
 const App = () => {
+  useEffect(() => {
+    trackingApi.recordVisit().catch(console.error);
+  }, []);
+
   return (
     <GlobalStatusGuard>
+      <LiveTracker />
       <IntroOverlay />
       {useLocation().pathname !== "/pdfpreview" && <Navbar />} 
       <Scroll />

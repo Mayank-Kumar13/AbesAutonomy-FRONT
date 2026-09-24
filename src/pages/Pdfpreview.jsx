@@ -1,19 +1,39 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import Pdfviewer from "../component/Pdfviewer";
 import { useEffect, useState } from "react";
-import { notesApi } from "../services/api";
+import { notesApi, trackingApi } from "../services/api";
 import { useAuth } from "../auth/AuthContext";
 import ReviewModal from "../component/home/ReviewModal";
 
 export default function PdfPreview() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user } = useAuth();
+  const { user, token } = useAuth();
 
-  const { pdfUrl, title = "PDF Preview", noteId } = location.state || {};
+  const { pdfUrl, title = "PDF Preview", noteId, subject = "" } = location.state || {};
   
   const [showReviewPrompt, setShowReviewPrompt] = useState(false);
   const [showActualReviewModal, setShowActualReviewModal] = useState(false);
+
+  // Live Tracking for PDFs
+  useEffect(() => {
+    if (!user || !token) return;
+
+    const ping = async () => {
+      try {
+        await trackingApi.ping(
+          "/pdfpreview",
+          pdfUrl || null,
+          title || "Untitled PDF",
+          subject || "Unknown Subject"
+        );
+      } catch (err) { console.error("[tracking] ping failed:", err); }
+    };
+
+    ping();
+    const interval = setInterval(ping, 15000);
+    return () => clearInterval(interval);
+  }, [user, token, pdfUrl, title]);
 
   // Increment view count when a note is viewed
   useEffect(() => {
@@ -53,7 +73,8 @@ export default function PdfPreview() {
   };
 
   const API_BASE = import.meta.env.VITE_API_URL || "/api";
-  const viewerFileUrl = noteId ? `${API_BASE}/notes/${noteId}/pdf` : pdfUrl;
+  // Directly use pdfUrl to load from CDN fast, rather than going through the backend which does slow dynamic watermarking on the fly.
+  const viewerFileUrl = pdfUrl || (noteId ? `${API_BASE}/notes/${noteId}/pdf` : "");
 
   const [isDownloading, setIsDownloading] = useState(false);
 
@@ -90,7 +111,7 @@ export default function PdfPreview() {
   };
 
   return (
-    <div>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
       <div style={{ display: "flex", width: "100%" }}>
         <button
           onClick={() => navigate(-1)}
@@ -125,7 +146,7 @@ export default function PdfPreview() {
         </button>
       </div>
 
-      <Pdfviewer file={viewerFileUrl} />
+      <Pdfviewer file={viewerFileUrl} backendUrl={noteId ? `${API_BASE}/notes/${noteId}/pdf` : ''} />
 
       {/* Custom Review Prompt Modal */}
       {showReviewPrompt && (

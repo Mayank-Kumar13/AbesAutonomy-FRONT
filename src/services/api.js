@@ -400,3 +400,27 @@ export const reviewApi = {
     });
   },
 };
+
+// ─────────────────────────────────────────────────────
+// Tracking API
+// ─────────────────────────────────────────────────────
+
+export const trackingApi = {
+  async ping(location, pdfId, pdfTitle, subject) {
+    return request('/reader/status', {
+      method: 'POST',
+      body: JSON.stringify({ location, pdfId, pdfTitle, subject }),
+    });
+  },
+  async getLiveUsers() {
+    return request('/reader/active');
+  },
+  async getLogs() {
+    return request('/reader/history');
+  },
+  async recordVisit() {
+    return request('/tracking/visit', {
+      method: 'POST',
+    });
+  },
+};

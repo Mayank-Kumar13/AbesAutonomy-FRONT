@@ -135,7 +135,7 @@ const Resources = () => {
                 key={note._id}
                 onClick={() =>
                   navigate("/pdfpreview", {
-                    state: { pdfUrl: note.pdfUrl, title: note.title, noteId: note._id },
+                    state: { pdfUrl: note.pdfUrl, title: note.title, noteId: note._id, subject: note.subject },
                   })
                 }
                 style={{
