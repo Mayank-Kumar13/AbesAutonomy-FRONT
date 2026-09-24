@@ -133,11 +133,12 @@ const Resources = () => {
             {searchResults.data?.map((note) => (
               <div
                 key={note._id}
-                onClick={() =>
+                onClick={() => {
+                  const isImg = note.pdfUrl ? /\.(png|jpe?g|webp)$/i.test(note.pdfUrl.split('?')[0]) : false;
                   navigate("/pdfpreview", {
-                    state: { pdfUrl: note.pdfUrl, title: note.title, noteId: note._id, subject: note.subject },
-                  })
-                }
+                    state: { pdfUrl: note.pdfUrl, title: note.title, noteId: note._id, subject: note.subject, isImage: isImg },
+                  });
+                }}
                 style={{
                   padding: "12px 16px",
                   marginBottom: "8px",

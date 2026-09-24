@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useAuth } from "../auth/AuthContext";
 
-export default function Pdfviewer({ file }) {
+export default function Pdfviewer({ file, isImageFlag }) {
   const { user } = useAuth();
   
   if (!file) {
@@ -11,18 +11,26 @@ export default function Pdfviewer({ file }) {
   const viewerUrl = `/pdfjs-6.1.200-dist/web/viewer.html?file=${encodeURIComponent(file)}`;
   const viewerName = user ? (user.name || user.email) : 'Guest User';
 
+  const isImage = isImageFlag || /\.(png|jpe?g|webp)$/i.test(file.split('?')[0]);
+
   return (
     <div style={{ position: 'relative', width: '100%', minHeight: '100vh', overflow: 'hidden' }}>
-      <iframe
-        src={viewerUrl}
-        width="100%"
-        height="100%"
-        style={{
-          border: "none",
-          minHeight: "100vh",
-        }}
-        title="PDF Viewer"
-      />
+      {isImage ? (
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', background: '#0f172a' }}>
+          <img src={file} alt="Document View" style={{ maxWidth: '100%', maxHeight: '100vh', objectFit: 'contain' }} />
+        </div>
+      ) : (
+        <iframe
+          src={viewerUrl}
+          width="100%"
+          height="100%"
+          style={{
+            border: "none",
+            minHeight: "100vh",
+          }}
+          title="PDF Viewer"
+        />
+      )}
       {/* CSS Watermark Overlay */}
       <div
         style={{

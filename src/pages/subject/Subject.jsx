@@ -52,12 +52,14 @@ const Subject = () => {
   }, [heading, year, resourceType, branch]);
 
   const handlePreview = (note) => {
+    const isImg = note.pdfUrl ? /\.(png|jpe?g|webp)$/i.test(note.pdfUrl.split('?')[0]) : false;
     navigate("/pdfpreview", {
       state: {
         pdfUrl: note.pdfUrl,
         title: note.title,
         noteId: note._id,
         subject: note.subject,
+        isImage: isImg
       },
     });
   };
@@ -81,9 +83,11 @@ const Subject = () => {
           const blob = await response.blob();
           const blobUrl = window.URL.createObjectURL(blob);
           
+          const extMatch = note.pdfUrl ? note.pdfUrl.match(/\.(pdf|png|jpe?g|webp)$/i) : null;
+          const ext = extMatch ? extMatch[1].toLowerCase() : 'pdf';
           const link = document.createElement("a");
           link.href = blobUrl;
-          link.download = note.title ? `${note.title}.pdf` : `document_${index + 1}.pdf`;
+          link.download = note.title ? `${note.title}.${ext}` : `document_${index + 1}.${ext}`;
           document.body.appendChild(link);
           link.click();
           document.body.removeChild(link);

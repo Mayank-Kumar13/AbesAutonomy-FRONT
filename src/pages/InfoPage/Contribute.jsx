@@ -16,7 +16,7 @@ const Contribute = () => {
           Do you have high-quality handwritten notes, lab manuals, or previous year question papers? 
         </p>
         <ul className="info-list">
-          <li>Scan your documents clearly into a PDF format.</li>
+          <li>Scan your documents clearly into a PDF or Image (PNG/JPG) format.</li>
           <li>Ensure the subject name, semester, and year are clearly labeled.</li>
           <li>Email your contributions to our content team to get them verified and uploaded.</li>
         </ul>

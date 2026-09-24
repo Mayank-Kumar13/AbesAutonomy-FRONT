@@ -10,7 +10,7 @@ export default function PdfPreview() {
   const location = useLocation();
   const { user, token } = useAuth();
 
-  const { pdfUrl, title = "PDF Preview", noteId, subject = "" } = location.state || {};
+  const { pdfUrl, title = "PDF Preview", noteId, subject = "", isImage = false } = location.state || {};
   
   const [showReviewPrompt, setShowReviewPrompt] = useState(false);
   const [showActualReviewModal, setShowActualReviewModal] = useState(false);
@@ -146,7 +146,7 @@ export default function PdfPreview() {
         </button>
       </div>
 
-      <Pdfviewer file={viewerFileUrl} backendUrl={noteId ? `${API_BASE}/notes/${noteId}/pdf` : ''} />
+      <Pdfviewer file={viewerFileUrl} backendUrl={noteId ? `${API_BASE}/notes/${noteId}/pdf` : ''} isImageFlag={isImage} />
 
       {/* Custom Review Prompt Modal */}
       {showReviewPrompt && (

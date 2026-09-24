@@ -15,7 +15,7 @@ const makeFileEntry = (file) => ({
   id: `${Date.now()}-${fileEntryIdCounter++}`,
   
   file,
-  title: file.name.replace(/\.pdf$/i, ''),
+  title: file.name.replace(/\.(pdf|png|jpe?g|webp)$/i, ''),
   year: 1,
   subject: '',
   branch: 'common',
@@ -295,16 +295,17 @@ export default function AdminPanel() {
 
   const handleFilesChange = (e) => {
     const selected = Array.from(e.target.files || []);
-    const pdfsOnly = selected.filter((f) => f.type === 'application/pdf');
+    const allowedTypes = ['application/pdf', 'image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
+    const validFiles = selected.filter((f) => allowedTypes.includes(f.type));
 
-    if (pdfsOnly.length !== selected.length) {
-      setUploadMsg({ type: 'error', text: 'Only PDF files are allowed — non-PDF files were skipped.' });
+    if (validFiles.length !== selected.length) {
+      setUploadMsg({ type: 'error', text: 'Only PDF and image files are allowed — invalid files were skipped.' });
     } else {
       setUploadMsg(null);
     }
 
-    if (pdfsOnly.length > 0) {
-      setFileEntries((prev) => [...prev, ...pdfsOnly.map(makeFileEntry)]);
+    if (validFiles.length > 0) {
+      setFileEntries((prev) => [...prev, ...validFiles.map(makeFileEntry)]);
     }
 
     e.target.value = ''; // allow re-selecting the same file(s) again later
@@ -330,7 +331,7 @@ export default function AdminPanel() {
     setUploadMsg(null);
 
     if (fileEntries.length === 0) {
-      setUploadMsg({ type: 'error', text: 'Please choose at least one PDF file to upload.' });
+      setUploadMsg({ type: 'error', text: 'Please choose at least one file to upload.' });
       return;
     }
 
@@ -377,7 +378,7 @@ export default function AdminPanel() {
     setUploading(false);
 
     if (failed.length === 0) {
-      setUploadMsg({ type: 'success', text: `${succeeded} PDF${succeeded === 1 ? '' : 's'} uploaded successfully.` });
+      setUploadMsg({ type: 'success', text: `${succeeded} file${succeeded === 1 ? '' : 's'} uploaded successfully.` });
       resetUploadForm();
     } else {
       setUploadMsg({
@@ -729,7 +730,7 @@ export default function AdminPanel() {
               Subjects
             </button>
             <button className={`admin-tab-btn ${tab === 'liveTracking' ? 'active' : ''}`} onClick={() => setTab('liveTracking')}>
-              PDF Read Logs
+              Document Read Logs
             </button>
           </>
         )}
@@ -768,10 +769,10 @@ export default function AdminPanel() {
           <div className="admin-table-wrap">
             <div className="admin-toolbar">
               <div className="admin-toolbar-left">
-                <h2 className="upload-form-title" style={{ margin: 0 }}>PDF Read Logs ({filteredPdfLogs.length})</h2>
+                <h2 className="upload-form-title" style={{ margin: 0 }}>Document Read Logs ({filteredPdfLogs.length})</h2>
                 <input
                   type="text"
-                  placeholder="Search by user or PDF..."
+                  placeholder="Search by user or Document..."
                   value={pdfLogsSearch}
                   onChange={(e) => setPdfLogsSearch(e.target.value)}
                   className="admin-search-input"
@@ -797,7 +798,7 @@ export default function AdminPanel() {
               <thead>
                 <tr>
                   <th>User Details</th>
-                  <th>Viewing PDF</th>
+                  <th>Viewing Document</th>
                   <th>Subject</th>
                   <th>Started At</th>
                   <th>Duration (mins)</th>
@@ -830,7 +831,7 @@ export default function AdminPanel() {
                   );
                 })}
                 {filteredPdfLogs.length === 0 && (
-                  <tr><td colSpan={6} className="admin-empty">No PDF reading logs found</td></tr>
+                  <tr><td colSpan={6} className="admin-empty">No document reading logs found</td></tr>
                 )}
               </tbody>
             </table>
@@ -998,7 +999,7 @@ export default function AdminPanel() {
             <h3>📝 Coordinator Upload Guide</h3>
             <p>Welcome Coordinators! Please follow these rules before uploading notes:</p>
             <ul>
-              <li><strong>Compress Files:</strong> The database has a strict file size limit. Please compress your PDFs to <strong>under 15MB</strong> before uploading. You can use <a href="https://www.ilovepdf.com/compress_pdf" target="_blank" rel="noreferrer">iLovePDF</a> to compress them easily.</li>
+              <li><strong>Compress Files:</strong> The database has a strict file size limit. Please compress your files to <strong>under 15MB</strong> before uploading. You can use <a href="https://www.ilovepdf.com/compress_pdf" target="_blank" rel="noreferrer">iLovePDF</a> to compress them easily.</li>
               <li><strong>Select Branch Carefully:</strong> Ensure you are only uploading files for your assigned branch/subject. If a subject belongs to multiple branches, check "Allow multiple groups".</li>
               <li><strong>Naming Convention:</strong> Give the file a clear, descriptive title (e.g., "Unit 1: Quantum Physics").</li>
               <li><strong>Need Help?</strong> If you face any issues or errors while uploading, please contact the ABES Autonomy Admins/Creators immediately.</li>
@@ -1006,14 +1007,14 @@ export default function AdminPanel() {
           </div>
 
           <form className="upload-form" onSubmit={handleUploadSubmit}>
-            <h2 className="upload-form-title">Upload New PDFs</h2>
+            <h2 className="upload-form-title">Upload New Files</h2>
 
             <div className="upload-field file-field">
-              <label htmlFor="pdf-file">PDF Files *</label>
+              <label htmlFor="pdf-file">Files *</label>
               <input
                 id="pdf-file"
                 type="file"
-                accept="application/pdf"
+                accept="application/pdf,image/png,image/jpeg,image/webp"
                 multiple
                 onChange={handleFilesChange}
               />
@@ -1194,7 +1195,7 @@ export default function AdminPanel() {
               <button type="submit" className="upload-submit-btn" disabled={uploading || fileEntries.length === 0}>
                 {uploading
                   ? 'Uploading...'
-                  : `Upload ${fileEntries.length || ''} PDF${fileEntries.length === 1 ? '' : 's'}`}
+                  : `Upload ${fileEntries.length || ''} file${fileEntries.length === 1 ? '' : 's'}`}
               </button>
               <button type="button" className="upload-reset-btn" onClick={() => resetUploadForm(false)} disabled={uploading}>
                 Clear
