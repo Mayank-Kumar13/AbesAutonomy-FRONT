@@ -104,7 +104,7 @@ export default function PdfPreview() {
       setTimeout(() => window.URL.revokeObjectURL(blobUrl), 1000);
     } catch (error) {
       console.error(error);
-      alert("Failed to download watermarked PDF.");
+      alert("Failed to download PDF.");
     } finally {
       setIsDownloading(false);
     }
@@ -142,7 +142,7 @@ export default function PdfPreview() {
             borderLeft: "1px solid #1a252f"
           }}
         >
-          {isDownloading ? "Generating..." : "Download (Watermarked)"}
+          {isDownloading ? "Downloading..." : "Download PDF"}
         </button>
       </div>
 
