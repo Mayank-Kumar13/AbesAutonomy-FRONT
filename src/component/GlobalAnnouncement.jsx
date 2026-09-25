@@ -32,41 +32,97 @@ const GlobalAnnouncement = () => {
 
   if (!isVisible || !announcement) return null;
 
+  const formatMessage = (text) => {
+    if (!text) return null;
+    return text.split('\n').map((line, i) => (
+      <React.Fragment key={i}>
+        {line.split(' ').map((word, j) => {
+          const isUrl = word.startsWith('http://') || word.startsWith('https://');
+          if (isUrl) {
+            return (
+              <React.Fragment key={j}>
+                <a 
+                  href={word} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  style={{ color: '#d4a373', textDecoration: 'none', fontWeight: '500', borderBottom: '1px dashed #d4a373' }}
+                >
+                  {word}
+                </a>{' '}
+              </React.Fragment>
+            );
+          }
+          return <span key={j}>{word} </span>;
+        })}
+        {i !== text.split('\n').length - 1 && <br />}
+      </React.Fragment>
+    ));
+  };
+
   return (
     <div style={{
       position: 'fixed',
-      bottom: '24px',
-      right: '24px',
+      bottom: '30px',
+      right: '30px',
       zIndex: 9999,
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'flex-end',
-      fontFamily: 'inherit'
+      fontFamily: 'Inter, system-ui, sans-serif'
     }}>
       {isOpen && (
         <div style={{
-          backgroundColor: '#1a1f26',
-          border: '1px solid #2a3441',
-          borderRadius: '12px',
-          padding: '16px',
-          marginBottom: '12px',
-          maxWidth: '300px',
-          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
+          backgroundColor: 'rgba(15, 20, 27, 0.85)',
+          backdropFilter: 'blur(16px)',
+          WebkitBackdropFilter: 'blur(16px)',
+          border: '1px solid rgba(212, 163, 115, 0.3)',
+          borderRadius: '16px',
+          padding: '24px',
+          marginBottom: '16px',
+          maxWidth: '380px',
+          width: 'calc(100vw - 60px)', // For smaller screens
+          boxShadow: '0 20px 40px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255,255,255,0.05) inset',
           color: '#f5f5f5',
-          animation: 'slideUp 0.3s ease-out'
+          animation: 'slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1)'
         }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-            <h4 style={{ margin: 0, fontSize: '14px', color: '#d4a373', fontWeight: 'bold' }}>Announcement</h4>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Bell size={18} color="#d4a373" className="bell-shake" />
+              <h4 style={{ margin: 0, fontSize: '16px', color: '#d4a373', fontWeight: '600', letterSpacing: '0.5px' }}>
+                Announcement
+              </h4>
+            </div>
             <button 
               onClick={() => setIsOpen(false)}
-              style={{ background: 'none', border: 'none', color: '#888', cursor: 'pointer', padding: '4px' }}
+              style={{ 
+                background: 'rgba(255,255,255,0.05)', 
+                border: 'none', 
+                color: '#a0aec0', 
+                cursor: 'pointer', 
+                padding: '6px',
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                transition: 'all 0.2s ease'
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.1)'; e.currentTarget.style.color = '#fff'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; e.currentTarget.style.color = '#a0aec0'; }}
             >
               <X size={16} />
             </button>
           </div>
-          <p style={{ margin: 0, fontSize: '13px', lineHeight: '1.5' }}>
-            {announcement.message}
-          </p>
+          <div style={{ 
+            margin: 0, 
+            fontSize: '14.5px', 
+            lineHeight: '1.6', 
+            color: '#cbd5e1',
+            maxHeight: '400px',
+            overflowY: 'auto',
+            paddingRight: '4px'
+          }}>
+            {formatMessage(announcement.message)}
+          </div>
         </div>
       )}
       
@@ -78,29 +134,60 @@ const GlobalAnnouncement = () => {
             color: '#11161d',
             border: 'none',
             borderRadius: '50%',
-            width: '48px',
-            height: '48px',
+            width: '56px',
+            height: '56px',
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
             cursor: 'pointer',
-            boxShadow: '0 4px 12px rgba(212, 163, 115, 0.3)',
-            animation: 'bounce 2s infinite'
+            boxShadow: '0 8px 24px rgba(212, 163, 115, 0.4)',
+            transition: 'transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+            animation: 'pulseGlow 2s infinite'
           }}
+          onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
+          onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
         >
-          <Bell size={24} />
+          <Bell size={26} />
         </button>
       )}
 
       <style>{`
         @keyframes slideUp {
-          from { opacity: 0; transform: translateY(20px); }
-          to { opacity: 1; transform: translateY(0); }
+          from { opacity: 0; transform: translateY(30px) scale(0.95); }
+          to { opacity: 1; transform: translateY(0) scale(1); }
         }
-        @keyframes bounce {
-          0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
-          40% { transform: translateY(-10px); }
-          60% { transform: translateY(-5px); }
+        @keyframes pulseGlow {
+          0% { box-shadow: 0 0 0 0 rgba(212, 163, 115, 0.6); }
+          70% { box-shadow: 0 0 0 15px rgba(212, 163, 115, 0); }
+          100% { box-shadow: 0 0 0 0 rgba(212, 163, 115, 0); }
+        }
+        @keyframes bellShake {
+          0% { transform: rotate(0); }
+          15% { transform: rotate(15deg); }
+          30% { transform: rotate(-15deg); }
+          45% { transform: rotate(10deg); }
+          60% { transform: rotate(-10deg); }
+          75% { transform: rotate(5deg); }
+          90% { transform: rotate(-5deg); }
+          100% { transform: rotate(0); }
+        }
+        .bell-shake {
+          animation: bellShake 2.5s infinite;
+          transform-origin: top center;
+        }
+        /* Custom scrollbar for the popup text area */
+        div::-webkit-scrollbar {
+          width: 4px;
+        }
+        div::-webkit-scrollbar-track {
+          background: rgba(255, 255, 255, 0.02);
+        }
+        div::-webkit-scrollbar-thumb {
+          background: rgba(212, 163, 115, 0.3);
+          border-radius: 4px;
+        }
+        div::-webkit-scrollbar-thumb:hover {
+          background: rgba(212, 163, 115, 0.6);
         }
       `}</style>
     </div>
