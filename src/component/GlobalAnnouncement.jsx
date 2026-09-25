@@ -11,6 +11,9 @@ const GlobalAnnouncement = () => {
   const handleReact = async () => {
     if (hasReacted) return;
     setHasReacted(true);
+    if (announcement?.message) {
+      localStorage.setItem('reacted_announcement_msg', announcement.message);
+    }
     setAnnouncement(prev => ({
       ...prev,
       reactions: (prev?.reactions || 0) + 1
@@ -20,6 +23,7 @@ const GlobalAnnouncement = () => {
     } catch (err) {
       console.error(err);
       setHasReacted(false);
+      localStorage.removeItem('reacted_announcement_msg');
       setAnnouncement(prev => ({
         ...prev,
         reactions: Math.max((prev?.reactions || 1) - 1, 0)
@@ -34,6 +38,12 @@ const GlobalAnnouncement = () => {
         if (res?.data?.announcement && res.data.announcement.active && res.data.announcement.message) {
           setAnnouncement(res.data.announcement);
           setIsVisible(true);
+          
+          if (localStorage.getItem('reacted_announcement_msg') === res.data.announcement.message) {
+            setHasReacted(true);
+          } else {
+            setHasReacted(false);
+          }
         } else {
           setIsVisible(false);
           setIsOpen(false);
