@@ -97,7 +97,9 @@ export default function PdfPreview() {
       const blobUrl = window.URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = blobUrl;
-      link.download = `${title}.pdf`;
+      const extMatch = viewerFileUrl ? viewerFileUrl.match(/\.(pdf|png|jpe?g|webp)$/i) : null;
+      const ext = extMatch ? extMatch[1].toLowerCase() : 'pdf';
+      link.download = `${title}.${ext}`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
