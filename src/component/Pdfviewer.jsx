@@ -1,9 +1,20 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "../auth/AuthContext";
 
 export default function Pdfviewer({ file, isImageFlag }) {
   const { user } = useAuth();
   
+  const initialIsImage = isImageFlag || (file ? /\.(png|jpe?g|webp|gif|bmp|jfif|heic)$/i.test(file.split('?')[0]) : false);
+  const [isImage, setIsImage] = useState(initialIsImage);
+
+  useEffect(() => {
+    if (file && !initialIsImage) {
+      const img = new Image();
+      img.onload = () => setIsImage(true);
+      img.src = file;
+    }
+  }, [file, initialIsImage]);
+
   if (!file) {
     return <p style={{ textAlign: "center", padding: "20px" }}>Loading Document...</p>;
   }
@@ -11,7 +22,6 @@ export default function Pdfviewer({ file, isImageFlag }) {
   const viewerUrl = `/pdfjs-6.1.200-dist/web/viewer.html?file=${encodeURIComponent(file)}`;
   const viewerName = user ? (user.name || user.email) : 'Guest User';
 
-  const isImage = isImageFlag || /\.(png|jpe?g|webp)$/i.test(file.split('?')[0]);
 
   return (
     <div style={{ position: 'relative', width: '100%', minHeight: '100vh', overflow: 'hidden' }}>

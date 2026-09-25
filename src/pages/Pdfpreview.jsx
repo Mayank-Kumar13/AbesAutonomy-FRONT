@@ -97,8 +97,17 @@ export default function PdfPreview() {
       const blobUrl = window.URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = blobUrl;
-      const extMatch = viewerFileUrl ? viewerFileUrl.match(/\.(pdf|png|jpe?g|webp)$/i) : null;
-      const ext = extMatch ? extMatch[1].toLowerCase() : 'pdf';
+      
+      let ext = 'pdf';
+      if (blob.type === 'image/jpeg') ext = 'jpg';
+      else if (blob.type === 'image/png') ext = 'png';
+      else if (blob.type === 'image/webp') ext = 'webp';
+      else if (blob.type === 'application/pdf') ext = 'pdf';
+      else {
+        const extMatch = viewerFileUrl ? viewerFileUrl.match(/\.(pdf|png|jpe?g|webp|gif|bmp|jfif|heic)$/i) : null;
+        ext = extMatch ? extMatch[1].toLowerCase() : 'pdf';
+      }
+      
       link.download = `${title}.${ext}`;
       document.body.appendChild(link);
       link.click();
