@@ -12,6 +12,7 @@ import {
   MessageSquare,
   Pen,
   Notebook,
+  FileText,
 } from "lucide-react";
 import { reviewApi } from "../../services/api";
 import { useAuth } from "../../auth/AuthContext";
@@ -25,10 +26,10 @@ const cards = [
     resourceType: "assignment",
   },
   {
-    title: "LAB MANUALS",
-    description: "Practical manuals, experiment records and lab guides.",
-    icon: <FlaskConical size={34} />,
-    resourceType: "lab_manual",
+    title: "THEORY",
+    description: "Academic notes and lecture slides.",
+    icon: <FileText size={34} />,
+    resourceType: "theory",
   },
   {
     title: "PREVIOUS PAPERS",
