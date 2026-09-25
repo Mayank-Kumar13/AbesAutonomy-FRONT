@@ -439,4 +439,9 @@ export const settingsApi = {
       body: JSON.stringify(updates),
     });
   },
+  async reactToAnnouncement() {
+    return request('/settings/react', {
+      method: 'POST',
+    });
+  },
 };

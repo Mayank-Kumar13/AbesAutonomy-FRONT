@@ -1,11 +1,31 @@
 import React, { useState, useEffect } from 'react';
-import { Bell, X } from 'lucide-react';
+import { Bell, X, Heart } from 'lucide-react';
 import { settingsApi } from '../services/api';
 
 const GlobalAnnouncement = () => {
   const [announcement, setAnnouncement] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
+  const [hasReacted, setHasReacted] = useState(false);
+
+  const handleReact = async () => {
+    if (hasReacted) return;
+    setHasReacted(true);
+    setAnnouncement(prev => ({
+      ...prev,
+      reactions: (prev?.reactions || 0) + 1
+    }));
+    try {
+      await settingsApi.reactToAnnouncement();
+    } catch (err) {
+      console.error(err);
+      setHasReacted(false);
+      setAnnouncement(prev => ({
+        ...prev,
+        reactions: Math.max((prev?.reactions || 1) - 1, 0)
+      }));
+    }
+  };
 
   useEffect(() => {
     const fetchAnnouncement = async () => {
@@ -123,6 +143,46 @@ const GlobalAnnouncement = () => {
           }}>
             {formatMessage(announcement.message)}
           </div>
+          
+          <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'flex-start', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '16px' }}>
+            <button
+              onClick={handleReact}
+              disabled={hasReacted}
+              style={{
+                background: hasReacted ? 'rgba(239, 68, 68, 0.15)' : 'rgba(255, 255, 255, 0.05)',
+                border: hasReacted ? '1px solid rgba(239, 68, 68, 0.3)' : '1px solid rgba(255, 255, 255, 0.1)',
+                color: hasReacted ? '#ef4444' : '#a0aec0',
+                padding: '6px 14px',
+                borderRadius: '20px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                cursor: hasReacted ? 'default' : 'pointer',
+                fontSize: '13px',
+                fontWeight: '600',
+                transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
+              }}
+              onMouseEnter={(e) => { 
+                if (!hasReacted) {
+                  e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)'; 
+                  e.currentTarget.style.color = '#ef4444'; 
+                  e.currentTarget.style.borderColor = 'rgba(239, 68, 68, 0.3)';
+                  e.currentTarget.style.transform = 'scale(1.05)';
+                }
+              }}
+              onMouseLeave={(e) => { 
+                if (!hasReacted) {
+                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)'; 
+                  e.currentTarget.style.color = '#a0aec0'; 
+                  e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+                  e.currentTarget.style.transform = 'scale(1)';
+                }
+              }}
+            >
+              <Heart size={16} fill={hasReacted ? '#ef4444' : 'none'} className={hasReacted ? 'heart-beat' : ''} />
+              {announcement.reactions || 0}
+            </button>
+          </div>
         </div>
       )}
       
@@ -174,6 +234,16 @@ const GlobalAnnouncement = () => {
         .bell-shake {
           animation: bellShake 2.5s infinite;
           transform-origin: top center;
+        }
+        @keyframes heartBeat {
+          0% { transform: scale(1); }
+          14% { transform: scale(1.3); }
+          28% { transform: scale(1); }
+          42% { transform: scale(1.3); }
+          70% { transform: scale(1); }
+        }
+        .heart-beat {
+          animation: heartBeat 1s ease-in-out;
         }
         /* Custom scrollbar for the popup text area */
         div::-webkit-scrollbar {
