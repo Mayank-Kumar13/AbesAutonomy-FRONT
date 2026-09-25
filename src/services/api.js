@@ -424,3 +424,19 @@ export const trackingApi = {
     });
   },
 };
+
+// ─────────────────────────────────────────────────────
+// Settings API
+// ─────────────────────────────────────────────────────
+
+export const settingsApi = {
+  async getSettings() {
+    return request('/settings');
+  },
+  async updateSettings(updates) {
+    return request('/settings', {
+      method: 'PATCH',
+      body: JSON.stringify(updates),
+    });
+  },
+};

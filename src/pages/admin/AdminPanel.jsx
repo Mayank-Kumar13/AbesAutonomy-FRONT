@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { authApi } from '../../auth/authApi';
 import { useAuth } from '../../auth/AuthContext';
-import { uploadApi, notesApi, metaApi, subjectsApi, trackingApi } from '../../services/api';
+import { uploadApi, notesApi, metaApi, subjectsApi, trackingApi, settingsApi } from '../../services/api';
 import './AdminPanel.css';
 import SubjectManagement from './SubjectManagement';
 
@@ -79,6 +79,41 @@ export default function AdminPanel() {
   
   const { websiteStatus, setWebsiteStatus, user, token } = useAuth();
   const [statusLoading, setStatusLoading] = useState(false);
+
+  // ─── Announcement state ────────────────────────────
+  const [announcementMsg, setAnnouncementMsg] = useState('');
+  const [announcementActive, setAnnouncementActive] = useState(false);
+  const [announcementLoading, setAnnouncementLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const res = await settingsApi.getSettings();
+        if (res?.data?.announcement) {
+          setAnnouncementMsg(res.data.announcement.message || '');
+          setAnnouncementActive(res.data.announcement.active || false);
+        }
+      } catch (err) {}
+    };
+    fetchSettings();
+  }, []);
+
+  const handleUpdateAnnouncement = async () => {
+    setAnnouncementLoading(true);
+    try {
+      await settingsApi.updateSettings({
+        announcement: {
+          message: announcementMsg,
+          active: announcementActive
+        }
+      });
+      alert('Announcement updated successfully!');
+    } catch (err) {
+      alert('Failed to update announcement: ' + err.message);
+    } finally {
+      setAnnouncementLoading(false);
+    }
+  };
 
   // ─── Uploads tab state ────────────────────────────
   const [notes, setNotes] = useState([]);
@@ -693,6 +728,42 @@ export default function AdminPanel() {
           >
             {statusLoading ? 'Updating...' : websiteStatus === 'LIVE' ? 'Put Website Under Construction' : 'Make Website Live'}
           </button>
+        </div>
+      )}
+
+      {user?.role !== 'coordinator' && (
+        <div className="admin-table-wrap" style={{ padding: '1.5rem', marginBottom: '2rem' }}>
+          <h2 style={{ color: '#e2e8f0', margin: '0 0 1rem 0' }}>Global Announcement (Pop-up)</h2>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <div>
+              <label style={{ display: 'block', color: '#a0aec0', marginBottom: '0.5rem', fontSize: '0.9rem' }}>Message</label>
+              <textarea 
+                className="admin-search-input"
+                style={{ width: '100%', minHeight: '80px', padding: '0.75rem', borderRadius: '8px', border: '1px solid #2d3748', background: '#0b0d10', color: '#fff' }}
+                value={announcementMsg}
+                onChange={(e) => setAnnouncementMsg(e.target.value)}
+                placeholder="Enter announcement message..."
+              />
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <input 
+                type="checkbox" 
+                id="announcementActive"
+                checked={announcementActive}
+                onChange={(e) => setAnnouncementActive(e.target.checked)}
+                style={{ width: '16px', height: '16px', cursor: 'pointer' }}
+              />
+              <label htmlFor="announcementActive" style={{ color: '#a0aec0', cursor: 'pointer', fontSize: '0.9rem' }}>Enable Announcement</label>
+            </div>
+            <button 
+              className="upload-submit-btn" 
+              style={{ padding: '0.75rem 1.5rem', width: '200px' }}
+              onClick={handleUpdateAnnouncement}
+              disabled={announcementLoading}
+            >
+              {announcementLoading ? 'Saving...' : 'Save Announcement'}
+            </button>
+          </div>
         </div>
       )}
 
