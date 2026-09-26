@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { creditsApi } from '../../services/api';
+import Credit_Card from '../../component/credit_card/Credit_Card';
 import './AdminPanel.css'; // Reuse AdminPanel styles where applicable
 
 export default function CreditsManagement() {
@@ -278,28 +279,31 @@ export default function CreditsManagement() {
           ) : (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', gap: '1.5rem' }}>
               {members.map(member => (
-                <div key={member._id} className="admin-card" style={{ display: 'flex', gap: '1.5rem', alignItems: 'flex-start' }}>
-                  <img src={member.photoUrl || '/avatar-placeholder.png'} alt={member.name} style={{ width: '80px', height: '80px', borderRadius: '50%', objectFit: 'cover', border: '2px solid #2d3748' }} />
-                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100%' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                      <div>
-                        <h4 style={{ margin: '0 0 0.25rem 0', color: '#e2e8f0', fontSize: '1.1rem' }}>{member.name}</h4>
-                        <p style={{ margin: '0 0 0.5rem 0', color: '#c89b63', fontSize: '0.85rem', fontWeight: 600 }}>{member.role || 'Member'}</p>
-                      </div>
-                      <span className={`badge ${member.isVisible ? 'live-badge' : 'admin-badge'}`}>
+                <div key={member._id} style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', alignItems: 'center' }}>
+                  <div style={{ position: 'relative' }}>
+                    <Credit_Card
+                      name={member.name}
+                      year={member.year}
+                      description={member.description}
+                      image={member.photoUrl || '/avatar-placeholder.png'}
+                      github={member.github}
+                      linkedin={member.linkedin}
+                      instagram={member.instagram}
+                      role={member.role}
+                    />
+                    <div style={{ position: 'absolute', top: '10px', right: '10px', zIndex: 10 }}>
+                      <span className={`badge ${member.isVisible ? 'live-badge' : 'admin-badge'}`} style={{ backdropFilter: 'blur(5px)' }}>
                         {member.isVisible ? 'Visible' : 'Hidden'}
                       </span>
                     </div>
-                    
-                    <p style={{ margin: '0 0 1rem 0', color: '#a0aec0', fontSize: '0.85rem', flex: 1 }}>{member.description || 'No description'}</p>
-                    
-                    <div style={{ display: 'flex', gap: '0.5rem', marginTop: 'auto', paddingTop: '1rem', borderTop: '1px solid #2d3748' }}>
-                      <button className="upload-reset-btn" style={{ padding: '0.3rem 0.6rem', fontSize: '0.8rem', flex: 1 }} onClick={() => handleOpenMemberForm(member)}>Edit</button>
-                      <button className="upload-reset-btn" style={{ padding: '0.3rem 0.6rem', fontSize: '0.8rem', flex: 1 }} onClick={() => handleToggleVisible(member)}>
-                        {member.isVisible ? 'Hide' : 'Show'}
-                      </button>
-                      <button className="delete-note-btn" style={{ padding: '0.3rem 0.6rem', fontSize: '0.8rem', flex: 1 }} onClick={() => handleDeleteMember(member._id)}>Delete</button>
-                    </div>
+                  </div>
+                  
+                  <div className="admin-card" style={{ width: '100%', maxWidth: '300px', display: 'flex', gap: '0.5rem', padding: '0.75rem', marginTop: '-20px', zIndex: 10, background: '#121418', border: '1px solid #2d3748' }}>
+                    <button className="upload-reset-btn" style={{ padding: '0.4rem 0.6rem', fontSize: '0.85rem', flex: 1 }} onClick={() => handleOpenMemberForm(member)}>Edit</button>
+                    <button className="upload-reset-btn" style={{ padding: '0.4rem 0.6rem', fontSize: '0.85rem', flex: 1 }} onClick={() => handleToggleVisible(member)}>
+                      {member.isVisible ? 'Hide' : 'Show'}
+                    </button>
+                    <button className="delete-note-btn" style={{ padding: '0.4rem 0.6rem', fontSize: '0.85rem', flex: 1 }} onClick={() => handleDeleteMember(member._id)}>Delete</button>
                   </div>
                 </div>
               ))}
