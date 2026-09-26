@@ -40,6 +40,12 @@ body {
     margin-top: 20px;
 }
 
+/* Contributor sections use the small ContributorCard, so they can sit
+   closer together than the big team cards. */
+.contributors-grid {
+    gap: 14px;
+}
+
 @media (max-width: 768px) {
     .details h2 {
         font-size: 2.2rem;

@@ -49,6 +49,7 @@ export default function CreditsManagement() {
       const res = await creditsApi.createSection({
         title: 'New Section',
         description: '',
+        type: 'team',
         displayOrder: sections.length + 1,
         isPublished: false
       });
@@ -85,6 +86,7 @@ export default function CreditsManagement() {
       await creditsApi.updateSection(activeSectionId, {
         title: sectionData.title,
         description: sectionData.description,
+        type: sectionData.type || 'team',
         isPublished: true // Publish it
       });
       closeSectionEditor();
@@ -204,6 +206,19 @@ export default function CreditsManagement() {
                       <span className={`badge ${section.isPublished ? 'live-badge' : 'admin-badge'}`}>
                         {section.isPublished ? 'Published' : 'Draft'}
                       </span>
+                      <span
+                        style={{
+                          fontSize: '0.75rem',
+                          padding: '0.2rem 0.6rem',
+                          borderRadius: '999px',
+                          border: '1px solid #2d3748',
+                          color: section.type === 'contributor' ? '#d9a441' : '#94a3b8',
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.5px'
+                        }}
+                      >
+                        {section.type === 'contributor' ? 'Contributors Badge' : 'Team Badge'}
+                      </span>
                       <span style={{ color: '#718096', fontSize: '0.9rem' }}>{section.description || 'No description'}</span>
                     </div>
                   </div>
@@ -241,6 +256,17 @@ export default function CreditsManagement() {
                 placeholder="Optional description for this section..."
                 style={{ background: 'transparent', border: 'none', color: '#a0aec0', fontSize: '1rem', outline: 'none', padding: '0.5rem 0', width: '100%' }}
               />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                <label style={{ color: '#a0aec0', fontSize: '0.9rem' }}>Card style:</label>
+                <select
+                  value={sectionData.type || 'team'}
+                  onChange={e => setSectionData({ ...sectionData, type: e.target.value })}
+                  style={{ background: '#0b0d10', border: '1px solid #2d3748', borderRadius: '6px', color: '#e2e8f0', padding: '0.5rem 0.75rem', fontSize: '0.9rem', outline: 'none' }}
+                >
+                  <option value="team">Team Badge</option>
+                  <option value="contributor">Contributors Badge</option>
+                </select>
+              </div>
             </div>
 
             <h3 style={{ color: '#e2e8f0', marginBottom: '1.5rem', fontSize: '1.2rem' }}>Members</h3>
