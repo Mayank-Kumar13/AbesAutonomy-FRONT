@@ -4,6 +4,7 @@ import { useAuth } from '../../auth/AuthContext';
 import { uploadApi, notesApi, metaApi, subjectsApi, trackingApi, settingsApi } from '../../services/api';
 import './AdminPanel.css';
 import SubjectManagement from './SubjectManagement';
+import CreditsManagement from './CreditsManagement';
 
 const BRANCHES_Y1 = ['electrical', 'electronics', 'common'];
 const BRANCHES_Y2 = ['cse', 'ds', 'aiml', 'ece', 'elce', 'common'];
@@ -800,6 +801,9 @@ export default function AdminPanel() {
             <button className={`admin-tab-btn ${tab === 'subjects' ? 'active' : ''}`} onClick={() => setTab('subjects')}>
               Subjects
             </button>
+            <button className={`admin-tab-btn ${tab === 'credits' ? 'active' : ''}`} onClick={() => setTab('credits')}>
+              Credits
+            </button>
             <button className={`admin-tab-btn ${tab === 'liveTracking' ? 'active' : ''}`} onClick={() => setTab('liveTracking')}>
               Document Read Logs
             </button>
@@ -809,6 +813,10 @@ export default function AdminPanel() {
 
       {tab === 'subjects' && (
         <SubjectManagement />
+      )}
+
+      {tab === 'credits' && (
+        <CreditsManagement />
       )}
 
       {tab === 'liveTracking' && (() => {

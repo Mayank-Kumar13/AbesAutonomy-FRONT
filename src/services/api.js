@@ -445,3 +445,53 @@ export const settingsApi = {
     });
   },
 };
+
+// ─────────────────────────────────────────────────────
+// Credits API
+// ─────────────────────────────────────────────────────
+
+export const creditsApi = {
+  async getPublicCredits() {
+    return request('/credits/public');
+  },
+  async getAllSections() {
+    return request('/credits/sections');
+  },
+  async createSection(data) {
+    return request('/credits/sections', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+  async updateSection(id, data) {
+    return request(`/credits/sections/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  },
+  async deleteSection(id) {
+    return request(`/credits/sections/${id}`, {
+      method: 'DELETE',
+    });
+  },
+  async getMembersBySection(sectionId) {
+    return request(`/credits/sections/${sectionId}/members`);
+  },
+  async createMember(sectionId, formData) {
+    return request(`/credits/sections/${sectionId}/members`, {
+      method: 'POST',
+      body: formData, // FormData
+    });
+  },
+  async updateMember(id, formData) {
+    return request(`/credits/members/${id}`, {
+      method: 'PUT',
+      body: formData, // FormData
+    });
+  },
+  async deleteMember(id) {
+    return request(`/credits/members/${id}`, {
+      method: 'DELETE',
+    });
+  },
+};

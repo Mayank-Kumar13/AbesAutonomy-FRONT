@@ -9,6 +9,7 @@ const Credit_Card = (props) => {
       <div className="content">
         <span className="year">{props.year}</span>
         <h2>{props.name}</h2>
+        {props.role && <h3 style={{ color: '#38bdf8', marginTop: '0.2rem', marginBottom: '0.5rem', fontSize: '1rem' }}>{props.role}</h3>}
         <h4>{props.description}</h4>
         <div className="end">
           <div className="socials">
