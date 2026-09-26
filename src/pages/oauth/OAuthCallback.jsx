@@ -7,25 +7,38 @@ export default function OAuthCallback() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const { loadAfterOAuth } = useAuth();
+  const { setTokenAndLoad } = useAuth();
   const [error, setError] = useState("");
 
   useEffect(() => {
-    const errorParam = searchParams.get("error");
+    const token = searchParams.get("token");
     const code = searchParams.get("code");
+    const errorParam = searchParams.get("error");
 
     if (errorParam) {
       setError(`Login failed: ${errorParam}`);
       return;
     }
 
+    if (token) {
+      setTokenAndLoad(token).then(() => {
+        navigate("/", { replace: true });
+      });
+      return;
+    }
+
     if (code) {
       const provider = location.pathname.includes("github") ? "github" : "google";
+
       authApi.exchangeCode(provider, code)
-        .then(() => {
-          loadAfterOAuth().then(() => {
-            navigate("/", { replace: true });
-          });
+        .then((data) => {
+          if (data.token) {
+            setTokenAndLoad(data.token).then(() => {
+              navigate("/", { replace: true });
+            });
+          } else {
+            setError("Login failed. No token returned from server.");
+          }
         })
         .catch((err) => {
           setError(`Login failed: ${err.message}`);
@@ -33,11 +46,8 @@ export default function OAuthCallback() {
       return;
     }
 
-    // Default flow: Cookie is already set by backend redirect
-    loadAfterOAuth().then(() => {
-      navigate("/", { replace: true });
-    });
-  }, [searchParams, location, loadAfterOAuth, navigate]);
+    setError("Login failed. No token or code received.");
+  }, [searchParams, location, setTokenAndLoad, navigate]);
 
   if (error) {
     return (
