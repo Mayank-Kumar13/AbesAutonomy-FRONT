@@ -227,29 +227,28 @@ export default function CreditsManagement() {
       {!managingSection && (
         <div style={{ marginTop: '2rem' }}>
           {sections.length === 0 ? (
-            <p style={{ color: '#a0aec0' }}>No credit sections found.</p>
+            <p style={{ color: '#a0aec0', textAlign: 'center', padding: '2rem' }}>No credit sections found.</p>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', gap: '1.5rem' }}>
               {sections.map(section => (
-                <div key={section._id} style={{ background: '#0b0d10', padding: '1.5rem', borderRadius: '12px', border: '1px solid #2d3748' }}>
+                <div key={section._id} className="admin-card" style={{ position: 'relative' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                    <div>
-                      <h3 style={{ margin: '0 0 0.5rem 0', color: '#e2e8f0' }}>{section.title}</h3>
-                      <p style={{ margin: '0 0 1rem 0', color: '#a0aec0', fontSize: '0.9rem' }}>{section.description}</p>
-                      <div style={{ display: 'flex', gap: '1rem', fontSize: '0.85rem' }}>
-                        <span style={{ color: '#94a3b8' }}>Order: {section.displayOrder}</span>
-                        <span style={{ color: section.isPublished ? '#4ade80' : '#f87171' }}>
-                          {section.isPublished ? 'Published' : 'Draft'}
-                        </span>
-                      </div>
-                    </div>
+                    <h3 style={{ margin: '0 0 0.5rem 0', color: '#c89b63', fontFamily: '"Times New Roman", Georgia, serif', fontSize: '1.4rem' }}>{section.title}</h3>
+                    <span className={`badge ${section.isPublished ? 'live-badge' : 'admin-badge'}`}>
+                      {section.isPublished ? 'Published' : 'Draft'}
+                    </span>
+                  </div>
+                  <p style={{ margin: '0 0 1rem 0', color: '#a0aec0', fontSize: '0.9rem', flex: 1 }}>{section.description || 'No description provided.'}</p>
+                  
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid #2d3748' }}>
+                    <span style={{ color: '#94a3b8', fontSize: '0.85rem' }}>Order: {section.displayOrder}</span>
                     <div style={{ display: 'flex', gap: '0.5rem' }}>
-                      <button className="upload-submit-btn" style={{ padding: '0.4rem 0.8rem', width: 'auto' }} onClick={() => handleManageMembers(section)}>Manage Members</button>
-                      <button className="admin-action-btn edit" onClick={() => handleOpenSectionForm(section)}>Edit</button>
-                      <button className="admin-action-btn" style={{ color: '#a0aec0' }} onClick={() => handleTogglePublish(section)}>
+                      <button className="upload-reset-btn" style={{ padding: '0.4rem 0.8rem' }} onClick={() => handleManageMembers(section)}>Members</button>
+                      <button className="upload-reset-btn" style={{ padding: '0.4rem 0.8rem' }} onClick={() => handleOpenSectionForm(section)}>Edit</button>
+                      <button className="upload-reset-btn" style={{ padding: '0.4rem 0.8rem', color: section.isPublished ? '#f87171' : '#4ade80', borderColor: section.isPublished ? '#f87171' : '#4ade80' }} onClick={() => handleTogglePublish(section)}>
                         {section.isPublished ? 'Unpublish' : 'Publish'}
                       </button>
-                      <button className="admin-action-btn delete" onClick={() => handleDeleteSection(section._id)}>Delete</button>
+                      <button className="delete-note-btn" style={{ padding: '0.4rem 0.8rem' }} onClick={() => handleDeleteSection(section._id)}>Delete</button>
                     </div>
                   </div>
                 </div>
@@ -262,10 +261,10 @@ export default function CreditsManagement() {
       {/* Member Management View */}
       {managingSection && (
         <div style={{ marginTop: '2rem' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', background: '#121418', padding: '1rem 1.5rem', borderRadius: '12px', border: '1px solid #2d3748' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-              <button className="admin-action-btn" onClick={() => setManagingSection(null)}>← Back to Sections</button>
-              <h3 style={{ margin: 0, color: '#e2e8f0' }}>{managingSection.title} - Members</h3>
+              <button className="upload-reset-btn" onClick={() => setManagingSection(null)}>← Back</button>
+              <h3 style={{ margin: 0, color: '#c89b63', fontFamily: '"Times New Roman", Georgia, serif' }}>{managingSection.title} <span style={{ color: '#a0aec0', fontSize: '1rem' }}>- Members</span></h3>
             </div>
             <button className="upload-submit-btn" style={{ margin: 0, width: 'auto' }} onClick={() => handleOpenMemberForm()}>
               + Add Member
@@ -273,30 +272,33 @@ export default function CreditsManagement() {
           </div>
 
           {membersLoading ? (
-            <p style={{ color: '#a0aec0' }}>Loading members...</p>
+            <p style={{ color: '#a0aec0', textAlign: 'center', padding: '2rem' }}>Loading members...</p>
           ) : members.length === 0 ? (
-            <p style={{ color: '#a0aec0' }}>No members added yet.</p>
+            <p style={{ color: '#a0aec0', textAlign: 'center', padding: '2rem' }}>No members added yet.</p>
           ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', gap: '1.5rem' }}>
               {members.map(member => (
-                <div key={member._id} style={{ background: '#0b0d10', padding: '1rem', borderRadius: '12px', border: '1px solid #2d3748', display: 'flex', gap: '1rem' }}>
-                  <img src={member.photoUrl || '/avatar-placeholder.png'} alt={member.name} style={{ width: '80px', height: '80px', borderRadius: '50%', objectFit: 'cover' }} />
-                  <div style={{ flex: 1 }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <h4 style={{ margin: '0 0 0.25rem 0', color: '#e2e8f0' }}>{member.name}</h4>
-                      <span style={{ fontSize: '0.8rem', color: member.isVisible ? '#4ade80' : '#f87171' }}>
+                <div key={member._id} className="admin-card" style={{ display: 'flex', gap: '1.5rem', alignItems: 'flex-start' }}>
+                  <img src={member.photoUrl || '/avatar-placeholder.png'} alt={member.name} style={{ width: '80px', height: '80px', borderRadius: '50%', objectFit: 'cover', border: '2px solid #2d3748' }} />
+                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100%' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                      <div>
+                        <h4 style={{ margin: '0 0 0.25rem 0', color: '#e2e8f0', fontSize: '1.1rem' }}>{member.name}</h4>
+                        <p style={{ margin: '0 0 0.5rem 0', color: '#c89b63', fontSize: '0.85rem', fontWeight: 600 }}>{member.role || 'Member'}</p>
+                      </div>
+                      <span className={`badge ${member.isVisible ? 'live-badge' : 'admin-badge'}`}>
                         {member.isVisible ? 'Visible' : 'Hidden'}
                       </span>
                     </div>
-                    <p style={{ margin: '0 0 0.25rem 0', color: '#a78bfa', fontSize: '0.85rem', fontWeight: 600 }}>{member.role}</p>
-                    <p style={{ margin: '0 0 0.5rem 0', color: '#94a3b8', fontSize: '0.8rem' }}>Year: {member.year}</p>
                     
-                    <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
-                      <button className="admin-action-btn edit" style={{ padding: '0.2rem 0.5rem', fontSize: '0.8rem' }} onClick={() => handleOpenMemberForm(member)}>Edit</button>
-                      <button className="admin-action-btn" style={{ padding: '0.2rem 0.5rem', fontSize: '0.8rem', color: '#a0aec0' }} onClick={() => handleToggleVisible(member)}>
+                    <p style={{ margin: '0 0 1rem 0', color: '#a0aec0', fontSize: '0.85rem', flex: 1 }}>{member.description || 'No description'}</p>
+                    
+                    <div style={{ display: 'flex', gap: '0.5rem', marginTop: 'auto', paddingTop: '1rem', borderTop: '1px solid #2d3748' }}>
+                      <button className="upload-reset-btn" style={{ padding: '0.3rem 0.6rem', fontSize: '0.8rem', flex: 1 }} onClick={() => handleOpenMemberForm(member)}>Edit</button>
+                      <button className="upload-reset-btn" style={{ padding: '0.3rem 0.6rem', fontSize: '0.8rem', flex: 1 }} onClick={() => handleToggleVisible(member)}>
                         {member.isVisible ? 'Hide' : 'Show'}
                       </button>
-                      <button className="admin-action-btn delete" style={{ padding: '0.2rem 0.5rem', fontSize: '0.8rem' }} onClick={() => handleDeleteMember(member._id)}>Delete</button>
+                      <button className="delete-note-btn" style={{ padding: '0.3rem 0.6rem', fontSize: '0.8rem', flex: 1 }} onClick={() => handleDeleteMember(member._id)}>Delete</button>
                     </div>
                   </div>
                 </div>
@@ -308,30 +310,35 @@ export default function CreditsManagement() {
 
       {/* Section Form Modal */}
       {showSectionForm && (
-        <div className="modal-overlay" style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
-          <div className="upload-form-container" style={{ width: '100%', maxWidth: '500px', margin: 0, padding: '2rem' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-              <h2 className="upload-form-title" style={{ margin: 0 }}>{editingSection ? 'Edit Section' : 'Create Section'}</h2>
-              <button className="admin-action-btn delete" onClick={() => setShowSectionForm(false)}>✕</button>
+        <div className="admin-modal-overlay">
+          <div className="admin-modal">
+            <div className="admin-modal-header">
+              <h3>{editingSection ? 'Edit Section' : 'Create Section'}</h3>
+              <button className="close-btn" onClick={() => setShowSectionForm(false)}>✕</button>
             </div>
-            <form onSubmit={handleSaveSection}>
+            <form onSubmit={handleSaveSection} className="admin-form">
               <div className="form-group">
                 <label>Title *</label>
-                <input type="text" required value={sectionForm.title} onChange={e => setSectionForm({...sectionForm, title: e.target.value})} className="upload-input" />
+                <input type="text" required value={sectionForm.title} onChange={e => setSectionForm({...sectionForm, title: e.target.value})} />
               </div>
               <div className="form-group">
                 <label>Description</label>
-                <textarea value={sectionForm.description} onChange={e => setSectionForm({...sectionForm, description: e.target.value})} className="upload-input" style={{ minHeight: '80px' }} />
+                <textarea value={sectionForm.description} onChange={e => setSectionForm({...sectionForm, description: e.target.value})} />
               </div>
               <div className="form-group">
                 <label>Display Order</label>
-                <input type="number" value={sectionForm.displayOrder} onChange={e => setSectionForm({...sectionForm, displayOrder: parseInt(e.target.value) || 0})} className="upload-input" />
+                <input type="number" value={sectionForm.displayOrder} onChange={e => setSectionForm({...sectionForm, displayOrder: parseInt(e.target.value) || 0})} />
               </div>
-              <div className="form-group" style={{ flexDirection: 'row', alignItems: 'center', gap: '0.5rem' }}>
-                <input type="checkbox" checked={sectionForm.isPublished} onChange={e => setSectionForm({...sectionForm, isPublished: e.target.checked})} id="isPublished" />
-                <label htmlFor="isPublished" style={{ margin: 0 }}>Published</label>
+              <div className="form-group checkbox-group" style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <label>
+                  <input type="checkbox" checked={sectionForm.isPublished} onChange={e => setSectionForm({...sectionForm, isPublished: e.target.checked})} />
+                  Published to public page
+                </label>
               </div>
-              <button type="submit" className="upload-submit-btn">Save Section</button>
+              <div className="admin-modal-footer">
+                <button type="button" className="admin-btn-secondary" onClick={() => setShowSectionForm(false)}>Cancel</button>
+                <button type="submit" className="admin-btn-primary">Save Section</button>
+              </div>
             </form>
           </div>
         </div>
@@ -339,63 +346,73 @@ export default function CreditsManagement() {
 
       {/* Member Form Modal */}
       {showMemberForm && (
-        <div className="modal-overlay" style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, overflowY: 'auto', padding: '2rem 0' }}>
-          <div className="upload-form-container" style={{ width: '100%', maxWidth: '600px', margin: 'auto', padding: '2rem' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-              <h2 className="upload-form-title" style={{ margin: 0 }}>{editingMember ? 'Edit Member' : 'Add Member'}</h2>
-              <button className="admin-action-btn delete" onClick={() => setShowMemberForm(false)}>✕</button>
+        <div className="admin-modal-overlay">
+          <div className="admin-modal" style={{ maxWidth: '700px' }}>
+            <div className="admin-modal-header">
+              <h3>{editingMember ? 'Edit Member' : 'Add Member'}</h3>
+              <button className="close-btn" onClick={() => setShowMemberForm(false)}>✕</button>
             </div>
-            <form onSubmit={handleSaveMember}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+            <form onSubmit={handleSaveMember} className="admin-form">
+              <div className="form-row">
                 <div className="form-group">
                   <label>Name *</label>
-                  <input type="text" required value={memberForm.name} onChange={e => setMemberForm({...memberForm, name: e.target.value})} className="upload-input" />
+                  <input type="text" required value={memberForm.name} onChange={e => setMemberForm({...memberForm, name: e.target.value})} />
                 </div>
                 <div className="form-group">
                   <label>Role</label>
-                  <input type="text" value={memberForm.role} onChange={e => setMemberForm({...memberForm, role: e.target.value})} className="upload-input" />
+                  <input type="text" value={memberForm.role} onChange={e => setMemberForm({...memberForm, role: e.target.value})} />
                 </div>
               </div>
               <div className="form-group">
                 <label>Description</label>
-                <textarea value={memberForm.description} onChange={e => setMemberForm({...memberForm, description: e.target.value})} className="upload-input" style={{ minHeight: '80px' }} />
+                <textarea value={memberForm.description} onChange={e => setMemberForm({...memberForm, description: e.target.value})} />
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+              <div className="form-row">
                 <div className="form-group">
                   <label>Year</label>
-                  <input type="text" value={memberForm.year} onChange={e => setMemberForm({...memberForm, year: e.target.value})} className="upload-input" />
+                  <input type="text" value={memberForm.year} onChange={e => setMemberForm({...memberForm, year: e.target.value})} />
                 </div>
                 <div className="form-group">
                   <label>Display Order</label>
-                  <input type="number" value={memberForm.displayOrder} onChange={e => setMemberForm({...memberForm, displayOrder: parseInt(e.target.value) || 0})} className="upload-input" />
+                  <input type="number" value={memberForm.displayOrder} onChange={e => setMemberForm({...memberForm, displayOrder: parseInt(e.target.value) || 0})} />
                 </div>
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem' }}>
+              <div className="form-row">
                 <div className="form-group">
                   <label>GitHub URL</label>
-                  <input type="url" value={memberForm.github} onChange={e => setMemberForm({...memberForm, github: e.target.value})} className="upload-input" />
+                  <input type="url" value={memberForm.github} onChange={e => setMemberForm({...memberForm, github: e.target.value})} />
                 </div>
                 <div className="form-group">
                   <label>LinkedIn URL</label>
-                  <input type="url" value={memberForm.linkedin} onChange={e => setMemberForm({...memberForm, linkedin: e.target.value})} className="upload-input" />
+                  <input type="url" value={memberForm.linkedin} onChange={e => setMemberForm({...memberForm, linkedin: e.target.value})} />
                 </div>
                 <div className="form-group">
                   <label>Instagram URL</label>
-                  <input type="url" value={memberForm.instagram} onChange={e => setMemberForm({...memberForm, instagram: e.target.value})} className="upload-input" />
+                  <input type="url" value={memberForm.instagram} onChange={e => setMemberForm({...memberForm, instagram: e.target.value})} />
                 </div>
               </div>
               <div className="form-group">
                 <label>Profile Photo</label>
-                <input type="file" accept="image/*" onChange={e => setMemberPhoto(e.target.files[0])} className="upload-input" style={{ padding: '0.5rem' }} />
-                {editingMember?.photoUrl && !memberPhoto && (
-                  <img src={editingMember.photoUrl} alt="Preview" style={{ width: '60px', height: '60px', marginTop: '0.5rem', borderRadius: '8px', objectFit: 'cover' }} />
-                )}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginTop: '0.5rem' }}>
+                  {editingMember?.photoUrl && !memberPhoto && (
+                    <img src={editingMember.photoUrl} alt="Preview" style={{ width: '60px', height: '60px', borderRadius: '50%', objectFit: 'cover', border: '2px solid #2d3748' }} />
+                  )}
+                  {memberPhoto && (
+                    <div style={{ width: '60px', height: '60px', borderRadius: '50%', background: '#2d3748', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#c89b63', fontSize: '0.8rem', textAlign: 'center' }}>New</div>
+                  )}
+                  <input type="file" accept="image/*" onChange={e => setMemberPhoto(e.target.files[0])} style={{ background: 'transparent', border: 'none', padding: 0 }} />
+                </div>
               </div>
-              <div className="form-group" style={{ flexDirection: 'row', alignItems: 'center', gap: '0.5rem' }}>
-                <input type="checkbox" checked={memberForm.isVisible} onChange={e => setMemberForm({...memberForm, isVisible: e.target.checked})} id="isVisible" />
-                <label htmlFor="isVisible" style={{ margin: 0 }}>Visible</label>
+              <div className="form-group checkbox-group" style={{ flexDirection: 'row', alignItems: 'center', marginTop: '1rem' }}>
+                <label>
+                  <input type="checkbox" checked={memberForm.isVisible} onChange={e => setMemberForm({...memberForm, isVisible: e.target.checked})} />
+                  Visible on public page
+                </label>
               </div>
-              <button type="submit" className="upload-submit-btn" style={{ marginTop: '1rem' }}>Save Member</button>
+              <div className="admin-modal-footer">
+                <button type="button" className="admin-btn-secondary" onClick={() => setShowMemberForm(false)}>Cancel</button>
+                <button type="submit" className="admin-btn-primary">Save Member</button>
+              </div>
             </form>
           </div>
         </div>
