@@ -11,29 +11,10 @@
 const envApiBase = import.meta.env.VITE_API_URL; const API_BASE = (envApiBase && envApiBase.includes("abes.work")) ? "/api" : (envApiBase || "/api");
 
 /**
- * Get auth token from localStorage.
- */
-const getToken = () => localStorage.getItem('token');
-
-/**
- * Set auth token in localStorage.
- */
-export const setToken = (token) => {
-  localStorage.setItem('token', token);
-};
-
-/**
- * Remove auth token from localStorage.
- */
-export const removeToken = () => {
-  localStorage.removeItem('token');
-};
-
-/**
- * Check if user is logged in.
+ * Check if user is logged in (rely on user object for frontend, cookie handles backend)
  */
 export const isLoggedIn = () => {
-  return !!getToken();
+  return !!getStoredUser();
 };
 
 /**
@@ -52,14 +33,17 @@ export const getStoredUser = () => {
  * Store user data.
  */
 export const setStoredUser = (user) => {
-  localStorage.setItem('abes_user', JSON.stringify(user));
+  if (user) {
+    localStorage.setItem('abes_user', JSON.stringify(user));
+  } else {
+    localStorage.removeItem('abes_user');
+  }
 };
 
 /**
  * Clear all auth data.
  */
 export const clearAuth = () => {
-  removeToken();
   localStorage.removeItem('abes_user');
 };
 
@@ -75,12 +59,6 @@ async function request(url, options = {}, retries = 3, backoff = 1000) {
   // Browser automatically sets the correct multipart boundary.
   if (!(options.body instanceof FormData)) {
     headers['Content-Type'] = 'application/json';
-  }
-
-  const token = getToken();
-
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
   }
 
   const response = await fetch(`${API_BASE}${url}`, {
@@ -138,8 +116,7 @@ export const authApi = {
       }),
     });
 
-    if (data.data?.token) {
-      setToken(data.data.token);
+    if (data.data?.user) {
       setStoredUser(data.data.user);
     }
 
@@ -155,8 +132,7 @@ export const authApi = {
       }),
     });
 
-    if (data.data?.token) {
-      setToken(data.data.token);
+    if (data.data?.user) {
       setStoredUser(data.data.user);
     }
 
@@ -180,7 +156,12 @@ export const authApi = {
     return data;
   },
 
-  logout() {
+  async logout() {
+    try {
+      await request('/auth/logout', { method: 'POST' });
+    } catch (error) {
+      console.error('Logout failed on backend:', error);
+    }
     clearAuth();
   },
 };

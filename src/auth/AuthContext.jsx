@@ -6,26 +6,20 @@ const HEARTBEAT_INTERVAL_MS = 20000;
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
-  const [token, setToken] = useState(() => localStorage.getItem("token"));
   const [loading, setLoading] = useState(true);
   const [websiteStatus, setWebsiteStatus] = useState('UNDER_CONSTRUCTION');
   const heartbeatRef = useRef(null);
 
   const loadProfile = useCallback(async () => {
-    const token = localStorage.getItem("token");
-    
-    // We shouldn't exit early if there is no token, because the backend might be using HttpOnly cookies for Google OAuth.
     try {
       const [profileRes, settingsRes] = await Promise.all([
-        token ? authApi.getProfile().catch(() => null) : Promise.resolve(null),
+        authApi.getProfile().catch(() => null),
         authApi.getSettings().catch(() => ({ data: { websiteStatus: 'UNDER_CONSTRUCTION' } }))
       ]);
 
       if (profileRes) {
         setUser(profileRes.data);
       } else {
-        if (token) localStorage.removeItem("token");
-        setToken(null);
         setUser(null);
       }
 
@@ -33,8 +27,6 @@ export function AuthProvider({ children }) {
         setWebsiteStatus(settingsRes.data.websiteStatus);
       }
     } catch (err) {
-      if (token) localStorage.removeItem("token");
-      setToken(null);
       setUser(null);
     } finally {
       setLoading(false);
@@ -63,10 +55,6 @@ export function AuthProvider({ children }) {
 
   const login = async (email, password) => {
     const res = await authApi.login(email, password);
-    if (res.data && res.data.token) {
-      localStorage.setItem("token", res.data.token);
-      setToken(res.data.token);
-    }
     return res.data;
   };
 
@@ -77,8 +65,6 @@ export function AuthProvider({ children }) {
 
   const verifyOtp = async (userId, otp, purpose = "signup") => {
     const res = await authApi.verifyOtp(userId, otp, purpose);
-    localStorage.setItem("token", res.data.token);
-    setToken(res.data.token);
     setUser(res.data.user);
     return res.data.user;
   };
@@ -88,15 +74,12 @@ export function AuthProvider({ children }) {
     return res.data;
   };
 
-  const setTokenAndLoad = async (token) => {
-    localStorage.setItem("token", token);
-    setToken(token);
+  const loadAfterOAuth = async () => {
     await loadProfile();
   };
 
-  const logout = () => {
-    localStorage.removeItem("token");
-    setToken(null);
+  const logout = async () => {
+    await authApi.logout();
     setUser(null);
   };
 
@@ -108,7 +91,6 @@ export function AuthProvider({ children }) {
 
   const value = {
     user,
-    token,
     loading,
     websiteStatus,
     setWebsiteStatus,
@@ -118,7 +100,7 @@ export function AuthProvider({ children }) {
     verifyOtp,
     resendOtp,
     logout,
-    setTokenAndLoad,
+    loadAfterOAuth,
     updateProfile,
   };
 
