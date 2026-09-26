@@ -72,37 +72,41 @@ const ChooseSubject = () => {
     const controller = new AbortController();
     
     setLoading(true);
-    subjectsApi.getSubjects({ year: selectedYear, group: activeGroup }, { signal: controller.signal })
-      .then(res => {
-        if (isMounted) {
-          setSubjects(res.data || []);
-          setLoading(false);
-        }
-      })
-      .catch(err => {
-        if (err.name === 'AbortError') return;
-        console.error("Failed to fetch subjects:", err);
-        if (isMounted) {
-          setSubjects([]);
-          setLoading(false);
-        }
-      });
+    // Fetch only subjects that actually have notes for this specific resourceType
+    import('../../services/api').then(({ metaApi }) => {
+      metaApi.getSubjects({ year: selectedYear, branch: activeGroup, resourceType }, { signal: controller.signal })
+        .then(res => {
+          if (isMounted) {
+            setSubjects(res.data || []);
+            setLoading(false);
+          }
+        })
+        .catch(err => {
+          if (err.name === 'AbortError') return;
+          console.error("Failed to fetch subjects:", err);
+          if (isMounted) {
+            setSubjects([]);
+            setLoading(false);
+          }
+        });
+    });
     
     return () => {
       isMounted = false;
       controller.abort();
     };
-  }, [activeGroup, selectedYear]);
+  }, [activeGroup, selectedYear, resourceType]);
 
   // Map DB subjects to frontend format
   const displayedSubjects = subjects.map(subj => {
+    const subjectName = subj.subject || subj.name || "Unknown";
     const iconName = subj.icon || 'BookOpen';
     // Fallback to our existing mapping if available, otherwise use default BookOpen
-    let mappedIcon = SUBJECT_ICONS[subj.name.toUpperCase()] || <BookOpen size={35} strokeWidth={1.5} />;
+    let mappedIcon = SUBJECT_ICONS[subjectName.toUpperCase()] || <BookOpen size={35} strokeWidth={1.5} />;
     
     return {
-      heading: subj.name,
-      para: subj.description || `${subj.name} Study Materials`,
+      heading: subjectName,
+      para: subj.description || `${subjectName} Study Materials (${subj.count || 0} files)`,
       icon: mappedIcon,
     };
   });
@@ -111,6 +115,11 @@ const ChooseSubject = () => {
     <div className="choose-subject-wrapper">
       <div className="choose-subject-container">
         <div className="header-section">
+          <div style={{ color: '#d4a373', marginBottom: '16px', fontSize: '13px', fontWeight: '600', letterSpacing: '1px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ cursor: 'pointer', transition: 'color 0.2s' }} onMouseEnter={(e) => e.target.style.color = '#fff'} onMouseLeave={(e) => e.target.style.color = '#d4a373'} onClick={() => navigate('/resources')}>RESOURCES</span>
+            <span>/</span>
+            <span style={{ color: '#fff' }}>{resourceTitle.toUpperCase()}</span>
+          </div>
           <div className="title-container">
             <h1 className="page-title">CHOOSE SUBJECT</h1>
             <p className="page-subtitle">Select a subject to explore all related resources, notes, previous papers and more.</p>
@@ -172,6 +181,7 @@ const ChooseSubject = () => {
                   para: subject.para,
                   year: selectedYear,
                   resourceType: resourceType,
+                  resourceTitle: resourceTitle,
                   branch: activeGroup,
                 }}
                 style={{ textDecoration: 'none', color: 'inherit' }}

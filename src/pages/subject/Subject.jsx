@@ -13,6 +13,7 @@ const Subject = () => {
     para = "Subject Resources",
     year = 1,
     resourceType = "theory",
+    resourceTitle = "THEORY NOTES",
     branch = "electrical",
   } = location.state || {};
 
@@ -110,20 +111,24 @@ const Subject = () => {
     groupedByUnit[unitKey].push(note);
   });
 
-  // If no notes are fetched, show fallback units
-  const displayUnits =
-    notes.length > 0
-      ? Object.keys(groupedByUnit)
-          .sort((a, b) => Number(a) - Number(b))
-          .map((unitKey) => ({
-            unitNumber: Number(unitKey),
-            notes: groupedByUnit[unitKey],
-          }))
-      : [1, 2, 3, 4, 5].map((u) => ({ unitNumber: u, notes: [] }));
+  // If no notes are fetched, do not show fallback units.
+  const displayUnits = Object.keys(groupedByUnit)
+    .sort((a, b) => Number(a) - Number(b))
+    .map((unitKey) => ({
+      unitNumber: Number(unitKey),
+      notes: groupedByUnit[unitKey],
+    }));
 
   return (
     <main className="subject-page">
       <div className="subject-container">
+        <div style={{ color: '#d4a373', marginBottom: '24px', fontSize: '13px', fontWeight: '600', letterSpacing: '1px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ cursor: 'pointer', transition: 'color 0.2s' }} onMouseEnter={(e) => e.target.style.color = '#fff'} onMouseLeave={(e) => e.target.style.color = '#d4a373'} onClick={() => navigate('/resources')}>RESOURCES</span>
+          <span>/</span>
+          <span style={{ cursor: 'pointer', transition: 'color 0.2s' }} onMouseEnter={(e) => e.target.style.color = '#fff'} onMouseLeave={(e) => e.target.style.color = '#d4a373'} onClick={() => navigate(-1)}>{resourceTitle.toUpperCase()}</span>
+          <span>/</span>
+          <span style={{ color: '#fff' }}>{heading.toUpperCase()}</span>
+        </div>
         <div className="subject-heading">
           <h1>{heading}</h1>
 
@@ -146,6 +151,10 @@ const Subject = () => {
         ) : error ? (
           <div style={{ textAlign: "center", padding: "60px 0", color: "#e57373" }}>
             <p>{error}</p>
+          </div>
+        ) : displayUnits.length === 0 ? (
+          <div style={{ textAlign: "center", padding: "60px 0", color: "#b9b8b5" }}>
+            <p>No resources found for this subject yet.</p>
           </div>
         ) : (
           <div className="units-grid">
