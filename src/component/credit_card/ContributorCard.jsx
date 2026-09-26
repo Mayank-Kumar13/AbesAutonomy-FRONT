@@ -1,50 +1,19 @@
 import React from 'react'
-import { FaGithub, FaLinkedinIn, FaInstagram } from "react-icons/fa";
 import "./ContributorCard.css"
 
+// Same visual language as Credit_Card (full-bleed photo, gradient overlay,
+// hover lift + zoom) but smaller, and without the socials/URL row — this is
+// the compact "Contributor Badge" card.
 const ContributorCard = (props) => {
-  const hasSocials = props.github || props.linkedin || props.instagram;
-
   return (
     <div className="contributor-card">
-      <div className="contributor-card-stripe" />
-
-      <div className="contributor-card-header">
-        <span>CONTRIBUTOR</span>
-        {props.year && <span>{props.year}</span>}
+      <img src={props.image} alt={props.name} />
+      <div className="contributor-overlay"></div>
+      <div className="contributor-content">
+        {props.year && <span className="contributor-year">{props.year}</span>}
+        <h2>{props.name}</h2>
+        {props.role && <h4>{props.role}</h4>}
       </div>
-
-      <div className="contributor-card-body">
-        <img
-          className="contributor-card-photo"
-          src={props.image || '/avatar-placeholder.png'}
-          alt={props.name}
-        />
-        <div className="contributor-card-info">
-          <h4 className="contributor-card-name">{props.name}</h4>
-          {props.role && <p className="contributor-card-role">{props.role}</p>}
-        </div>
-      </div>
-
-      {hasSocials && (
-        <div className="contributor-card-socials">
-          {props.github && (
-            <a href={props.github} target="_blank" rel="noreferrer" aria-label="GitHub">
-              <FaGithub />
-            </a>
-          )}
-          {props.linkedin && (
-            <a href={props.linkedin} target="_blank" rel="noreferrer" aria-label="LinkedIn">
-              <FaLinkedinIn />
-            </a>
-          )}
-          {props.instagram && (
-            <a href={props.instagram} target="_blank" rel="noreferrer" aria-label="Instagram">
-              <FaInstagram />
-            </a>
-          )}
-        </div>
-      )}
     </div>
   )
 }
