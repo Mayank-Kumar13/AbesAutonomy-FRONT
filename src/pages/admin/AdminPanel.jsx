@@ -647,7 +647,7 @@ export default function AdminPanel() {
             <span className="admin-card-value">{stats?.totalUsers ?? '—'}</span>
           </div>
           <div className="admin-card live">
-            <span className="admin-card-label">Live Users (Real-time)</span>
+            <span className="admin-card-label">Live Users (last 5 min)</span>
             <span className="admin-card-value">
               <span className="live-dot" /> {stats?.liveUsers ?? '—'}
             </span>

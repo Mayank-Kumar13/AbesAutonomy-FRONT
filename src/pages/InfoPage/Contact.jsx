@@ -6,11 +6,11 @@ const Contact = () => {
     <div className="info-page-wrapper">
       <div className="info-container">
         <h1 className="info-title">Contact Support</h1>
-        
+
         <p className="info-text">
           Have a question, found a bug, or need help with your account? We are here to ensure your experience on ABES Autonomy is flawless.
         </p>
-        
+
         <h2 className="info-heading">Get in Touch</h2>
         <ul className="info-list">
           <li><strong>Technical Support:</strong> If a PDF isn't loading or a page is broken, reach out to our dev team.</li>
@@ -27,11 +27,11 @@ const Contact = () => {
           For any urgent queries, collaboration, or feedback, you can reach out directly to the core developers:
         </p>
         <ul className="info-list">
-          <li><strong>Mayank Kotuli:</strong> +91 9310664653</li>
-          <li><strong>Mayank Kumar:</strong> +91 97602 98122</li>
-          <li><strong>Mukul Yadav:</strong> +91 97582 81801</li>
+          <li><strong>Mayank Kotuli:</strong> +919310664653</li>
+          <li><strong>Mayank Kumar:</strong> +919760298122</li>
+          <li><strong>Mukul Yadav:</strong> +919758281801</li>
         </ul>
-        
+
         <p className="info-text" style={{ marginTop: '20px' }}>
           Alternatively, you can message the development team directly via our official social channels linked in the footer. We typically respond within 24 hours.
         </p>
