@@ -1,8 +1,9 @@
 import { jsPDF } from 'jspdf';
 import * as pdfjsLib from 'pdfjs-dist';
+import pdfWorker from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
 
-// We need to set the worker source for pdfjs to work in browser environments
-pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+// Use the bundled worker instead of a CDN
+pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorker;
 
 const fileToImage = (file) => {
   return new Promise((resolve, reject) => {
