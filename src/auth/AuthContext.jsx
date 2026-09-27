@@ -8,7 +8,7 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(() => localStorage.getItem("token"));
   const [loading, setLoading] = useState(true);
-  const [websiteStatus, setWebsiteStatus] = useState('UNDER_CONSTRUCTION');
+  const [websiteStatus, setWebsiteStatus] = useState('LIVE');
   const heartbeatRef = useRef(null);
 
   const loadProfile = useCallback(async () => {
@@ -18,7 +18,7 @@ export function AuthProvider({ children }) {
     try {
       const [profileRes, settingsRes] = await Promise.all([
         token ? authApi.getProfile().catch(() => null) : Promise.resolve(null),
-        authApi.getSettings().catch(() => ({ data: { websiteStatus: 'UNDER_CONSTRUCTION' } }))
+        authApi.getSettings().catch(() => ({ data: { websiteStatus: 'LIVE' } }))
       ]);
 
       if (profileRes) {
