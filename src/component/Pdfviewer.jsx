@@ -4,7 +4,11 @@ import { useAuth } from "../auth/AuthContext";
 export default function Pdfviewer({ file, isImageFlag }) {
   const { user } = useAuth();
   
-  const initialIsImage = isImageFlag || (file ? /\.(png|jpe?g|webp|gif|bmp|jfif|heic)$/i.test(file.split('?')[0]) : false);
+  const cleanFileUrl = file ? file.split('?')[0] : '';
+  const initialIsImage = isImageFlag || (file ? /\.(png|jpe?g|webp|gif|bmp|jfif|heic)$/i.test(cleanFileUrl) : false);
+  const isPdf = file ? /\.(pdf)$/i.test(cleanFileUrl) : true; // default to pdf if unknown
+  const isOffice = file ? /\.(docx?|pptx?|xlsx?)$/i.test(cleanFileUrl) : false;
+
   const [isImage, setIsImage] = useState(initialIsImage);
 
   useEffect(() => {
@@ -19,7 +23,15 @@ export default function Pdfviewer({ file, isImageFlag }) {
     return <p style={{ textAlign: "center", padding: "20px" }}>Loading Document...</p>;
   }
 
-  const viewerUrl = `/pdfjs-6.1.200-dist/web/viewer.html?file=${encodeURIComponent(file)}`;
+  let viewerUrl = file;
+  if (isPdf && !isOffice) {
+    viewerUrl = `/pdfjs-6.1.200-dist/web/viewer.html?file=${encodeURIComponent(file)}`;
+  } else if (isOffice) {
+    viewerUrl = `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(file)}`;
+  } else if (!isImage) {
+    viewerUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(file)}&embedded=true`;
+  }
+
   const viewerName = user ? (user.name || user.email) : 'Guest User';
 
 
