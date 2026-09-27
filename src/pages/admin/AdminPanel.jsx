@@ -5,6 +5,7 @@ import { uploadApi, notesApi, metaApi, subjectsApi, trackingApi, settingsApi } f
 import './AdminPanel.css';
 import SubjectManagement from './SubjectManagement';
 import CreditsManagement from './CreditsManagement';
+import { compressAndConvertToPdf } from '../../utils/pdfCompression';
 
 const BRANCHES_Y1 = ['electrical', 'electronics', 'common'];
 const BRANCHES_Y2 = ['cse', 'ds', 'aiml', 'ece', 'elce', 'common'];
@@ -24,6 +25,8 @@ const makeFileEntry = (file) => ({
   branches: ['common'],
   resourceType: 'theory',
   description: '',
+  compress: true,
+  quality: 0.6,
 });
 
 const formatWatchTime = (ms) => {
@@ -403,7 +406,17 @@ export default function AdminPanel() {
           year: entry.year,
         };
 
-        await uploadApi.uploadPdf(entry.file, metadata);
+        let fileToUpload = entry.file;
+        if (entry.compress) {
+          try {
+            fileToUpload = await compressAndConvertToPdf(entry.file, entry.quality || 0.6);
+          } catch (compErr) {
+            console.error("Compression failed for", entry.file.name, compErr);
+            throw new Error('Compression failed: ' + compErr.message);
+          }
+        }
+
+        await uploadApi.uploadPdf(fileToUpload, metadata);
         succeeded += 1;
       } catch (err) {
         failed.push({ name: entry.file.name, error: err.message || 'Upload failed.' });
@@ -1254,6 +1267,34 @@ export default function AdminPanel() {
                         placeholder="Optional short description"
                         disabled={uploading}
                       />
+                    </div>
+                    
+                    <div className="upload-field" style={{ display: 'flex', flexDirection: 'column', gap: '8px', paddingBottom: '10px' }}>
+                      <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                        <input
+                          type="checkbox"
+                          checked={entry.compress || false}
+                          onChange={(e) => updateFileEntry(entry.id, 'compress', e.target.checked)}
+                          disabled={uploading}
+                        />
+                        <span>Compress / Convert to PDF (Flattens text to images)</span>
+                      </label>
+                      
+                      {entry.compress && (
+                        <div style={{ paddingLeft: '24px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                          <span style={{ fontSize: '0.85rem', color: '#9ca3af' }}>Quality/Size:</span>
+                          <input 
+                            type="range" 
+                            min="10" 
+                            max="100" 
+                            value={entry.quality ? entry.quality * 100 : 60} 
+                            onChange={(e) => updateFileEntry(entry.id, 'quality', Number(e.target.value) / 100)}
+                            disabled={uploading}
+                            style={{ flex: 1, maxWidth: '200px' }}
+                          />
+                          <span style={{ fontSize: '0.85rem', color: '#d9a441' }}>{Math.round((entry.quality || 0.6) * 100)}%</span>
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))}
