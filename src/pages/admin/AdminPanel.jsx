@@ -342,8 +342,27 @@ export default function AdminPanel() {
     
     setUploadMsg(null);
 
-    if (selected.length > 0) {
-      setFileEntries((prev) => [...prev, ...selected.map(makeFileEntry)]);
+    const validFiles = [];
+    const invalidFiles = [];
+
+    selected.forEach(file => {
+      const isCompressible = file.type.startsWith('image/') || file.type === 'application/pdf';
+      if (file.size > 25 * 1024 * 1024 && !isCompressible) {
+        invalidFiles.push(file);
+      } else {
+        validFiles.push(file);
+      }
+    });
+
+    if (invalidFiles.length > 0) {
+      setUploadMsg({ 
+        type: 'error', 
+        text: `Cannot upload: ${invalidFiles.map(f => f.name).join(', ')}. Files over 25MB that cannot be auto-compressed (like PPT/Word) must be compressed manually or converted to PDF first.` 
+      });
+    }
+
+    if (validFiles.length > 0) {
+      setFileEntries((prev) => [...prev, ...validFiles.map(makeFileEntry)]);
     }
 
     e.target.value = ''; // allow re-selecting the same file(s) again later
@@ -1092,7 +1111,7 @@ export default function AdminPanel() {
             <div className="guide-grid">
               <div className="guide-card">
                 <h4>Auto-Compression</h4>
-                <p>The system now automatically compresses large files (over 10MB) before uploading. You no longer need to manually compress them using tools like iLovePDF!</p>
+                <p>The system now automatically compresses large Image/PDF files (over 10MB) before uploading. (Note: PPT/Word files cannot be auto-compressed and have a strict 25MB limit).</p>
               </div>
               <div className="guide-card">
                 <h4>Select Branch Carefully</h4>
