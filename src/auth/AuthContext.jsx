@@ -2,7 +2,7 @@ import { createContext, useContext, useState, useEffect, useCallback, useRef } f
 import { authApi } from "./authApi";
 
 const AuthContext = createContext(null);
-const HEARTBEAT_INTERVAL_MS = 20000;
+const HEARTBEAT_INTERVAL_MS = 60000;
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
