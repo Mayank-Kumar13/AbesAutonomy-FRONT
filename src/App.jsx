@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, Suspense, lazy } from 'react';
 import Navbar from './component/navbar/Navbar';
 import IntroOverlay from './component/intro/IntroOverlay';
 import LiveTracker from './component/LiveTracker';
@@ -12,7 +12,6 @@ import Footer from './component/footer/Footer';
 import ChooseSubject from './pages/choosesubject/ChooseSubject';
 import Scroll from "./component/Scroll";
 import Subject from './pages/subject/Subject';
-import Pdfpreview from "./pages/Pdfpreview";
 import { useLocation } from "react-router-dom";
 import LoginPage from './pages/loginPage/LoginPage';
 import Profile from './pages/profile/Profile';
@@ -26,10 +25,12 @@ import ResetPassword from './pages/forgotPassword/ResetPassword';
 import OAuthCallback from './pages/oauth/OAuthCallback';
 import ProviderCallback from './pages/oauth/ProviderCallback';
 import ProtectedRoute from './auth/ProtectedRoute';
-import AdminPanel from './pages/admin/AdminPanel';
 import AdminRoute from './auth/AdminRoute';
 import GlobalStatusGuard from './auth/GlobalStatusGuard';
 import { trackingApi } from './services/api';
+
+const Pdfpreview = lazy(() => import('./pages/Pdfpreview'));
+const AdminPanel = lazy(() => import('./pages/admin/AdminPanel'));
 
 const App = () => {
   useEffect(() => {
@@ -43,7 +44,8 @@ const App = () => {
       <IntroOverlay />
       {useLocation().pathname !== "/pdfpreview" && <Navbar />} 
       <Scroll />
-      <Routes>
+      <Suspense fallback={<div className="flex h-screen items-center justify-center text-white"><div className="animate-spin h-8 w-8 border-4 border-blue-500 rounded-full border-t-transparent"></div></div>}>
+        <Routes>
           <Route path="/" element={<HomeContent />} />
           <Route path="/resources" element={<ProtectedRoute><Resources/></ProtectedRoute>} />
           <Route path="/credits" element={<Credits />} />
@@ -65,6 +67,7 @@ const App = () => {
           <Route path="/contribute" element={<Contribute />} />
           <Route path="/admin" element={<AdminRoute><AdminPanel /></AdminRoute>} />
         </Routes>
+      </Suspense>
       <Footer />
     </GlobalStatusGuard>
   )
