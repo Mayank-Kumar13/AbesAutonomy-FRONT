@@ -26,7 +26,7 @@ const makeFileEntry = (file) => ({
   resourceType: 'theory',
   description: '',
   compress: true,
-  quality: 0.6,
+  targetSizeKb: 500,
 });
 
 const formatWatchTime = (ms) => {
@@ -409,7 +409,7 @@ export default function AdminPanel() {
         let fileToUpload = entry.file;
         if (entry.compress) {
           try {
-            fileToUpload = await compressAndConvertToPdf(entry.file, entry.quality || 0.6);
+            fileToUpload = await compressAndConvertToPdf(entry.file, entry.targetSizeKb || null);
           } catch (compErr) {
             console.error("Compression failed for", entry.file.name, compErr);
             throw new Error('Compression failed: ' + compErr.message);
@@ -1282,17 +1282,24 @@ export default function AdminPanel() {
                       
                       {entry.compress && (
                         <div style={{ paddingLeft: '24px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                          <span style={{ fontSize: '0.85rem', color: '#9ca3af' }}>Quality/Size:</span>
+                          <span style={{ fontSize: '0.85rem', color: '#9ca3af' }}>Target Size (KB):</span>
                           <input 
-                            type="range" 
+                            type="number" 
                             min="10" 
-                            max="100" 
-                            value={entry.quality ? entry.quality * 100 : 60} 
-                            onChange={(e) => updateFileEntry(entry.id, 'quality', Number(e.target.value) / 100)}
+                            max="50000" 
+                            value={entry.targetSizeKb || ''} 
+                            onChange={(e) => updateFileEntry(entry.id, 'targetSizeKb', e.target.value ? Number(e.target.value) : null)}
                             disabled={uploading}
-                            style={{ flex: 1, maxWidth: '200px' }}
+                            placeholder="e.g. 200"
+                            style={{ 
+                              width: '100px', 
+                              padding: '4px 8px', 
+                              background: '#1a1d24', 
+                              border: '1px solid #374151', 
+                              color: '#fff', 
+                              borderRadius: '4px' 
+                            }}
                           />
-                          <span style={{ fontSize: '0.85rem', color: '#d9a441' }}>{Math.round((entry.quality || 0.6) * 100)}%</span>
                         </div>
                       )}
                     </div>

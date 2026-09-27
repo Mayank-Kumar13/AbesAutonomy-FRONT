@@ -4,9 +4,6 @@ import * as pdfjsLib from 'pdfjs-dist';
 // We need to set the worker source for pdfjs to work in browser environments
 pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
 
-/**
- * Convert an image file (File or Blob) to an HTMLImageElement
- */
 const fileToImage = (file) => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -21,13 +18,37 @@ const fileToImage = (file) => {
   });
 };
 
-/**
- * Compresses an image File or converts it into a PDF
- * @param {File} file 
- * @param {number} quality (0.1 to 1.0)
- * @returns {Promise<File>} a PDF File object
- */
-const compressImageToPdf = async (file, quality, originalName) => {
+const findOptimalQuality = (canvas, targetSizeKb) => {
+  if (!targetSizeKb) return canvas.toDataURL('image/jpeg', 0.6); // default
+
+  let minQ = 0.05;
+  let maxQ = 1.0;
+  let bestDiff = Infinity;
+  let bestData = null;
+
+  for (let i = 0; i < 7; i++) {
+    const q = (minQ + maxQ) / 2;
+    const data = canvas.toDataURL('image/jpeg', q);
+    // Rough estimation of JPEG size from Base64
+    const sizeKb = (data.length * 0.75) / 1024;
+    
+    const diff = Math.abs(sizeKb - targetSizeKb);
+    if (diff < bestDiff) {
+      bestDiff = diff;
+      bestData = data;
+    }
+
+    // Add a tiny bit of overhead for PDF structure
+    if (sizeKb * 1.05 > targetSizeKb) {
+      maxQ = q;
+    } else {
+      minQ = q;
+    }
+  }
+  return bestData;
+};
+
+const compressImageToPdf = async (file, targetSizeKb, originalName) => {
   const img = await fileToImage(file);
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
@@ -36,48 +57,36 @@ const compressImageToPdf = async (file, quality, originalName) => {
   canvas.height = img.height;
   ctx.drawImage(img, 0, 0, img.width, img.height);
 
-  // Compress using canvas toDataURL
-  const imgData = canvas.toDataURL('image/jpeg', quality);
+  // If a target size is given, it's for the whole file (1 page)
+  const imgData = findOptimalQuality(canvas, targetSizeKb);
 
-  // Determine orientation based on dimensions
   const orientation = img.width > img.height ? 'l' : 'p';
   
-  // A4 size in mm is roughly 210x297
   const pdf = new jsPDF({
     orientation,
     unit: 'px',
-    format: [img.width, img.height] // keep original image aspect ratio as page size
+    format: [img.width, img.height]
   });
 
   pdf.addImage(imgData, 'JPEG', 0, 0, img.width, img.height);
-  
   const pdfBlob = pdf.output('blob');
   
-  // Return as a File object
   const filename = originalName.replace(/\.[^/.]+$/, "") + ".pdf";
   return new File([pdfBlob], filename, { type: 'application/pdf' });
 };
 
-/**
- * Reads an existing PDF, rasterizes each page, compresses the images, and creates a new PDF
- * @param {File} file 
- * @param {number} quality (0.1 to 1.0)
- * @returns {Promise<File>} a compressed PDF File object
- */
-const compressExistingPdf = async (file, quality, originalName) => {
+const compressExistingPdf = async (file, targetSizeKb, originalName) => {
   const arrayBuffer = await file.arrayBuffer();
   const pdfDocument = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
   
-  // We'll initialize a new jsPDF instance (first page is auto-created, but we'll delete it or overwrite it)
-  // Let's create it on the first loop to know the exact dimensions of page 1
   let pdf = null;
+  // Distribute the target size evenly across all pages, minus ~5% for PDF metadata overhead
+  const targetPageSizeKb = targetSizeKb ? (targetSizeKb * 0.95) / pdfDocument.numPages : null;
 
   for (let pageNum = 1; pageNum <= pdfDocument.numPages; pageNum++) {
     const page = await pdfDocument.getPage(pageNum);
     
-    // Scale controls the internal resolution of the rasterized canvas. 
-    // Usually 1.5 to 2.0 gives good readability for text while allowing JPEG compression to shrink file size.
-    // Quality slider will mostly affect the JPEG compression artifacts and size.
+    // Maintain a good scale for reading while letting JPEG handle the file size
     const viewport = page.getViewport({ scale: 1.5 }); 
     
     const canvas = document.createElement('canvas');
@@ -91,8 +100,8 @@ const compressExistingPdf = async (file, quality, originalName) => {
     };
 
     await page.render(renderContext).promise;
-    const imgData = canvas.toDataURL('image/jpeg', quality);
-
+    
+    const imgData = findOptimalQuality(canvas, targetPageSizeKb);
     const orientation = viewport.width > viewport.height ? 'l' : 'p';
 
     if (!pdf) {
@@ -112,12 +121,7 @@ const compressExistingPdf = async (file, quality, originalName) => {
   return new File([pdfBlob], originalName, { type: 'application/pdf' });
 };
 
-/**
- * Main function exposed to the UI to handle any file
- * @param {File} file 
- * @param {number} quality (0.1 to 1.0)
- */
-export const compressAndConvertToPdf = async (file, quality = 0.6) => {
+export const compressAndConvertToPdf = async (file, targetSizeKb = null) => {
   const isImage = file.type.startsWith('image/');
   const isPdf = file.type === 'application/pdf';
 
@@ -126,8 +130,8 @@ export const compressAndConvertToPdf = async (file, quality = 0.6) => {
   }
 
   if (isImage) {
-    return await compressImageToPdf(file, quality, file.name);
+    return await compressImageToPdf(file, targetSizeKb, file.name);
   } else {
-    return await compressExistingPdf(file, quality, file.name);
+    return await compressExistingPdf(file, targetSizeKb, file.name);
   }
 };
