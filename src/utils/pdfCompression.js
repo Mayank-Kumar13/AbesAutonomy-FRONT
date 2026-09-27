@@ -48,7 +48,7 @@ const findOptimalQuality = (canvas, targetSizeKb) => {
   return bestData;
 };
 
-const compressImageToPdf = async (file, targetSizeKb, originalName) => {
+const compressImage = async (file, targetSizeKb, originalName) => {
   const img = await fileToImage(file);
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
@@ -57,22 +57,14 @@ const compressImageToPdf = async (file, targetSizeKb, originalName) => {
   canvas.height = img.height;
   ctx.drawImage(img, 0, 0, img.width, img.height);
 
-  // If a target size is given, it's for the whole file (1 page)
+  // If a target size is given, it's for the whole file
   const imgData = findOptimalQuality(canvas, targetSizeKb);
-
-  const orientation = img.width > img.height ? 'l' : 'p';
   
-  const pdf = new jsPDF({
-    orientation,
-    unit: 'px',
-    format: [img.width, img.height]
-  });
-
-  pdf.addImage(imgData, 'JPEG', 0, 0, img.width, img.height);
-  const pdfBlob = pdf.output('blob');
+  // Convert Data URL to Blob
+  const res = await fetch(imgData);
+  const blob = await res.blob();
   
-  const filename = originalName.replace(/\.[^/.]+$/, "") + ".pdf";
-  return new File([pdfBlob], filename, { type: 'application/pdf' });
+  return new File([blob], originalName, { type: 'image/jpeg' });
 };
 
 const compressExistingPdf = async (file, targetSizeKb, originalName) => {
@@ -126,11 +118,13 @@ export const compressAndConvertToPdf = async (file, targetSizeKb = null) => {
   const isPdf = file.type === 'application/pdf';
 
   if (!isImage && !isPdf) {
-    throw new Error('Unsupported file type. Only Images and PDFs can be compressed/converted.');
+    // For Word, Excel, etc., we cannot compress them in the browser.
+    // Just return the original file to be uploaded as-is.
+    return file;
   }
 
   if (isImage) {
-    return await compressImageToPdf(file, targetSizeKb, file.name);
+    return await compressImage(file, targetSizeKb, file.name);
   } else {
     return await compressExistingPdf(file, targetSizeKb, file.name);
   }

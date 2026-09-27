@@ -334,17 +334,11 @@ export default function AdminPanel() {
 
   const handleFilesChange = (e) => {
     const selected = Array.from(e.target.files || []);
-    const allowedTypes = ['application/pdf', 'image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
-    const validFiles = selected.filter((f) => allowedTypes.includes(f.type));
+    
+    setUploadMsg(null);
 
-    if (validFiles.length !== selected.length) {
-      setUploadMsg({ type: 'error', text: 'Only PDF and image files are allowed — invalid files were skipped.' });
-    } else {
-      setUploadMsg(null);
-    }
-
-    if (validFiles.length > 0) {
-      setFileEntries((prev) => [...prev, ...validFiles.map(makeFileEntry)]);
+    if (selected.length > 0) {
+      setFileEntries((prev) => [...prev, ...selected.map(makeFileEntry)]);
     }
 
     e.target.value = ''; // allow re-selecting the same file(s) again later
@@ -1106,7 +1100,6 @@ export default function AdminPanel() {
               <input
                 id="pdf-file"
                 type="file"
-                accept="application/pdf,image/png,image/jpeg,image/webp"
                 multiple
                 onChange={handleFilesChange}
               />
@@ -1277,7 +1270,7 @@ export default function AdminPanel() {
                           onChange={(e) => updateFileEntry(entry.id, 'compress', e.target.checked)}
                           disabled={uploading}
                         />
-                        <span>Compress / Convert to PDF (Flattens text to images)</span>
+                        <span>Compress Image/PDF File (Flattens PDF text)</span>
                       </label>
                       
                       {entry.compress && (
