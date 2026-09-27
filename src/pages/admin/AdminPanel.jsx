@@ -13,21 +13,26 @@ const BRANCHES = Array.from(new Set(['cse', 'it', 'me', 'aids', 'ds', 'aiml', 'e
 const RESOURCE_TYPES = ['theory', 'assignment', 'lab_manual', 'pyq', 'handwritten', 'syllabus'];
 
 let fileEntryIdCounter = 0;
-const makeFileEntry = (file) => ({
-  id: `${Date.now()}-${fileEntryIdCounter++}`,
+const makeFileEntry = (file) => {
+  const isCompressible = file.type.startsWith('image/') || file.type === 'application/pdf';
+  const isLarge = file.size > 10 * 1024 * 1024; // > 10 MB
   
-  file,
-  title: file.name.replace(/\.(pdf|png|jpe?g|webp)$/i, ''),
-  year: 1,
-  subject: '',
-  branch: 'common',
-  allowMultipleBranches: false,
-  branches: ['common'],
-  resourceType: 'theory',
-  description: '',
-  compress: true,
-  targetSizeKb: 500,
-});
+  return {
+    id: `${Date.now()}-${fileEntryIdCounter++}`,
+    file,
+    title: file.name.replace(/\.(pdf|png|jpe?g|webp)$/i, ''),
+    year: 1,
+    subject: '',
+    branch: 'common',
+    allowMultipleBranches: false,
+    branches: ['common'],
+    resourceType: 'theory',
+    description: '',
+    compress: (isLarge && isCompressible) ? true : false,
+    targetSizeKb: (isLarge && isCompressible) ? 9500 : 500,
+    autoCompressed: (isLarge && isCompressible),
+  };
+};
 
 const formatWatchTime = (ms) => {
   const totalMinutes = Math.floor(ms / 60000);
@@ -1263,37 +1268,56 @@ export default function AdminPanel() {
                     </div>
                     
                     <div className="upload-field" style={{ display: 'flex', flexDirection: 'column', gap: '8px', paddingBottom: '10px' }}>
-                      <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
-                        <input
-                          type="checkbox"
-                          checked={entry.compress || false}
-                          onChange={(e) => updateFileEntry(entry.id, 'compress', e.target.checked)}
-                          disabled={uploading}
-                        />
-                        <span>Compress Image/PDF File (Flattens PDF text)</span>
-                      </label>
-                      
-                      {entry.compress && (
-                        <div style={{ paddingLeft: '24px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                          <span style={{ fontSize: '0.85rem', color: '#9ca3af' }}>Target Size (KB):</span>
-                          <input 
-                            type="number" 
-                            min="10" 
-                            max="50000" 
-                            value={entry.targetSizeKb || ''} 
-                            onChange={(e) => updateFileEntry(entry.id, 'targetSizeKb', e.target.value ? Number(e.target.value) : null)}
-                            disabled={uploading}
-                            placeholder="e.g. 200"
-                            style={{ 
-                              width: '100px', 
-                              padding: '4px 8px', 
-                              background: '#1a1d24', 
-                              border: '1px solid #374151', 
-                              color: '#fff', 
-                              borderRadius: '4px' 
-                            }}
-                          />
-                        </div>
+                      {(entry.file.type.startsWith('image/') || entry.file.type === 'application/pdf') && (
+                        <>
+                          <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                            <input
+                              type="checkbox"
+                              checked={entry.compress || false}
+                              onChange={(e) => updateFileEntry(entry.id, 'compress', e.target.checked)}
+                              disabled={uploading}
+                            />
+                            <span>Compress Image/PDF File (Flattens PDF text)</span>
+                          </label>
+                          
+                          {entry.compress && (
+                            <div style={{ paddingLeft: '24px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                <span style={{ fontSize: '0.85rem', color: '#9ca3af' }}>Target Size (KB):</span>
+                                <input 
+                                  type="number" 
+                                  min="10" 
+                                  max="50000" 
+                                  value={entry.targetSizeKb || ''} 
+                                  onChange={(e) => updateFileEntry(entry.id, 'targetSizeKb', e.target.value ? Number(e.target.value) : null)}
+                                  disabled={uploading}
+                                  placeholder="e.g. 200"
+                                  style={{ 
+                                    width: '100px', 
+                                    padding: '4px 8px', 
+                                    background: '#1a1d24', 
+                                    border: '1px solid #374151', 
+                                    color: '#fff', 
+                                    borderRadius: '4px' 
+                                  }}
+                                />
+                                <span style={{ fontSize: '0.75rem', color: '#9ca3af' }}>(Original: {Math.round(entry.file.size / 1024)} KB)</span>
+                              </div>
+                              
+                              {entry.autoCompressed && (
+                                <p style={{ margin: 0, fontSize: '0.8rem', color: '#d9a441' }}>
+                                  ⚠️ File is over 10,000 KB and was auto-compressed.
+                                </p>
+                              )}
+                              
+                              {entry.targetSizeKb && entry.targetSizeKb < (entry.file.size / 1024) * 0.25 && (
+                                <p style={{ margin: 0, fontSize: '0.8rem', color: '#ef4444' }}>
+                                  ⚠️ Warning: You reduced the target size too much. This will cause a noticeable drop in quality!
+                                </p>
+                              )}
+                            </div>
+                          )}
+                        </>
                       )}
                     </div>
                   </div>
