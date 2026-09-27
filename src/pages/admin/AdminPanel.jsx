@@ -1089,12 +1089,24 @@ export default function AdminPanel() {
           <div className="coordinator-guide">
             <h3>📝 Coordinator Upload Guide</h3>
             <p>Welcome Coordinators! Please follow these rules before uploading notes:</p>
-            <ul>
-              <li><strong>Auto-Compression:</strong> The system now automatically compresses large files (over 10MB) before uploading. You no longer need to manually compress them using tools like iLovePDF!</li>
-              <li><strong>Select Branch Carefully:</strong> Ensure you are only uploading files for your assigned branch/subject. If a subject belongs to multiple branches, check "Allow multiple groups".</li>
-              <li><strong>Naming Convention:</strong> Give the file a clear, descriptive title (e.g., "Unit 1: Quantum Physics").</li>
-              <li><strong>Need Help?</strong> If you face any issues or errors while uploading, please contact the ABES Autonomy Admins/Creators immediately.</li>
-            </ul>
+            <div className="guide-grid">
+              <div className="guide-card">
+                <h4>Auto-Compression</h4>
+                <p>The system now automatically compresses large files (over 10MB) before uploading. You no longer need to manually compress them using tools like iLovePDF!</p>
+              </div>
+              <div className="guide-card">
+                <h4>Select Branch Carefully</h4>
+                <p>Ensure you are only uploading files for your assigned branch/subject. If a subject belongs to multiple branches, check "Allow multiple groups".</p>
+              </div>
+              <div className="guide-card">
+                <h4>Naming Convention</h4>
+                <p>Give the file a clear, descriptive title (e.g., "Unit 1: Quantum Physics").</p>
+              </div>
+              <div className="guide-card">
+                <h4>Need Help?</h4>
+                <p>If you face any issues or errors while uploading, please contact the ABES Autonomy Admins/Creators immediately.</p>
+              </div>
+            </div>
           </div>
 
           <form className="upload-form" onSubmit={handleUploadSubmit}>
