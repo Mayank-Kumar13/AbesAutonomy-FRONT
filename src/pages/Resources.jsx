@@ -199,22 +199,15 @@ const Resources = () => {
           key={card.id}
         >
         <div className="resource-card" key={card.id}>
-          <div className="card-top-section">
-            <div className="resource-icon">
-              <Icon size={32} strokeWidth={1.5} />
-            </div>
-            <div className="decorative-circles">
-              <div className="circle"></div>
-              <div className="circle"></div>
-            </div>
+          <div className="resource-icon">
+            <Icon size={42} strokeWidth={1.5} />
           </div>
-          
-          <hr className="card-divider" />
-          
-          <div className="card-bottom-section">
-            <h2>{card.title}</h2>
-            <p>{card.description}</p>
-          </div>
+          <h2>{card.title}</h2>
+          <p>{card.description}</p>
+          <button className="explore-button">
+            Explore
+            <span>→</span>
+          </button>
         </div>
         </Link>
       );
