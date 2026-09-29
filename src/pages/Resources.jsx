@@ -38,24 +38,6 @@ const Resources = () => {
     icon: FileText,
   },
   {
-    id: 2,
-    title: "ASSIGNMENTS",
-    description: "Problem sets & projects",
-    icon: ClipboardList,
-  },
-  {
-    id: 3,
-    title: "LAB MANUALS",
-    description: "Manuals & experimentation logs",
-    icon: FlaskConical,
-  },
-  {
-    id: 4,
-    title: "PYQ QUESTION",
-    description: "Previous year exam papers",
-    icon: CircleHelp,
-  },
-  {
     id: 5,
     title: "HANDWRITTEN NOTES",
     description: "Handwritten notes by Topper Student [10 SGPA]",
@@ -66,6 +48,24 @@ const Resources = () => {
     title: "SYLLABUS",
     description: "Course syllabus & curriculum",
     icon: BookOpen,
+  },
+  {
+    id: 4,
+    title: "PYQ QUESTION",
+    description: "Previous year exam papers",
+    icon: CircleHelp,
+  },
+  {
+    id: 2,
+    title: "ASSIGNMENTS",
+    description: "Problem sets & projects",
+    icon: ClipboardList,
+  },
+  {
+    id: 3,
+    title: "LAB MANUALS",
+    description: "Manuals & experimentation logs",
+    icon: FlaskConical,
   },
 ];
 
@@ -199,17 +199,22 @@ const Resources = () => {
           key={card.id}
         >
         <div className="resource-card" key={card.id}>
-
-          <div className="resource-icon">
-            <Icon size={42} strokeWidth={1.5} />
+          <div className="card-top-section">
+            <div className="resource-icon">
+              <Icon size={32} strokeWidth={1.5} />
+            </div>
+            <div className="decorative-circles">
+              <div className="circle"></div>
+              <div className="circle"></div>
+            </div>
           </div>
-          <h2>{card.title}</h2>
-          <p>{card.description}</p>
-          <button className="explore-button">
-            Explore
-            <span>→</span>
-          </button>
-
+          
+          <hr className="card-divider" />
+          
+          <div className="card-bottom-section">
+            <h2>{card.title}</h2>
+            <p>{card.description}</p>
+          </div>
         </div>
         </Link>
       );

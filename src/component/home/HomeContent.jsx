@@ -21,10 +21,10 @@ import ReviewModal from "./ReviewModal";
 
 const cards = [
   {
-    title: "ASSIGNMENTS",
-    description: "Homework, problem sets and project assignments.",
-    icon: <ClipboardList size={34} />,
-    resourceType: "assignment",
+    title: "SYLLABUS",
+    description: "Course syllabus & curriculum",
+    icon: <BookOpen size={34} />,
+    resourceType: "syllabus",
   },
   {
     title: "THEORY",
