@@ -645,3 +645,59 @@
         padding: 1.5rem 1rem;
     }
 }
+
+/* ─── Review Actions & Reactions ─────────────────────────── */
+
+.review-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 1rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid #1f2937;
+}
+
+.reaction-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: transparent;
+    border: none;
+    color: #6b7280;
+    cursor: pointer;
+    font-size: 0.8125rem;
+    transition: all 0.2s ease;
+    padding: 4px 8px;
+    border-radius: 6px;
+}
+
+.reaction-btn:hover:not(:disabled) {
+    background: rgba(212, 163, 115, 0.1);
+    color: #d4a373;
+}
+
+.reaction-btn.reacted {
+    color: #d4a373;
+}
+
+.reaction-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.reaction-count {
+    font-weight: 500;
+}
+
+.admin-liked-badge {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.75rem;
+    color: #d4a373;
+    background: rgba(212, 163, 115, 0.1);
+    padding: 4px 8px;
+    border-radius: 20px;
+    border: 1px solid rgba(212, 163, 115, 0.2);
+    font-weight: 500;
+}

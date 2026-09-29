@@ -399,6 +399,12 @@ export const reviewApi = {
       method: 'DELETE',
     });
   },
+
+  async toggleReaction(reviewId) {
+    return request(`/reviews/${reviewId}/react`, {
+      method: 'POST',
+    });
+  },
 };
 
 // ─────────────────────────────────────────────────────

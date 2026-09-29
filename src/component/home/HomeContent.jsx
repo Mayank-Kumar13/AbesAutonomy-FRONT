@@ -13,6 +13,7 @@ import {
   Pen,
   Notebook,
   FileText,
+  Heart,
 } from "lucide-react";
 import { reviewApi } from "../../services/api";
 import { useAuth } from "../../auth/AuthContext";
@@ -46,12 +47,55 @@ const cards = [
 ];
 
 const ReviewCard = ({ review }) => {
+  const { user, isAuthenticated } = useAuth();
   const initial = (review.displayName || "U")[0].toUpperCase();
   const date = new Date(review.createdAt).toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
     year: "numeric",
   });
+
+  const [reactions, setReactions] = useState(review.reactions || []);
+  const [likedByAdmin, setLikedByAdmin] = useState(review.likedByAdmin || false);
+  const [isReacting, setIsReacting] = useState(false);
+
+  const hasReacted = user ? reactions.includes(user._id) : false;
+
+  const handleReact = async () => {
+    if (!isAuthenticated) {
+      window.location.href = "/login";
+      return;
+    }
+    if (isReacting) return;
+    
+    setIsReacting(true);
+    
+    // Optimistic update
+    const previousReactions = [...reactions];
+    const previousLikedByAdmin = likedByAdmin;
+    
+    if (hasReacted) {
+      setReactions(reactions.filter(id => id !== user._id));
+      if (user.role === 'admin') setLikedByAdmin(false);
+    } else {
+      setReactions([...reactions, user._id]);
+      if (user.role === 'admin') setLikedByAdmin(true);
+    }
+
+    try {
+      const res = await reviewApi.toggleReaction(review._id);
+      if (res.data) {
+        setReactions(res.data.reactions || []);
+        setLikedByAdmin(res.data.likedByAdmin || false);
+      }
+    } catch (error) {
+      // Revert on error
+      setReactions(previousReactions);
+      setLikedByAdmin(previousLikedByAdmin);
+    } finally {
+      setIsReacting(false);
+    }
+  };
 
   return (
     <div className="review-card" aria-label={`Review by ${review.displayName}`}>
@@ -73,6 +117,27 @@ const ReviewCard = ({ review }) => {
         ))}
       </div>
       <p className="review-text">{review.content}</p>
+      
+      <div className="review-actions">
+        <button 
+          className={`reaction-btn ${hasReacted ? 'reacted' : ''}`} 
+          onClick={handleReact}
+          aria-label={hasReacted ? "Remove reaction" : "React to review"}
+          disabled={isReacting}
+        >
+          <Heart 
+            size={16} 
+            fill={hasReacted ? "#d4a373" : "none"} 
+            color={hasReacted ? "#d4a373" : "#374151"} 
+          />
+          <span className="reaction-count">{reactions.length > 0 ? reactions.length : ''}</span>
+        </button>
+        {likedByAdmin && (
+          <span className="admin-liked-badge">
+            <Star size={12} fill="#d4a373" color="#d4a373" /> Liked by Admin
+          </span>
+        )}
+      </div>
     </div>
   );
 };
