@@ -225,7 +225,7 @@ export default function AdminPanel() {
   const loadNotes = useCallback(async () => {
     setNotesLoading(true);
     try {
-      const res = await notesApi.list({ limit: 100, sort: '-createdAt' });
+      const res = await notesApi.list({ limit: 500, sort: '-createdAt', admin: true });
       setNotes(res.data || []);
       setNotesError('');
     } catch (err) {
@@ -457,6 +457,15 @@ export default function AdminPanel() {
     }
 
     loadNotes();
+  };
+
+  const handleApproveNote = async (note) => {
+    try {
+      await notesApi.update(note._id, { isPublished: true });
+      setNotes((prev) => prev.map((n) => n._id === note._id ? { ...n, isPublished: true } : n));
+    } catch (err) {
+      setNotesError(err.message);
+    }
   };
 
   const handleDeleteNote = async (note) => {
@@ -1424,6 +1433,7 @@ export default function AdminPanel() {
                     <th>Branch</th>
                     <th>Year</th>
                     <th>Type</th>
+                    <th>Status</th>
                     <th>Views</th>
                     <th>Uploaded Date</th>
                     <th>Uploader</th>
@@ -1497,6 +1507,13 @@ export default function AdminPanel() {
                       </td>
                       <td>{n.year}</td>
                       <td>{n.resourceType}</td>
+                      <td>
+                        {n.isPublished ? (
+                          <span style={{color: '#4ade80'}}>Approved</span>
+                        ) : (
+                          <span style={{color: '#facc15'}}>Pending</span>
+                        )}
+                      </td>
                       <td>{n.viewCount || 0}</td>
                       <td>{formatDate(n.createdAt)}</td>
                       <td>
@@ -1514,6 +1531,15 @@ export default function AdminPanel() {
                             Edit
                           </button>
                         )}
+                        {!n.isPublished && user?.role === 'admin' && (
+                          <button
+                            type="button"
+                            style={{ padding: '4px 8px', fontSize: '0.8rem', backgroundColor: '#4ade80', color: '#0b0d10', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+                            onClick={() => handleApproveNote(n)}
+                          >
+                            Approve
+                          </button>
+                        )}
                         <button
                           type="button"
                           className="delete-note-btn"
@@ -1526,10 +1552,10 @@ export default function AdminPanel() {
                     </tr>
                   ))}
                   {!notesLoading && notes.length === 0 && (
-                    <tr><td colSpan={8} className="admin-empty">No notes uploaded yet</td></tr>
+                    <tr><td colSpan={9} className="admin-empty">No notes uploaded yet</td></tr>
                   )}
                   {notesLoading && (
-                    <tr><td colSpan={8} className="admin-empty">Loading notes...</td></tr>
+                    <tr><td colSpan={9} className="admin-empty">Loading notes...</td></tr>
                   )}
                 </tbody>
               </table>
