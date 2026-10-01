@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { authApi } from '../../auth/authApi';
 import { useAuth } from '../../auth/AuthContext';
 import { uploadApi, notesApi, metaApi, subjectsApi, trackingApi, settingsApi } from '../../services/api';
@@ -74,6 +75,7 @@ const LiveTimer = ({ updatedAt, durationMs }) => {
 };
 
 export default function AdminPanel() {
+  const navigate = useNavigate();
   const [stats, setStats] = useState(null);
   const [users, setUsers] = useState([]);
   const [logs, setLogs] = useState([]);
@@ -1522,6 +1524,18 @@ export default function AdminPanel() {
                         </span>
                       </td>
                       <td style={{ display: 'flex', gap: '0.5rem' }}>
+                        <button
+                          type="button"
+                          style={{ padding: '4px 8px', fontSize: '0.8rem', backgroundColor: '#8b5cf6', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+                          onClick={() => {
+                            const isImg = n.pdfUrl ? /\.(png|jpe?g|webp)$/i.test(n.pdfUrl.split('?')[0]) : false;
+                            navigate("/pdfpreview", {
+                              state: { pdfUrl: n.pdfUrl, title: n.title, noteId: n._id, subject: n.subject, isImage: isImg },
+                            });
+                          }}
+                        >
+                          View
+                        </button>
                         {editingNoteId !== n._id && (
                           <button
                             type="button"
