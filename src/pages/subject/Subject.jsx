@@ -84,8 +84,19 @@ const Subject = () => {
           const blob = await response.blob();
           const blobUrl = window.URL.createObjectURL(blob);
           
-          const extMatch = note.pdfUrl ? note.pdfUrl.match(/\.(pdf|png|jpe?g|webp)$/i) : null;
-          const ext = extMatch ? extMatch[1].toLowerCase() : 'pdf';
+          const urlToMatch = response.url || note.pdfUrl;
+          const urlMatch = urlToMatch ? urlToMatch.match(/\.([a-zA-Z0-9]+)(?:[\?#]|$)/) : null;
+          let ext = urlMatch ? urlMatch[1].toLowerCase() : 'pdf';
+          
+          if (blob.type === 'image/jpeg') ext = 'jpg';
+          else if (blob.type === 'image/png') ext = 'png';
+          else if (blob.type === 'image/webp') ext = 'webp';
+          else if (blob.type === 'application/pdf') ext = 'pdf';
+          else if (blob.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') ext = 'docx';
+          else if (blob.type === 'application/msword') ext = 'doc';
+          else if (blob.type === 'application/vnd.openxmlformats-officedocument.presentationml.presentation') ext = 'pptx';
+          else if (blob.type === 'application/vnd.ms-powerpoint') ext = 'ppt';
+
           const link = document.createElement("a");
           link.href = blobUrl;
           link.download = note.title ? `${note.title}.${ext}` : `document_${index + 1}.${ext}`;

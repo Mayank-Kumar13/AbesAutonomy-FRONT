@@ -99,14 +99,18 @@ export default function PdfPreview() {
       link.href = blobUrl;
       
       let ext = 'pdf';
+      const urlToMatch = response.url || viewerFileUrl;
+      const urlMatch = urlToMatch ? urlToMatch.match(/\.([a-zA-Z0-9]+)(?:[\?#]|$)/) : null;
+      if (urlMatch) ext = urlMatch[1].toLowerCase();
+
       if (blob.type === 'image/jpeg') ext = 'jpg';
       else if (blob.type === 'image/png') ext = 'png';
       else if (blob.type === 'image/webp') ext = 'webp';
       else if (blob.type === 'application/pdf') ext = 'pdf';
-      else {
-        const extMatch = viewerFileUrl ? viewerFileUrl.match(/\.(pdf|png|jpe?g|webp|gif|bmp|jfif|heic)$/i) : null;
-        ext = extMatch ? extMatch[1].toLowerCase() : 'pdf';
-      }
+      else if (blob.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') ext = 'docx';
+      else if (blob.type === 'application/msword') ext = 'doc';
+      else if (blob.type === 'application/vnd.openxmlformats-officedocument.presentationml.presentation') ext = 'pptx';
+      else if (blob.type === 'application/vnd.ms-powerpoint') ext = 'ppt';
       
       link.download = `${title}.${ext}`;
       document.body.appendChild(link);
@@ -153,7 +157,7 @@ export default function PdfPreview() {
             borderLeft: "1px solid #1a252f"
           }}
         >
-          {isDownloading ? "Downloading..." : "Download PDF"}
+          {isDownloading ? "Downloading..." : (isImage ? "Download Image" : "Download File")}
         </button>
       </div>
 
