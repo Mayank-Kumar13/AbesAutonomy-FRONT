@@ -29,9 +29,9 @@ const Amcat = () => {
       />
       
       <div style={{ textAlign: 'center', maxWidth: '600px' }}>
-        <h2 style={{ marginBottom: '15px', fontSize: '28px', fontWeight: 'bold' }}>Got an idea? Let's build it!</h2>
+        <h2 style={{ marginBottom: '15px', fontSize: '28px', fontWeight: 'bold' }}>Got An Amazing Project? Just Pitch It</h2>
         <p style={{ fontSize: '18px', marginBottom: '30px', lineHeight: '1.6', color: '#e0cfa5' }}>
-          If you want to pitch your project, DM us! We are always looking for innovative student projects to feature and collaborate on.
+          If you have an Amazing Project, just DM us! We are always looking for innovative student projects to feature and collaborate on.
         </p>
         
         <a 
