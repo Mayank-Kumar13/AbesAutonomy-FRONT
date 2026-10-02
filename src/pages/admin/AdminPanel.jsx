@@ -1048,18 +1048,18 @@ export default function AdminPanel() {
                         <button
                           type="button"
                           className="admin-action-btn"
-                          style={{ padding: '4px 8px', fontSize: '0.8rem', backgroundColor: '#e2e8f0', color: '#1e293b', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+                          style={{ padding: '4px 8px', fontSize: '0.8rem', backgroundColor: u.email === 'abesautonomy30@gmail.com' ? '#334155' : '#e2e8f0', color: u.email === 'abesautonomy30@gmail.com' ? '#94a3b8' : '#1e293b', border: 'none', borderRadius: '4px', cursor: u.email === 'abesautonomy30@gmail.com' ? 'not-allowed' : 'pointer' }}
                           onClick={() => startEditRole(u)}
-                          disabled={actionLoading === `role-${u._id}`}
+                          disabled={actionLoading === `role-${u._id}` || u.email === 'abesautonomy30@gmail.com'}
                         >
                           Manage Role
                         </button>
                         <button
                           type="button"
                           className="delete-note-btn"
-                          style={{ padding: '4px 8px', fontSize: '0.8rem' }}
+                          style={{ padding: '4px 8px', fontSize: '0.8rem', cursor: u.email === 'abesautonomy30@gmail.com' ? 'not-allowed' : 'pointer' }}
                           onClick={() => handleDeleteUser(u)}
-                          disabled={actionLoading === `delete-${u._id}`}
+                          disabled={actionLoading === `delete-${u._id}` || u.email === 'abesautonomy30@gmail.com'}
                         >
                           {actionLoading === `delete-${u._id}` ? '...' : 'Delete'}
                         </button>
