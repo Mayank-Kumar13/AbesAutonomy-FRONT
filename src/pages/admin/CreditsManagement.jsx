@@ -105,6 +105,32 @@ export default function CreditsManagement() {
     }
   };
 
+  const handleMoveUp = async (index) => {
+    if (index === 0) return;
+    const newSections = [...sections];
+    [newSections[index - 1], newSections[index]] = [newSections[index], newSections[index - 1]];
+    setSections(newSections);
+    try {
+      await creditsApi.reorderSections(newSections.map(s => s._id));
+    } catch (err) {
+      alert('Error reordering sections: ' + err.message);
+      loadSections();
+    }
+  };
+
+  const handleMoveDown = async (index) => {
+    if (index === sections.length - 1) return;
+    const newSections = [...sections];
+    [newSections[index], newSections[index + 1]] = [newSections[index + 1], newSections[index]];
+    setSections(newSections);
+    try {
+      await creditsApi.reorderSections(newSections.map(s => s._id));
+    } catch (err) {
+      alert('Error reordering sections: ' + err.message);
+      loadSections();
+    }
+  };
+
   // --- Member Handlers ---
 
   const handleStartAddMember = () => {
@@ -198,7 +224,7 @@ export default function CreditsManagement() {
             {sections.length === 0 ? (
               <p style={{ color: '#a0aec0', textAlign: 'center', padding: '3rem' }}>No credit sections found.</p>
             ) : (
-              sections.map(section => (
+              sections.map((section, index) => (
                 <div key={section._id} className="admin-card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1.5rem', background: '#121418', border: '1px solid #2d3748', borderRadius: '12px' }}>
                   <div>
                     <h3 style={{ margin: '0 0 0.5rem 0', color: '#c89b63', fontSize: '1.4rem', fontFamily: '"Times New Roman", Georgia, serif' }}>{section.title}</h3>
@@ -222,7 +248,23 @@ export default function CreditsManagement() {
                       <span style={{ color: '#718096', fontSize: '0.9rem' }}>{section.description || 'No description'}</span>
                     </div>
                   </div>
-                  <div style={{ display: 'flex', gap: '0.75rem' }}>
+                  <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem', marginRight: '1rem' }}>
+                      <button 
+                        onClick={() => handleMoveUp(index)} 
+                        disabled={index === 0}
+                        style={{ background: 'transparent', border: 'none', color: index === 0 ? '#4a5568' : '#e2e8f0', cursor: index === 0 ? 'not-allowed' : 'pointer', fontSize: '1.2rem' }}
+                      >
+                        ▲
+                      </button>
+                      <button 
+                        onClick={() => handleMoveDown(index)} 
+                        disabled={index === sections.length - 1}
+                        style={{ background: 'transparent', border: 'none', color: index === sections.length - 1 ? '#4a5568' : '#e2e8f0', cursor: index === sections.length - 1 ? 'not-allowed' : 'pointer', fontSize: '1.2rem' }}
+                      >
+                        ▼
+                      </button>
+                    </div>
                     <button className="upload-reset-btn" onClick={() => openSectionEditor(section)}>Edit Section</button>
                     <button className="delete-note-btn" onClick={() => handleDeleteSection(section._id)}>Delete</button>
                   </div>

@@ -463,6 +463,12 @@ export const creditsApi = {
   async getAllSections() {
     return request('/credits/sections');
   },
+  async reorderSections(sectionIds) {
+    return request('/credits/sections/reorder', {
+      method: 'PUT',
+      body: JSON.stringify({ sectionIds }),
+    });
+  },
   async createSection(data) {
     return request('/credits/sections', {
       method: 'POST',
