@@ -6,6 +6,7 @@ import { uploadApi, notesApi, metaApi, subjectsApi, trackingApi, settingsApi } f
 import './AdminPanel.css';
 import SubjectManagement from './SubjectManagement';
 import CreditsManagement from './CreditsManagement';
+import AnalyticsDashboard from './AnalyticsDashboard';
 import { compressAndConvertToPdf } from '../../utils/pdfCompression';
 
 const BRANCHES_Y1 = ['electrical', 'electronics', 'common'];
@@ -81,7 +82,7 @@ export default function AdminPanel() {
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [tab, setTab] = useState('users');
+  const [tab, setTab] = useState('analytics');
   const [searchQuery, setSearchQuery] = useState('');
   const [userRoleFilter, setUserRoleFilter] = useState('all'); // 'all', 'admin', 'coordinator', 'user'
   const [userStatusFilter, setUserStatusFilter] = useState('all'); // 'all', 'live', 'offline'
@@ -815,6 +816,9 @@ export default function AdminPanel() {
       <div className="admin-tabs">
         {user?.role !== 'coordinator' && (
           <>
+            <button className={`admin-tab-btn ${tab === 'analytics' ? 'active' : ''}`} onClick={() => setTab('analytics')}>
+              Analytics
+            </button>
             <button className={`admin-tab-btn ${tab === 'users' ? 'active' : ''}`} onClick={() => setTab('users')}>
               Users
             </button>
@@ -852,6 +856,10 @@ export default function AdminPanel() {
           </>
         )}
       </div>
+
+      {tab === 'analytics' && user?.role !== 'coordinator' && (
+        <AnalyticsDashboard />
+      )}
 
       {tab === 'subjects' && (
         <SubjectManagement />

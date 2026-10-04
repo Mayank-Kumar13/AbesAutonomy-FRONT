@@ -506,4 +506,27 @@ export const creditsApi = {
       method: 'DELETE',
     });
   },
+};
+
+// ─────────────────────────────────────────────────────
+// Analytics API
+// ─────────────────────────────────────────────────────
+
+export const analyticsApi = {
+  async getOverview(params = {}) {
+    const qs = new URLSearchParams(params).toString();
+    return request(`/analytics/overview?${qs}`);
+  },
+  async getActivityGraph(params = {}) {
+    const qs = new URLSearchParams(params).toString();
+    return request(`/analytics/activity-graph?${qs}`);
+  },
+  async getContentEngagement(params = {}) {
+    const qs = new URLSearchParams(params).toString();
+    return request(`/analytics/content-engagement?${qs}`);
+  },
+  async getUserActivity(params = {}) {
+    const qs = new URLSearchParams(params).toString();
+    return request(`/analytics/users?${qs}`);
+  }
 };
