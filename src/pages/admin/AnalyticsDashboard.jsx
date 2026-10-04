@@ -18,6 +18,35 @@ const formatDuration = (ms) => {
   return `${minutes}m`;
 };
 
+const formatDateLabel = (label) => {
+  if (!label) return '';
+  const parts = label.split('-');
+  
+  // Daily: YYYY-MM-DD
+  if (parts.length === 3) {
+    const d = new Date(label);
+    if (!isNaN(d.getTime())) {
+      return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    }
+  }
+  
+  // Monthly: YYYY-MM
+  if (parts.length === 2 && parseInt(parts[1]) <= 12) {
+    const d = new Date(`${label}-01`);
+    if (!isNaN(d.getTime())) {
+      return d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+    }
+  }
+  
+  // Weekly: YYYY-WW
+  if (parts.length === 2 && parseInt(parts[1]) > 12) {
+    return `Week ${parts[1]}, ${parts[0]}`;
+  }
+  
+  // Yearly: YYYY
+  return label;
+};
+
 const MetricCard = ({ title, data, format = 'number' }) => {
   if (!data) return (
     <div className="analytics-card">
@@ -64,7 +93,7 @@ const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
     return (
       <div className="custom-tooltip">
-        <div className="custom-tooltip-label">{label}</div>
+        <div className="custom-tooltip-label">{formatDateLabel(label)}</div>
         {payload.map((entry, index) => (
           <div key={index} className="custom-tooltip-item" style={{ color: entry.color }}>
             <span>{entry.name}:</span>
@@ -167,7 +196,7 @@ export default function AnalyticsDashboard() {
 
           <div className="analytics-section">
             <div className="analytics-section-header">
-              <h3 className="analytics-section-title">User Activity & Engagement</h3>
+              <h3 className="analytics-section-title">Analytics Graphs</h3>
               <select className="analytics-select" value={interval} onChange={e => setIntervalOption(e.target.value)}>
                 <option value="Daily">Daily</option>
                 <option value="Weekly">Weekly</option>
@@ -176,7 +205,8 @@ export default function AnalyticsDashboard() {
               </select>
             </div>
             
-            <div className="analytics-chart-container">
+            <div className="analytics-chart-container small" style={{ marginBottom: '3rem' }}>
+              <h4 style={{ color: '#e2e8f0', marginBottom: '1rem', marginTop: 0, fontWeight: 500 }}>Active Users Trend</h4>
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={graphData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
                   <defs>
@@ -184,22 +214,50 @@ export default function AnalyticsDashboard() {
                       <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
                       <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
                     </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" vertical={false} />
+                  <XAxis dataKey="label" stroke="#9ca3af" tick={{ fill: '#9ca3af' }} tickMargin={10} tickFormatter={formatDateLabel} minTickGap={30} />
+                  <YAxis stroke="#9ca3af" tick={{ fill: '#9ca3af' }} />
+                  <Tooltip content={<CustomTooltip />} />
+                  <Area type="monotone" dataKey="activeUsers" name="Active Users" stroke="#3b82f6" fillOpacity={1} fill="url(#colorActive)" />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+
+            <div className="analytics-chart-container small" style={{ marginBottom: '3rem' }}>
+              <h4 style={{ color: '#e2e8f0', marginBottom: '1rem', marginTop: 0, fontWeight: 500 }}>New Users Trend</h4>
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={graphData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                  <defs>
                     <linearGradient id="colorNew" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
                       <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" vertical={false} />
-                  <XAxis dataKey="label" stroke="#9ca3af" tick={{ fill: '#9ca3af' }} tickMargin={10} />
-                  <YAxis yAxisId="left" stroke="#9ca3af" tick={{ fill: '#9ca3af' }} />
-                  <YAxis yAxisId="right" orientation="right" stroke="#8b5cf6" tick={{ fill: '#8b5cf6' }} 
-                    tickFormatter={(val) => Math.floor(val/60000) + 'm'} 
-                  />
+                  <XAxis dataKey="label" stroke="#9ca3af" tick={{ fill: '#9ca3af' }} tickMargin={10} tickFormatter={formatDateLabel} minTickGap={30} />
+                  <YAxis stroke="#9ca3af" tick={{ fill: '#9ca3af' }} />
                   <Tooltip content={<CustomTooltip />} />
-                  <Legend />
-                  <Area yAxisId="left" type="monotone" dataKey="activeUsers" name="Active Users" stroke="#3b82f6" fillOpacity={1} fill="url(#colorActive)" />
-                  <Area yAxisId="left" type="monotone" dataKey="newUsers" name="New Users" stroke="#10b981" fillOpacity={1} fill="url(#colorNew)" />
-                  <Line yAxisId="right" type="monotone" dataKey="engagementMs" name="Engagement Time" stroke="#8b5cf6" strokeWidth={2} dot={false} />
+                  <Area type="monotone" dataKey="newUsers" name="New Users" stroke="#10b981" fillOpacity={1} fill="url(#colorNew)" />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+
+            <div className="analytics-chart-container small">
+              <h4 style={{ color: '#e2e8f0', marginBottom: '1rem', marginTop: 0, fontWeight: 500 }}>Engagement Time</h4>
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={graphData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="colorEngage" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.3}/>
+                      <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" vertical={false} />
+                  <XAxis dataKey="label" stroke="#9ca3af" tick={{ fill: '#9ca3af' }} tickMargin={10} tickFormatter={formatDateLabel} minTickGap={30} />
+                  <YAxis stroke="#8b5cf6" tick={{ fill: '#8b5cf6' }} tickFormatter={(val) => Math.floor(val/60000) + 'm'} width={80} />
+                  <Tooltip content={<CustomTooltip />} />
+                  <Area type="monotone" dataKey="engagementMs" name="Engagement Time" stroke="#8b5cf6" fillOpacity={1} fill="url(#colorEngage)" />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
