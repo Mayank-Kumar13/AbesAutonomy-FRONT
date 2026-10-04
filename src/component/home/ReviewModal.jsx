@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { Star, X, Send } from "lucide-react";
+import { Star, X, Send, Lock, Unlock } from "lucide-react";
 import { reviewApi } from "../../services/api";
+import { useAuth } from "../../auth/AuthContext";
 import "./ReviewModal.css";
 
 const ReviewModal = ({ isOpen, onClose, onSuccess }) => {
@@ -10,6 +11,13 @@ const ReviewModal = ({ isOpen, onClose, onSuccess }) => {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+  const { currentWatchTime } = useAuth();
+  
+  const REQUIRED_TIME_MS = 600000; // 10 minutes
+  const isLocked = currentWatchTime < REQUIRED_TIME_MS;
+  const remainingMs = Math.max(0, REQUIRED_TIME_MS - currentWatchTime);
+  const remainingMins = Math.floor(remainingMs / 60000);
+  const remainingSecs = Math.floor((remainingMs % 60000) / 1000);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -65,8 +73,21 @@ const ReviewModal = ({ isOpen, onClose, onSuccess }) => {
             <div className="success-icon">✓</div>
             <p>Review submitted successfully!</p>
           </div>
+        ) : isLocked ? (
+          <div className="review-locked-state" style={{ textAlign: "center", padding: "2rem 0" }}>
+            <Lock size={48} color="#d4a373" style={{ margin: "0 auto 1rem" }} />
+            <h3 style={{ fontSize: "1.2rem", marginBottom: "0.5rem" }}>🔒 Review locked</h3>
+            <p style={{ color: "#a0a0a0", marginBottom: "1rem" }}>Watch for 10 minutes to unlock the review option.</p>
+            <div style={{ background: "#2a2a2a", padding: "10px", borderRadius: "8px", display: "inline-block" }}>
+              <span style={{ color: "#d4a373", fontWeight: "bold" }}>Remaining: {remainingMins} minutes {remainingSecs} seconds</span>
+            </div>
+          </div>
         ) : (
           <form onSubmit={handleSubmit} className="review-modal-form">
+            <div className="review-unlocked-banner" style={{ background: "rgba(76, 175, 80, 0.1)", color: "#4caf50", padding: "10px", borderRadius: "8px", marginBottom: "1.5rem", display: "flex", alignItems: "center", gap: "8px" }}>
+              <Unlock size={18} />
+              <span>✓ Review unlocked. You can now submit your review.</span>
+            </div>
             {/* Star Rating */}
             <div className="rating-section">
               <label className="rating-label">Your Rating</label>

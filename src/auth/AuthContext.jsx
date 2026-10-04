@@ -9,7 +9,9 @@ export function AuthProvider({ children }) {
   const [token, setToken] = useState(() => localStorage.getItem("token"));
   const [loading, setLoading] = useState(true);
   const [websiteStatus, setWebsiteStatus] = useState('LIVE');
+  const [currentWatchTime, setCurrentWatchTime] = useState(0);
   const heartbeatRef = useRef(null);
+  const sessionStartTimeRef = useRef(Date.now());
 
   const loadProfile = useCallback(async () => {
     const token = localStorage.getItem("token");
@@ -44,6 +46,17 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     loadProfile();
   }, [loadProfile]);
+
+  // Real-time watch time updater for the frontend
+  useEffect(() => {
+    if (user) {
+      sessionStartTimeRef.current = Date.now();
+      const interval = setInterval(() => {
+        setCurrentWatchTime((user.totalWatchTimeMs || 0) + (Date.now() - sessionStartTimeRef.current));
+      }, 1000);
+      return () => clearInterval(interval);
+    }
+  }, [user?.totalWatchTimeMs, user?._id]);
 
   // Watch-time heartbeat — only while a user is logged in
   useEffect(() => {
@@ -111,6 +124,7 @@ export function AuthProvider({ children }) {
     token,
     loading,
     websiteStatus,
+    currentWatchTime,
     setWebsiteStatus,
     isAuthenticated: !!user,
     login,
