@@ -12,7 +12,7 @@ import { compressAndConvertToPdf } from '../../utils/pdfCompression';
 const BRANCHES_Y1 = ['electrical', 'electronics', 'common'];
 const BRANCHES_Y2 = ['cse', 'ds', 'aiml', 'ece', 'elce', 'common'];
 const BRANCHES = Array.from(new Set(['cse', 'it', 'me', 'aids', 'ds', 'aiml', 'ece', 'elce', 'electrical', 'electronics', 'common']));
-const RESOURCE_TYPES = ['theory', 'assignment', 'lab_manual', 'pyq', 'handwritten', 'syllabus'];
+const RESOURCE_TYPES = ['theory', 'assignment', 'question_bank', 'pyq', 'handwritten', 'syllabus'];
 
 let fileEntryIdCounter = 0;
 const makeFileEntry = (file) => {

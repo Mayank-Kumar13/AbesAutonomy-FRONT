@@ -17,7 +17,7 @@ import { notesApi } from "../services/api";
 const RESOURCE_TYPE_MAP = {
   1: "theory",
   2: "assignment",
-  3: "lab_manual",
+  3: "question_bank",
   4: "pyq",
   5: "handwritten",
   6: "syllabus",
@@ -63,8 +63,8 @@ const Resources = () => {
   },
   {
     id: 3,
-    title: "LAB MANUALS",
-    description: "Manuals & experimentation logs",
+    title: "QUESTION BANKS",
+    description: "Comprehensive question banks",
     icon: FlaskConical,
   },
 ];

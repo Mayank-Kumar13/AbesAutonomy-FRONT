@@ -13,7 +13,7 @@ const Contribute = () => {
         
         <h2 className="info-heading">1. Share Academic Resources</h2>
         <p className="info-text">
-          Do you have high-quality handwritten notes, lab manuals, or previous year question papers? 
+          Do you have high-quality handwritten notes, question banks, or previous year question papers? 
         </p>
         <ul className="info-list">
           <li>Scan your documents clearly into a PDF or Image (PNG/JPG) format.</li>
