@@ -40,7 +40,7 @@ const Resources = () => {
   {
     id: 5,
     title: "HANDWRITTEN NOTES",
-    description: "Handwritten notes by Topper Student [10 SGPA]",
+    description: "Handwritten notes by Topper Students",
     icon: Notebook,
   },
   {
