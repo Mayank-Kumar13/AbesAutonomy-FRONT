@@ -86,6 +86,7 @@ export default function AdminPanel() {
   const [searchQuery, setSearchQuery] = useState('');
   const [userRoleFilter, setUserRoleFilter] = useState('all'); // 'all', 'admin', 'coordinator', 'user'
   const [userStatusFilter, setUserStatusFilter] = useState('all'); // 'all', 'live', 'offline'
+  const [userRegistrationFilter, setUserRegistrationFilter] = useState('all'); // 'all', 'registered', 'unregistered'
   const [userSortBy, setUserSortBy] = useState('recent'); // 'recent', 'watchTime', 'logins'
   const [actionLoading, setActionLoading] = useState(null);
   
@@ -594,6 +595,10 @@ export default function AdminPanel() {
       if (userStatusFilter === 'live' && !u.isLive) return false;
       if (userStatusFilter === 'offline' && u.isLive) return false;
 
+      // Registration Filter (Using emailVerified)
+      if (userRegistrationFilter === 'registered' && !u.emailVerified) return false;
+      if (userRegistrationFilter === 'unregistered' && u.emailVerified) return false;
+
       // Search Query
       if (searchQuery) {
         const lowerQuery = searchQuery.toLowerCase();
@@ -993,6 +998,11 @@ export default function AdminPanel() {
                 <option value="all">All Status</option>
                 <option value="live">Live Now</option>
                 <option value="offline">Offline</option>
+              </select>
+              <select className="admin-filter-select" value={userRegistrationFilter} onChange={(e) => setUserRegistrationFilter(e.target.value)}>
+                <option value="all">All Registration</option>
+                <option value="registered">Registered</option>
+                <option value="unregistered">Unregistered</option>
               </select>
               <select className="admin-filter-select" value={userSortBy} onChange={(e) => setUserSortBy(e.target.value)}>
                 <option value="recent">Sort: Recent</option>
