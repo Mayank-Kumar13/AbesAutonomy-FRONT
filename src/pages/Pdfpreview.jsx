@@ -130,10 +130,12 @@ export default function PdfPreview() {
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
       <div 
         style={{ 
-          transition: 'max-height 0.4s ease-in-out, opacity 0.3s ease-in-out', 
-          maxHeight: isNavbarVisible ? '200px' : '0px', 
-          overflow: 'hidden',
+          transition: 'max-height 0.4s ease-in-out, opacity 0.3s ease-in-out, margin-top 0.4s ease-in-out', 
+          maxHeight: isNavbarVisible ? '150px' : '0px', 
           opacity: isNavbarVisible ? 1 : 0,
+          flexShrink: 0,
+          width: '100%',
+          overflow: 'hidden'
         }}
       >
         <Navbar />
