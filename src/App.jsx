@@ -42,7 +42,7 @@ const App = () => {
       <LiveTracker />
       <GlobalAnnouncement />
       <IntroOverlay />
-      {useLocation().pathname !== "/pdfpreview" && <Navbar />} 
+      <Navbar />
       <Scroll />
       <Suspense fallback={<div className="flex h-screen items-center justify-center text-white"><div className="animate-spin h-8 w-8 border-4 border-blue-500 rounded-full border-t-transparent"></div></div>}>
         <Routes>

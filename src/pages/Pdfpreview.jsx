@@ -126,7 +126,7 @@ export default function PdfPreview() {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: 'calc(100vh - 106px)' }}>
       <div style={{ display: "flex", width: "100%" }}>
         <button
           onClick={() => navigate(-1)}
