@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { notesApi, trackingApi } from "../services/api";
 import { useAuth } from "../auth/AuthContext";
 import ReviewModal from "../component/home/ReviewModal";
-
+import Navbar from "../component/navbar/Navbar";
 export default function PdfPreview() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -12,6 +12,7 @@ export default function PdfPreview() {
 
   const { pdfUrl, title = "PDF Preview", noteId, subject = "", isImage = false } = location.state || {};
   
+  const [isNavbarVisible, setIsNavbarVisible] = useState(true);
   const [showReviewPrompt, setShowReviewPrompt] = useState(false);
   const [showActualReviewModal, setShowActualReviewModal] = useState(false);
 
@@ -126,8 +127,19 @@ export default function PdfPreview() {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: 'calc(100vh - 106px)' }}>
-      <div style={{ display: "flex", width: "100%" }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
+      <div 
+        style={{ 
+          transition: 'max-height 0.4s ease-in-out, opacity 0.3s ease-in-out', 
+          maxHeight: isNavbarVisible ? '200px' : '0px', 
+          overflow: 'hidden',
+          opacity: isNavbarVisible ? 1 : 0,
+        }}
+      >
+        <Navbar />
+      </div>
+
+      <div style={{ display: "flex", width: "100%", zIndex: 10, position: 'relative', boxShadow: '0 2px 10px rgba(0,0,0,0.5)' }}>
         <button
           onClick={() => navigate(-1)}
           style={{
@@ -143,6 +155,24 @@ export default function PdfPreview() {
         >
           ← Back — {title}
         </button>
+
+        <button
+          onClick={() => setIsNavbarVisible(!isNavbarVisible)}
+          style={{
+            padding: "8px 20px",
+            cursor: "pointer",
+            color: "white",
+            backgroundColor: "#161b22",
+            border: "none",
+            fontSize: "16px",
+            fontWeight: "bold",
+            borderLeft: "1px solid #1a252f",
+            transition: "background-color 0.3s"
+          }}
+        >
+          {isNavbarVisible ? "▲ Hide Nav" : "▼ Show Nav"}
+        </button>
+
         <button
           onClick={handleDownload}
           disabled={isDownloading || !noteId}
