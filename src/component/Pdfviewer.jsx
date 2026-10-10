@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../auth/AuthContext";
 
-export default function Pdfviewer({ file, isImageFlag }) {
+export default function Pdfviewer({ file, isImageFlag, isDarkMode }) {
   const { user } = useAuth();
   
   const cleanFileUrl = file ? file.split('?')[0] : '';
@@ -33,13 +33,13 @@ export default function Pdfviewer({ file, isImageFlag }) {
   }
 
   const viewerName = user ? (user.name || user.email) : 'Guest User';
-
+  const filterStyle = isDarkMode ? 'invert(1) hue-rotate(180deg) brightness(0.9) contrast(1.1)' : 'none';
 
   return (
     <div style={{ position: 'relative', width: '100%', minHeight: '100vh', overflow: 'hidden' }}>
       {isImage ? (
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', background: '#0f172a' }}>
-          <img src={file} alt="Document View" style={{ maxWidth: '100%', maxHeight: '100vh', objectFit: 'contain' }} />
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', background: isDarkMode ? '#111' : '#0f172a' }}>
+          <img src={file} alt="Document View" style={{ maxWidth: '100%', maxHeight: '100vh', objectFit: 'contain', filter: filterStyle, transition: 'filter 0.3s ease' }} />
         </div>
       ) : (
         <iframe
@@ -49,6 +49,9 @@ export default function Pdfviewer({ file, isImageFlag }) {
           style={{
             border: "none",
             minHeight: "100vh",
+            filter: filterStyle,
+            transition: 'filter 0.3s ease',
+            backgroundColor: isDarkMode ? 'black' : 'white'
           }}
           title="PDF Viewer"
         />

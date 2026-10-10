@@ -78,6 +78,7 @@ export default function PdfPreview() {
   const viewerFileUrl = pdfUrl || (noteId ? `${API_BASE}/notes/${noteId}/pdf` : "");
 
   const [isDownloading, setIsDownloading] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(false);
 
   const handleDownload = async () => {
     if (!noteId) {
@@ -176,6 +177,23 @@ export default function PdfPreview() {
         </button>
 
         <button
+          onClick={() => setIsDarkMode(!isDarkMode)}
+          style={{
+            padding: "8px 20px",
+            cursor: "pointer",
+            color: "white",
+            backgroundColor: isDarkMode ? "#374151" : "#1f2937",
+            border: "none",
+            fontSize: "16px",
+            fontWeight: "bold",
+            borderLeft: "1px solid #1a252f",
+            transition: "background-color 0.3s"
+          }}
+        >
+          {isDarkMode ? "☀️ Light Mode" : "🌙 Dark Mode"}
+        </button>
+
+        <button
           onClick={handleDownload}
           disabled={isDownloading || !noteId}
           style={{
@@ -193,7 +211,7 @@ export default function PdfPreview() {
         </button>
       </div>
 
-      <Pdfviewer file={viewerFileUrl} backendUrl={noteId ? `${API_BASE}/notes/${noteId}/pdf` : ''} isImageFlag={isImage} />
+      <Pdfviewer file={viewerFileUrl} backendUrl={noteId ? `${API_BASE}/notes/${noteId}/pdf` : ''} isImageFlag={isImage} isDarkMode={isDarkMode} />
 
       {/* Custom Review Prompt Modal */}
       {showReviewPrompt && (
