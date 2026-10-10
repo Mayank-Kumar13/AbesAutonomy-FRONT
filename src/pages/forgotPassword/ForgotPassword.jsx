@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { authApi } from "../../auth/authApi";
 import "../loginPage/LoginPage.css";
@@ -7,17 +7,38 @@ export default function ForgotPassword() {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState("idle");
   const [error, setError] = useState("");
+  const [captchaSvg, setCaptchaSvg] = useState("");
+  const [captchaToken, setCaptchaToken] = useState("");
+  const [captchaValue, setCaptchaValue] = useState("");
+
+  const loadCaptcha = async () => {
+    try {
+      const res = await authApi.getCaptcha();
+      if (res.data) {
+        setCaptchaSvg(res.data.svg);
+        setCaptchaToken(res.data.captchaToken);
+        setCaptchaValue("");
+      }
+    } catch (err) {
+      console.error("Failed to load captcha", err);
+    }
+  };
+
+  useEffect(() => {
+    loadCaptcha();
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setStatus("loading");
     try {
-      await authApi.forgotPassword(email);
+      await authApi.forgotPassword(email, captchaToken, captchaValue);
       setStatus("sent");
     } catch (err) {
       setError(err.message);
       setStatus("idle");
+      loadCaptcha();
     }
   };
 
@@ -48,6 +69,33 @@ export default function ForgotPassword() {
                   required
                 />
               </div>
+
+              {captchaSvg && (
+                <div className="input-group">
+                  <label>Captcha</label>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <div 
+                      dangerouslySetInnerHTML={{ __html: captchaSvg }} 
+                      style={{ background: '#1e293b', borderRadius: '4px', overflow: 'hidden' }}
+                    />
+                    <button 
+                      type="button" 
+                      onClick={loadCaptcha}
+                      style={{ background: 'transparent', border: '1px solid #334155', color: '#cbd5e1', padding: '8px', borderRadius: '4px', cursor: 'pointer' }}
+                    >
+                      Refresh
+                    </button>
+                  </div>
+                  <input 
+                    type="text" 
+                    value={captchaValue}
+                    onChange={(e) => setCaptchaValue(e.target.value)}
+                    placeholder="Enter characters above"
+                    required
+                    style={{ marginTop: '10px' }}
+                  />
+                </div>
+              )}
 
               {error && <p style={{ color: "red", fontSize: "0.9rem" }}>{error}</p>}
 

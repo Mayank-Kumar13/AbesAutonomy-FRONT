@@ -75,10 +75,10 @@ export const authApi = {
       body: JSON.stringify(updates),
     }),
 
-  forgotPassword: (email) =>
+  forgotPassword: (email, captchaToken, captchaValue) =>
     request("/auth/forgot-password", {
       method: "POST",
-      body: JSON.stringify({ email }),
+      body: JSON.stringify({ email, captchaToken, captchaValue }),
     }),
 
   resetPassword: (token, newPassword) =>
