@@ -1704,6 +1704,7 @@ export default function AdminPanel() {
               <tr>
                 <th>Device Name (User Agent)</th>
                 <th>IP Address</th>
+                <th>Targeted Info</th>
                 <th>Endpoint Targeted</th>
                 <th>Method</th>
                 <th>Attempts</th>
@@ -1723,6 +1724,16 @@ export default function AdminPanel() {
                       {ipRec.userAgent || 'Unknown'}
                     </td>
                     <td style={{ fontFamily: 'monospace', color: '#fca5a5' }}>{ipRec.ip}</td>
+                    <td style={{ color: '#fbbf24', fontSize: '0.85rem', maxWidth: '200px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={`${ipRec.relatedEmail || ''} ${ipRec.relatedName || ''}`}>
+                      {ipRec.relatedEmail || ipRec.relatedName ? (
+                        <>
+                          {ipRec.relatedEmail && <div>{ipRec.relatedEmail}</div>}
+                          {ipRec.relatedName && <div style={{ color: '#94a3b8' }}>{ipRec.relatedName}</div>}
+                        </>
+                      ) : (
+                        <span style={{ color: '#64748b' }}>N/A</span>
+                      )}
+                    </td>
                     <td>{ipRec.endpoint}</td>
                     <td><span className="badge" style={{backgroundColor: '#334155'}}>{ipRec.method}</span></td>
                     <td style={{ fontWeight: 'bold' }}>{ipRec.attemptCount}</td>
@@ -1733,10 +1744,10 @@ export default function AdminPanel() {
                 );
               })}
               {!securityLoading && suspiciousIPs.length === 0 && (
-                <tr><td colSpan={6} className="admin-empty" style={{ color: '#4ade80' }}>No suspicious IPs detected recently.</td></tr>
+                <tr><td colSpan={7} className="admin-empty" style={{ color: '#4ade80' }}>No suspicious IPs detected recently.</td></tr>
               )}
               {securityLoading && (
-                <tr><td colSpan={6} className="admin-empty">Loading security data...</td></tr>
+                <tr><td colSpan={7} className="admin-empty">Loading security data...</td></tr>
               )}
             </tbody>
           </table>
