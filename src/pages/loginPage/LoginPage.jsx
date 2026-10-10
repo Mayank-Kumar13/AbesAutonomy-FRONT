@@ -283,7 +283,7 @@ function App() {
 
             {captchaSvg && (
               <div className="input-group">
-                <label>Security Check</label>
+                <label>Captcha</label>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                   <div 
                     dangerouslySetInnerHTML={{ __html: captchaSvg }} 
