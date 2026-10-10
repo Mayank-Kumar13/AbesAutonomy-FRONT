@@ -26,8 +26,31 @@ function App() {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    password: ''
+    password: '',
+    captchaValue: ''
   });
+
+  const [captchaSvg, setCaptchaSvg] = useState('');
+  const [captchaToken, setCaptchaToken] = useState('');
+
+  const loadCaptcha = async () => {
+    try {
+      const res = await authApi.getCaptcha();
+      if (res.data) {
+        setCaptchaSvg(res.data.svg);
+        setCaptchaToken(res.data.captchaToken);
+        setFormData(prev => ({ ...prev, captchaValue: '' }));
+      }
+    } catch (err) {
+      console.error("Failed to load captcha", err);
+    }
+  };
+
+  React.useEffect(() => {
+    if (!otpStep) {
+      loadCaptcha();
+    }
+  }, [activeTab, otpStep]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -44,8 +67,8 @@ function App() {
     try {
       const data =
         activeTab === 'login'
-          ? await login(formData.email, formData.password)
-          : await register(formData.name, formData.email, formData.password);
+          ? await login(formData.email, formData.password, captchaToken, formData.captchaValue)
+          : await register(formData.name, formData.email, formData.password, captchaToken, formData.captchaValue);
 
       setOtpUserId(data.userId);
       setOtpEmail(data.email);
@@ -54,6 +77,8 @@ function App() {
       setOtpStep(true);
     } catch (err) {
       setError(err.message);
+      // Reload captcha on failure
+      loadCaptcha();
     } finally {
       setIsLoading(false);
     }
@@ -255,6 +280,34 @@ function App() {
                 </button>
               </div>
             </div>
+
+            {captchaSvg && (
+              <div className="input-group">
+                <label>Security Check</label>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <div 
+                    dangerouslySetInnerHTML={{ __html: captchaSvg }} 
+                    style={{ background: '#1e293b', borderRadius: '4px', overflow: 'hidden' }}
+                  />
+                  <button 
+                    type="button" 
+                    onClick={loadCaptcha}
+                    style={{ background: 'transparent', border: '1px solid #334155', color: '#cbd5e1', padding: '8px', borderRadius: '4px', cursor: 'pointer' }}
+                  >
+                    Refresh
+                  </button>
+                </div>
+                <input 
+                  type="text" 
+                  name="captchaValue"
+                  value={formData.captchaValue}
+                  onChange={handleInputChange}
+                  placeholder="Enter characters above"
+                  required
+                  style={{ marginTop: '10px' }}
+                />
+              </div>
+            )}
 
             {error && <p style={{ color: 'red', fontSize: '0.9rem' }}>{error}</p>}
 

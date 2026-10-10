@@ -41,16 +41,18 @@ function buildOAuthUrl(provider) {
 }
 
 export const authApi = {
-  register: (name, email, password) =>
+  getCaptcha: () => request("/auth/captcha"),
+
+  register: (name, email, password, captchaToken, captchaValue) =>
     request("/auth/register", {
       method: "POST",
-      body: JSON.stringify({ name, email, password }),
+      body: JSON.stringify({ name, email, password, captchaToken, captchaValue }),
     }),
 
-  login: (email, password) =>
+  login: (email, password, captchaToken, captchaValue) =>
     request("/auth/login", {
       method: "POST",
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ email, password, captchaToken, captchaValue }),
     }),
 
   verifyOtp: (userId, otp, purpose = "signup") =>
