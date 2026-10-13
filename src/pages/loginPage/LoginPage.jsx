@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import './LoginPage.css';
-import { Eye, EyeOff, Loader2 } from 'lucide-react';
+import { Eye, EyeOff, Loader2, CheckCircle2 } from 'lucide-react';
 import { useAuth } from '../../auth/AuthContext';
 import { authApi } from '../../auth/authApi';
 
@@ -10,6 +10,7 @@ function App() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [loginSuccess, setLoginSuccess] = useState(false);
 
   const [otpStep, setOtpStep] = useState(false);
   const [otpPurpose, setOtpPurpose] = useState('signup');
@@ -47,10 +48,10 @@ function App() {
   };
 
   React.useEffect(() => {
-    if (!otpStep) {
+    if (!otpStep && !loginSuccess) {
       loadCaptcha();
     }
-  }, [activeTab, otpStep]);
+  }, [activeTab, otpStep, loginSuccess]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -69,6 +70,19 @@ function App() {
         activeTab === 'login'
           ? await login(formData.email, formData.password, captchaToken, formData.captchaValue)
           : await register(formData.name, formData.email, formData.password, captchaToken, formData.captchaValue);
+
+      // If user account is already created and verified, login returned token directly (no OTP needed)
+      if (activeTab === 'login' && data?.token) {
+        setLoginSuccess(true);
+        sessionStorage.setItem('just_logged_in', 'true');
+        if (data.user?.name) {
+          sessionStorage.setItem('just_logged_in_name', data.user.name);
+        }
+        setTimeout(() => {
+          navigate(redirectTo, { replace: true });
+        }, 1200);
+        return;
+      }
 
       setOtpUserId(data.userId);
       setOtpEmail(data.email);
@@ -95,8 +109,15 @@ function App() {
     setError('');
     setIsLoading(true);
     try {
-      await verifyOtp(otpUserId, otpValue, otpPurpose);
-      navigate(redirectTo, { replace: true });
+      const verifiedUser = await verifyOtp(otpUserId, otpValue, otpPurpose);
+      setLoginSuccess(true);
+      sessionStorage.setItem('just_logged_in', 'true');
+      if (verifiedUser?.name) {
+        sessionStorage.setItem('just_logged_in_name', verifiedUser.name);
+      }
+      setTimeout(() => {
+        navigate(redirectTo, { replace: true });
+      }, 1200);
     } catch (err) {
       setError(err.message);
       setOtpValue('');
@@ -147,6 +168,72 @@ function App() {
       setError(err.message);
     }
   };
+
+  if (loginSuccess) {
+    return (
+      <div className="modal-overlay">
+        <div className="modal-container">
+          <div className="modal-content" style={{ textAlign: 'center', padding: '3rem 2rem' }}>
+            <div
+              style={{
+                width: '68px',
+                height: '68px',
+                margin: '0 auto 1.5rem',
+                borderRadius: '50%',
+                background: 'rgba(34, 197, 94, 0.15)',
+                border: '2px solid rgba(74, 222, 128, 0.5)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#4ade80',
+                boxShadow: '0 0 30px rgba(34, 197, 94, 0.35)',
+                animation: 'loginSuccessPop 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+              }}
+            >
+              <CheckCircle2 size={38} />
+            </div>
+
+            <h2 className="modal-title" style={{ margin: '0 0 0.75rem 0', color: '#f8fafc', fontSize: '1.65rem' }}>
+              Successfully Logged In!
+            </h2>
+
+            <p style={{ color: '#94a3b8', fontSize: '0.95rem', marginBottom: '2rem', lineHeight: '1.5' }}>
+              Welcome back to ABES Autonomy. Redirecting to your dashboard...
+            </p>
+
+            <div
+              style={{
+                width: '100%',
+                height: '4px',
+                background: 'rgba(255, 255, 255, 0.1)',
+                borderRadius: '4px',
+                overflow: 'hidden',
+              }}
+            >
+              <div
+                style={{
+                  height: '100%',
+                  background: 'linear-gradient(90deg, #c89b63, #4ade80)',
+                  animation: 'loginProgress 1.2s ease-in-out forwards',
+                }}
+              />
+            </div>
+
+            <style>{`
+              @keyframes loginSuccessPop {
+                0% { transform: scale(0.5); opacity: 0; }
+                100% { transform: scale(1); opacity: 1; }
+              }
+              @keyframes loginProgress {
+                0% { width: 0%; }
+                100% { width: 100%; }
+              }
+            `}</style>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (otpStep) {
     return (

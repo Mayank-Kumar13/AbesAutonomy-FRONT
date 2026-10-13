@@ -21,6 +21,7 @@ export default function OAuthCallback() {
     }
 
     if (token) {
+      sessionStorage.setItem('just_logged_in', 'true');
       setTokenAndLoad(token).then(() => {
         navigate("/", { replace: true });
       });
@@ -33,6 +34,7 @@ export default function OAuthCallback() {
       authApi.exchangeCode(provider, code)
         .then((data) => {
           if (data.token) {
+            sessionStorage.setItem('just_logged_in', 'true');
             setTokenAndLoad(data.token).then(() => {
               navigate("/", { replace: true });
             });

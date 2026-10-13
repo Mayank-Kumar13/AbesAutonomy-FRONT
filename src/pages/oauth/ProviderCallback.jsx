@@ -20,6 +20,7 @@ export default function ProviderCallback({ provider }) {
     authApi.exchangeCode(provider, code)
       .then((res) => {
         if (res.token) {
+          sessionStorage.setItem('just_logged_in', 'true');
           return setTokenAndLoad(res.token).then(() => {
             navigate("/", { replace: true });
           });

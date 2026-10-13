@@ -3,6 +3,7 @@ import Navbar from './component/navbar/Navbar';
 import IntroOverlay from './component/intro/IntroOverlay';
 import LiveTracker from './component/LiveTracker';
 import GlobalAnnouncement from './component/GlobalAnnouncement';
+import LoginToast from './component/LoginToast';
 import Credits from './pages/Credits';
 import HomeContent from './component/home/HomeContent';
 import { Routes, Route } from "react-router-dom";
@@ -39,6 +40,7 @@ const App = () => {
 
   return (
     <GlobalStatusGuard>
+      <LoginToast />
       <LiveTracker />
       <GlobalAnnouncement />
       <IntroOverlay />
