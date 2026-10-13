@@ -15,19 +15,32 @@ const LiveTracker = () => {
     if (location.pathname === '/pdfpreview') return;
 
     const ping = async () => {
+      // Don't send background pings if tab is hidden
+      if (document.hidden) return;
       try {
         await trackingApi.ping(
           location.pathname + location.search,
           null,
+          null,
           null
         );
-      } catch (err) { console.error("[tracking] ping failed:", err); }
+      } catch (err) { 
+        // Silently ignore tracking errors to avoid console noise
+      }
     };
 
+    // Ping once on page navigation
     ping();
-    const interval = setInterval(ping, 15000);
+
+    // Lightweight heartbeat every 2.5 minutes (150s) instead of 15s to save API limits
+    const interval = setInterval(() => {
+      if (!document.hidden) {
+        ping();
+      }
+    }, 150000);
+
     return () => clearInterval(interval);
-  }, [location, user, token]);
+  }, [location.pathname, location.search, user, token]);
 
   return null;
 };

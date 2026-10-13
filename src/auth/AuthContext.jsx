@@ -58,19 +58,38 @@ export function AuthProvider({ children }) {
     }
   }, [user?.totalWatchTimeMs, user?._id]);
 
-  // Watch-time heartbeat — only while a user is logged in
+  // Watch-time heartbeat — only while a user is logged in and actively using the tab
   useEffect(() => {
     if (heartbeatRef.current) {
       clearInterval(heartbeatRef.current);
       heartbeatRef.current = null;
     }
-    if (user) {
-      heartbeatRef.current = setInterval(() => {
-        authApi.heartbeat(HEARTBEAT_INTERVAL_MS).catch(() => {});
-      }, HEARTBEAT_INTERVAL_MS);
-    }
+    if (!user) return;
+
+    let lastInteraction = Date.now();
+    const handleActivity = () => {
+      lastInteraction = Date.now();
+    };
+
+    window.addEventListener('mousemove', handleActivity, { passive: true });
+    window.addEventListener('keydown', handleActivity, { passive: true });
+    window.addEventListener('scroll', handleActivity, { passive: true });
+    window.addEventListener('touchstart', handleActivity, { passive: true });
+
+    heartbeatRef.current = setInterval(() => {
+      // Skip heartbeat if tab is in background or user has been idle for > 2 minutes
+      const isIdle = Date.now() - lastInteraction > 120000;
+      if (document.hidden || isIdle) return;
+
+      authApi.heartbeat(HEARTBEAT_INTERVAL_MS).catch(() => {});
+    }, HEARTBEAT_INTERVAL_MS);
+
     return () => {
       if (heartbeatRef.current) clearInterval(heartbeatRef.current);
+      window.removeEventListener('mousemove', handleActivity);
+      window.removeEventListener('keydown', handleActivity);
+      window.removeEventListener('scroll', handleActivity);
+      window.removeEventListener('touchstart', handleActivity);
     };
   }, [user]);
 

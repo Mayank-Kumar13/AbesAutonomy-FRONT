@@ -1,6 +1,6 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import Pdfviewer from "../component/Pdfviewer";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { notesApi, trackingApi } from "../services/api";
 import { useAuth } from "../auth/AuthContext";
 import ReviewModal from "../component/home/ReviewModal";
@@ -16,26 +16,134 @@ export default function PdfPreview() {
   const [isNavbarVisible, setIsNavbarVisible] = useState(true);
   const [showReviewPrompt, setShowReviewPrompt] = useState(false);
   const [showActualReviewModal, setShowActualReviewModal] = useState(false);
+  const [showStillReadingPrompt, setShowStillReadingPrompt] = useState(false);
+  const [isReadingActive, setIsReadingActive] = useState(true);
 
-  // Live Tracking for PDFs
+  // References to track genuine engagement & active read seconds
+  const lastInteractionRef = useRef(Date.now());
+  const activeSecondsAccumulatorRef = useRef(0);
+  const isPromptVisibleRef = useRef(false);
+
+  const resetActivity = useCallback(() => {
+    lastInteractionRef.current = Date.now();
+    if (isPromptVisibleRef.current) {
+      isPromptVisibleRef.current = false;
+      setShowStillReadingPrompt(false);
+      setIsReadingActive(true);
+    }
+  }, []);
+
+  // Listen to user engagement (scroll, mouse, touch, keyboard)
+  useEffect(() => {
+    const handleUserInteraction = () => {
+      lastInteractionRef.current = Date.now();
+    };
+
+    window.addEventListener('mousemove', handleUserInteraction, { passive: true });
+    window.addEventListener('scroll', handleUserInteraction, { passive: true });
+    window.addEventListener('keydown', handleUserInteraction, { passive: true });
+    window.addEventListener('touchstart', handleUserInteraction, { passive: true });
+    window.addEventListener('wheel', handleUserInteraction, { passive: true });
+
+    return () => {
+      window.removeEventListener('mousemove', handleUserInteraction);
+      window.removeEventListener('scroll', handleUserInteraction);
+      window.removeEventListener('keydown', handleUserInteraction);
+      window.removeEventListener('touchstart', handleUserInteraction);
+      window.removeEventListener('wheel', handleUserInteraction);
+    };
+  }, []);
+
+  // 1-second ticker to accumulate genuine active reading seconds
   useEffect(() => {
     if (!user || !token) return;
 
-    const ping = async () => {
+    const IDLE_THRESHOLD_MS = 60000;      // 60s without interaction = Idle
+    const INACTIVITY_PROMPT_MS = 180000;  // 3m without interaction = Still Reading prompt
+
+    const ticker = setInterval(() => {
+      // 1. If tab is in background / minimized -> Pause accumulation
+      if (document.hidden) {
+        setIsReadingActive(false);
+        return;
+      }
+
+      const idleDuration = Date.now() - lastInteractionRef.current;
+
+      // 2. If idle for > 3 minutes -> Show prompt and pause
+      if (idleDuration >= INACTIVITY_PROMPT_MS) {
+        if (!isPromptVisibleRef.current) {
+          isPromptVisibleRef.current = true;
+          setShowStillReadingPrompt(true);
+        }
+        setIsReadingActive(false);
+        return;
+      }
+
+      // 3. If idle for > 60 seconds -> Pause accumulation (no spam pings)
+      if (idleDuration >= IDLE_THRESHOLD_MS) {
+        setIsReadingActive(false);
+        return;
+      }
+
+      // 4. Otherwise user is genuinely reading!
+      setIsReadingActive(true);
+      activeSecondsAccumulatorRef.current += 1;
+    }, 1000);
+
+    return () => clearInterval(ticker);
+  }, [user, token]);
+
+  // Periodic 60-second ping (reduces API load by ~75% compared to 15s)
+  useEffect(() => {
+    if (!user || !token) return;
+
+    const sendPing = async (forcedDurationMs = null) => {
+      const durationToReport = forcedDurationMs !== null 
+        ? forcedDurationMs 
+        : activeSecondsAccumulatorRef.current * 1000;
+
+      // Only send if at least 10 seconds of active reading occurred
+      if (durationToReport < 10000) return;
+
+      // Reset accumulator before network request to prevent double-counting
+      activeSecondsAccumulatorRef.current = 0;
+
       try {
         await trackingApi.ping(
           "/pdfpreview",
           pdfUrl || null,
           title || "Untitled PDF",
-          subject || "Unknown Subject"
+          subject || "Unknown Subject",
+          {
+            isActive: true,
+            activeDurationMs: durationToReport
+          }
         );
-      } catch (err) { console.error("[tracking] ping failed:", err); }
+      } catch (err) {
+        // Silently catch tracking errors to avoid disrupting reader
+      }
     };
 
-    ping();
-    const interval = setInterval(ping, 15000);
-    return () => clearInterval(interval);
-  }, [user, token, pdfUrl, title]);
+    // First heartbeat after 30 seconds of active reading
+    const initialTimer = setTimeout(() => {
+      sendPing();
+    }, 30000);
+
+    // Main 60-second interval
+    const interval = setInterval(() => {
+      sendPing();
+    }, 60000);
+
+    return () => {
+      clearTimeout(initialTimer);
+      clearInterval(interval);
+      // Flush any remaining active seconds on unmount
+      if (activeSecondsAccumulatorRef.current >= 10) {
+        sendPing(activeSecondsAccumulatorRef.current * 1000);
+      }
+    };
+  }, [user, token, pdfUrl, title, subject]);
 
   // Increment view count when a note is viewed
   useEffect(() => {
@@ -184,9 +292,81 @@ export default function PdfPreview() {
         >
           {isDownloading ? "Downloading..." : (isImage ? "Download Image" : "Download File")}
         </button>
+
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          padding: '0 16px',
+          backgroundColor: '#11161d',
+          borderLeft: '1px solid #1a252f',
+          fontSize: '13px',
+          fontWeight: 600,
+          color: isReadingActive ? '#10b981' : '#f59e0b',
+          whiteSpace: 'nowrap'
+        }}>
+          <span style={{
+            display: 'inline-block',
+            width: '8px',
+            height: '8px',
+            borderRadius: '50%',
+            backgroundColor: isReadingActive ? '#10b981' : '#f59e0b',
+            boxShadow: isReadingActive ? '0 0 8px #10b981' : 'none'
+          }} />
+          {isReadingActive ? 'Reading Active' : 'Paused (Idle)'}
+        </div>
       </div>
 
       <Pdfviewer file={viewerFileUrl} backendUrl={noteId ? `${API_BASE}/notes/${noteId}/pdf` : ''} isImageFlag={isImage} isDarkMode={isDarkMode} />
+
+      {/* "Still Reading?" Anti-AFK Modal */}
+      {showStillReadingPrompt && (
+        <div style={{
+          position: 'fixed',
+          bottom: '24px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          zIndex: 9999,
+          backgroundColor: '#0d131f',
+          border: '1px solid #3b82f6',
+          boxShadow: '0 12px 35px rgba(0,0,0,0.85), 0 0 25px rgba(59,130,246,0.3)',
+          borderRadius: '12px',
+          padding: '14px 22px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '16px',
+          maxWidth: '92%'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <span style={{ fontSize: '24px' }}>📖</span>
+            <div>
+              <div style={{ color: '#f8fafc', fontWeight: 600, fontSize: '14px' }}>
+                Are you still reading?
+              </div>
+              <div style={{ color: '#94a3b8', fontSize: '12px' }}>
+                Study time tracking paused due to inactivity. Click resume to continue recording your progress.
+              </div>
+            </div>
+          </div>
+          <button
+            onClick={resetActivity}
+            style={{
+              backgroundColor: '#d9a441',
+              color: '#0b0d10',
+              border: 'none',
+              padding: '8px 18px',
+              borderRadius: '6px',
+              fontWeight: 700,
+              fontSize: '13px',
+              cursor: 'pointer',
+              whiteSpace: 'nowrap',
+              boxShadow: '0 2px 10px rgba(217, 164, 65, 0.4)'
+            }}
+          >
+            I'm Still Reading
+          </button>
+        </div>
+      )}
 
       {/* Custom Review Prompt Modal */}
       {showReviewPrompt && (
