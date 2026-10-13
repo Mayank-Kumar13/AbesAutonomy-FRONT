@@ -122,4 +122,5 @@ export const authApi = {
     return request(`/admin/email-logs?${params.toString()}`);
   },
   getAdminEmailQuota: () => request('/admin/email-quota'),
+  getTopReaders: (timeframe = '24h') => request(`/admin/top-readers?timeframe=${timeframe}`),
 };

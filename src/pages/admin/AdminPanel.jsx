@@ -7,6 +7,7 @@ import './AdminPanel.css';
 import SubjectManagement from './SubjectManagement';
 import CreditsManagement from './CreditsManagement';
 import AnalyticsDashboard from './AnalyticsDashboard';
+import TopReadersLeaderboard from './TopReadersLeaderboard';
 import { compressAndConvertToPdf } from '../../utils/pdfCompression';
 
 const BRANCHES_Y1 = ['electrical', 'electronics', 'common'];
@@ -855,6 +856,9 @@ export default function AdminPanel() {
             <button className={`admin-tab-btn ${tab === 'credits' ? 'active' : ''}`} onClick={() => setTab('credits')}>
               Credits
             </button>
+            <button className={`admin-tab-btn ${tab === 'topReaders' ? 'active' : ''}`} onClick={() => setTab('topReaders')}>
+              🏆 24h Top Readers
+            </button>
             <button className={`admin-tab-btn ${tab === 'liveTracking' ? 'active' : ''}`} onClick={() => setTab('liveTracking')}>
               Document Read Logs
             </button>
@@ -864,6 +868,10 @@ export default function AdminPanel() {
 
       {tab === 'analytics' && user?.role !== 'coordinator' && (
         <AnalyticsDashboard />
+      )}
+
+      {tab === 'topReaders' && (
+        <TopReadersLeaderboard />
       )}
 
       {tab === 'subjects' && (
@@ -914,6 +922,14 @@ export default function AdminPanel() {
                 />
               </div>
               <div className="admin-toolbar-right">
+                <button
+                  type="button"
+                  className="upload-submit-btn"
+                  style={{ margin: 0, padding: '0.6rem 1rem', width: 'auto', background: 'linear-gradient(135deg, #f59e0b, #d97706)', border: 'none', color: '#000', fontWeight: 700, cursor: 'pointer' }}
+                  onClick={() => setTab('topReaders')}
+                >
+                  🏆 24h Top Readers
+                </button>
                 <select className="admin-filter-select" value={pdfLogsStatusFilter} onChange={(e) => setPdfLogsStatusFilter(e.target.value)}>
                   <option value="all">All Status</option>
                   <option value="live">Reading Now</option>
