@@ -1040,8 +1040,18 @@ export default function AdminPanel() {
                 <option value="watchTime">Sort: Watch Time</option>
                 <option value="logins">Sort: Logins</option>
               </select>
+              <button 
+                type="button" 
+                className="upload-reset-btn" 
+                onClick={() => loadAll()} 
+                disabled={loading}
+                style={{ marginLeft: '4px' }}
+              >
+                Refresh
+              </button>
             </div>
           </div>
+
           <table className="admin-table">
             <thead>
               <tr>
