@@ -279,6 +279,21 @@ export default function AdminPanel() {
     }
   }, []);
 
+  const handleClearSuspiciousIPs = async () => {
+    if (!window.confirm('Are you sure you want to clear all blocked/suspicious IPs?')) return;
+    setSecurityLoading(true);
+    try {
+      await authApi.clearAdminSuspiciousIPs();
+      setSuspiciousIPs([]);
+      setSecurityError('');
+    } catch (err) {
+      setSecurityError(err.message);
+    } finally {
+      setSecurityLoading(false);
+    }
+  };
+
+
   const loadEmailLogs = useCallback(async (page = 1) => {
     setEmailLogsLoading(true);
     try {
@@ -1707,10 +1722,22 @@ export default function AdminPanel() {
         <div className="admin-table-wrap">
           <div className="admin-table-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', padding: '0 1rem' }}>
             <h2 className="upload-form-title" style={{ margin: 0, color: '#ef4444' }}>Suspicious IPs (Rate Limited)</h2>
-            <button type="button" className="upload-reset-btn" onClick={() => loadSuspiciousIPs()} disabled={securityLoading}>
-              Refresh
-            </button>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <button 
+                type="button" 
+                className="upload-reset-btn" 
+                style={{ backgroundColor: '#dc2626', color: '#fff', borderColor: '#ef4444' }} 
+                onClick={handleClearSuspiciousIPs} 
+                disabled={securityLoading}
+              >
+                Clear All Blocked IPs
+              </button>
+              <button type="button" className="upload-reset-btn" onClick={() => loadSuspiciousIPs()} disabled={securityLoading}>
+                Refresh
+              </button>
+            </div>
           </div>
+
           <p style={{ padding: '0 1rem', color: '#a0aec0', fontSize: '0.9rem', marginBottom: '1rem' }}>
             These IP addresses have exceeded the rate limits on sensitive authentication or forgot password routes.
           </p>
