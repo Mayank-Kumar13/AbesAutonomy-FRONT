@@ -1,19 +1,25 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { authApi } from "../../auth/authApi";
+import TurnstileWidget from "../../component/TurnstileWidget";
 import "../loginPage/LoginPage.css";
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState("idle");
   const [error, setError] = useState("");
+  const [turnstileToken, setTurnstileToken] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    if (!turnstileToken) {
+      setError("Please complete the security check.");
+      return;
+    }
     setStatus("loading");
     try {
-      await authApi.forgotPassword(email);
+      await authApi.forgotPassword(email, turnstileToken);
       setStatus("sent");
     } catch (err) {
       setError(err.message);
@@ -49,7 +55,16 @@ export default function ForgotPassword() {
                 />
               </div>
 
+              <TurnstileWidget 
+                onVerify={(token) => {
+                  setTurnstileToken(token);
+                  setError("");
+                }}
+                onExpire={() => setTurnstileToken("")}
+              />
+
               {error && <p style={{ color: "red", fontSize: "0.9rem" }}>{error}</p>}
+
 
 
               <button type="submit" className="submit-btn" disabled={status === "loading"}>

@@ -4,6 +4,7 @@ import './LoginPage.css';
 import { Eye, EyeOff, Loader2, CheckCircle2 } from 'lucide-react';
 import { useAuth } from '../../auth/AuthContext';
 import { authApi } from '../../auth/authApi';
+import TurnstileWidget from '../../component/TurnstileWidget';
 
 function App() {
   const [activeTab, setActiveTab] = useState('login');
@@ -11,6 +12,8 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [loginSuccess, setLoginSuccess] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState('');
+
 
 
   const [otpStep, setOtpStep] = useState(false);
@@ -42,12 +45,17 @@ function App() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    if (!turnstileToken) {
+      setError('Please complete the security check.');
+      return;
+    }
     setIsLoading(true);
     try {
       const data =
         activeTab === 'login'
-          ? await login(formData.email, formData.password)
-          : await register(formData.name, formData.email, formData.password);
+          ? await login(formData.email, formData.password, turnstileToken)
+          : await register(formData.name, formData.email, formData.password, turnstileToken);
+
 
 
       // If user account is already created and verified, login returned token directly (no OTP needed)
@@ -348,7 +356,16 @@ function App() {
 
 
 
+            <TurnstileWidget 
+              onVerify={(token) => {
+                setTurnstileToken(token);
+                setError('');
+              }}
+              onExpire={() => setTurnstileToken('')}
+            />
+
             {error && <p style={{ color: 'red', fontSize: '0.9rem' }}>{error}</p>}
+
 
             <button type="submit" className="submit-btn" disabled={isLoading}>
               {isLoading ? (
