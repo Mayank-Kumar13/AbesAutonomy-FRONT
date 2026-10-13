@@ -5,6 +5,7 @@ import { notesApi, trackingApi } from "../services/api";
 import { useAuth } from "../auth/AuthContext";
 import ReviewModal from "../component/home/ReviewModal";
 import Navbar from "../component/navbar/Navbar";
+import { downloadNoteFile } from "../utils/downloadHelper";
 export default function PdfPreview() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -81,46 +82,20 @@ export default function PdfPreview() {
   const [isDarkMode, setIsDarkMode] = useState(false);
 
   const handleDownload = async () => {
-    if (!noteId) {
-      alert("Cannot download this file securely.");
+    if (!noteId && !pdfUrl && !viewerFileUrl) {
+      alert("Cannot download this file.");
       return;
     }
     
     setIsDownloading(true);
     try {
-      const token = localStorage.getItem("token");
-      const headers = token ? { "Authorization": `Bearer ${token}` } : {};
-      const downloadUrl = `${API_BASE}/notes/${noteId}/download`;
-      
-      const response = await fetch(downloadUrl, { headers });
-      if (!response.ok) throw new Error("Download failed");
-      
-      const blob = await response.blob();
-      const blobUrl = window.URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = blobUrl;
-      
-      let ext = 'pdf';
-      const urlToMatch = response.url || viewerFileUrl;
-      const urlMatch = urlToMatch ? urlToMatch.match(/\.([a-zA-Z0-9]+)(?:[\?#]|$)/) : null;
-      if (urlMatch) ext = urlMatch[1].toLowerCase();
-
-      if (blob.type === 'image/jpeg') ext = 'jpg';
-      else if (blob.type === 'image/png') ext = 'png';
-      else if (blob.type === 'image/webp') ext = 'webp';
-      else if (blob.type === 'application/pdf') ext = 'pdf';
-      else if (blob.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') ext = 'docx';
-      else if (blob.type === 'application/msword') ext = 'doc';
-      else if (blob.type === 'application/vnd.openxmlformats-officedocument.presentationml.presentation') ext = 'pptx';
-      else if (blob.type === 'application/vnd.ms-powerpoint') ext = 'ppt';
-      
-      link.download = `${title}.${ext}`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      setTimeout(() => window.URL.revokeObjectURL(blobUrl), 1000);
+      await downloadNoteFile({
+        noteId,
+        pdfUrl: pdfUrl || viewerFileUrl,
+        title,
+      });
     } catch (error) {
-      console.error(error);
+      console.error("PDF download error:", error);
       alert("Failed to download PDF.");
     } finally {
       setIsDownloading(false);
@@ -195,10 +170,10 @@ export default function PdfPreview() {
 
         <button
           onClick={handleDownload}
-          disabled={isDownloading || !noteId}
+          disabled={isDownloading || (!noteId && !pdfUrl && !viewerFileUrl)}
           style={{
             padding: "8px 20px",
-            cursor: isDownloading || !noteId ? "not-allowed" : "pointer",
+            cursor: isDownloading || (!noteId && !pdfUrl && !viewerFileUrl) ? "not-allowed" : "pointer",
             color: "white",
             backgroundColor: isDownloading ? "#555" : "#2c3e50",
             border: "none",

@@ -70,6 +70,13 @@
   transform: translateY(-2px);
 }
 
+.download-all:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  border-color: #8a6a3b;
+}
+
 
 
 .units-grid {
