@@ -41,16 +41,16 @@ function buildOAuthUrl(provider) {
 }
 
 export const authApi = {
-  register: (name, email, password) =>
+  register: (name, email, password, turnstileToken) =>
     request("/auth/register", {
       method: "POST",
-      body: JSON.stringify({ name, email, password }),
+      body: JSON.stringify({ name, email, password, turnstileToken }),
     }),
 
-  login: (email, password) =>
+  login: (email, password, turnstileToken) =>
     request("/auth/login", {
       method: "POST",
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ email, password, turnstileToken }),
     }),
 
   verifyOtp: (userId, otp, purpose = "signup") =>
@@ -73,10 +73,10 @@ export const authApi = {
       body: JSON.stringify(updates),
     }),
 
-  forgotPassword: (email) =>
+  forgotPassword: (email, turnstileToken) =>
     request("/auth/forgot-password", {
       method: "POST",
-      body: JSON.stringify({ email }),
+      body: JSON.stringify({ email, turnstileToken }),
     }),
 
   resetPassword: (token, newPassword) =>

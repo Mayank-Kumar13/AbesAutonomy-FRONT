@@ -93,8 +93,8 @@ export function AuthProvider({ children }) {
     };
   }, [user]);
 
-  const login = async (email, password) => {
-    const res = await authApi.login(email, password);
+  const login = async (email, password, turnstileToken) => {
+    const res = await authApi.login(email, password, turnstileToken);
     if (res.data && res.data.token) {
       localStorage.setItem("token", res.data.token);
       setToken(res.data.token);
@@ -102,8 +102,8 @@ export function AuthProvider({ children }) {
     return res.data;
   };
 
-  const register = async (name, email, password) => {
-    const res = await authApi.register(name, email, password);
+  const register = async (name, email, password, turnstileToken) => {
+    const res = await authApi.register(name, email, password, turnstileToken);
     return res.data;
   };
 
