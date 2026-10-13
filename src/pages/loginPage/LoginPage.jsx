@@ -27,38 +27,8 @@ function App() {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    password: '',
-    captchaValue: ''
+    password: ''
   });
-
-  const [captchaSvg, setCaptchaSvg] = useState('');
-  const [captchaToken, setCaptchaToken] = useState('');
-  const [captchaLoading, setCaptchaLoading] = useState(false);
-  const [captchaError, setCaptchaError] = useState('');
-
-  const loadCaptcha = async () => {
-    setCaptchaLoading(true);
-    setCaptchaError('');
-    try {
-      const res = await authApi.getCaptcha();
-      if (res.data) {
-        setCaptchaSvg(res.data.svg);
-        setCaptchaToken(res.data.captchaToken);
-        setFormData(prev => ({ ...prev, captchaValue: '' }));
-      }
-    } catch (err) {
-      console.error("Failed to load captcha", err);
-      setCaptchaError(err.message || 'Failed to load captcha');
-    } finally {
-      setCaptchaLoading(false);
-    }
-  };
-
-  React.useEffect(() => {
-    if (!otpStep && !loginSuccess) {
-      loadCaptcha();
-    }
-  }, [activeTab, otpStep, loginSuccess]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -75,8 +45,8 @@ function App() {
     try {
       const data =
         activeTab === 'login'
-          ? await login(formData.email, formData.password, captchaToken, formData.captchaValue)
-          : await register(formData.name, formData.email, formData.password, captchaToken, formData.captchaValue);
+          ? await login(formData.email, formData.password)
+          : await register(formData.name, formData.email, formData.password);
 
       // If user account is already created and verified, login returned token directly (no OTP needed)
       if (activeTab === 'login' && data?.token) {
@@ -98,8 +68,6 @@ function App() {
       setOtpStep(true);
     } catch (err) {
       setError(err.message);
-      // Reload captcha on failure
-      loadCaptcha();
     } finally {
       setIsLoading(false);
     }
@@ -375,43 +343,7 @@ function App() {
               </div>
             </div>
 
-            <div className="input-group">
-              <label>Captcha</label>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minHeight: '44px' }}>
-                {captchaLoading ? (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#94a3b8', fontSize: '0.85rem' }}>
-                    <Loader2 size={16} className="animate-spin" style={{ animation: 'spin 1s linear infinite' }} />
-                    Loading captcha...
-                  </div>
-                ) : captchaSvg ? (
-                  <div 
-                    dangerouslySetInnerHTML={{ __html: captchaSvg }} 
-                    style={{ background: '#1e293b', borderRadius: '4px', overflow: 'hidden' }}
-                  />
-                ) : (
-                  <div style={{ color: '#f87171', fontSize: '0.85rem', flex: 1 }}>
-                    {captchaError || 'Captcha failed to load'}
-                  </div>
-                )}
-                <button 
-                  type="button" 
-                  onClick={loadCaptcha}
-                  disabled={captchaLoading}
-                  style={{ background: 'transparent', border: '1px solid #334155', color: '#cbd5e1', padding: '8px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.85rem' }}
-                >
-                  Refresh
-                </button>
-              </div>
-              <input 
-                type="text" 
-                name="captchaValue"
-                value={formData.captchaValue}
-                onChange={handleInputChange}
-                placeholder="Enter characters above"
-                required
-                style={{ marginTop: '10px' }}
-              />
-            </div>
+
 
             {error && <p style={{ color: 'red', fontSize: '0.9rem' }}>{error}</p>}
 
