@@ -33,15 +33,15 @@ export default function PdfPreview() {
     }
   }, []);
 
-  // Listen to user engagement (scroll, mouse, touch, keyboard)
+  // Listen to user engagement (scroll, mouse, touch, keyboard) on parent window AND inside PDF viewer iframe
   useEffect(() => {
     const handleUserInteraction = () => {
       lastInteractionRef.current = Date.now();
       if (isPromptVisibleRef.current) {
         isPromptVisibleRef.current = false;
         setShowStillReadingPrompt(false);
-        setIsReadingActive(true);
       }
+      setIsReadingActive(true);
     };
 
     window.addEventListener('mousemove', handleUserInteraction, { passive: true });
@@ -50,7 +50,31 @@ export default function PdfPreview() {
     window.addEventListener('touchstart', handleUserInteraction, { passive: true });
     window.addEventListener('wheel', handleUserInteraction, { passive: true });
 
+    // Also attach listeners to the PDF Viewer iframe so scrolling/reading inside PDF resets timer
+    const attachIframeListeners = () => {
+      try {
+        const iframe = document.querySelector('iframe[title="PDF Viewer"]');
+        if (iframe && iframe.contentWindow) {
+          const doc = iframe.contentDocument || iframe.contentWindow.document;
+          if (doc && !doc._hasTrackingListeners) {
+            doc._hasTrackingListeners = true;
+            doc.addEventListener('mousemove', handleUserInteraction, { passive: true });
+            doc.addEventListener('scroll', handleUserInteraction, { passive: true });
+            doc.addEventListener('keydown', handleUserInteraction, { passive: true });
+            doc.addEventListener('touchstart', handleUserInteraction, { passive: true });
+            doc.addEventListener('wheel', handleUserInteraction, { passive: true });
+          }
+        }
+      } catch (e) {
+        // Ignore cross-origin iframe security restrictions if any
+      }
+    };
+
+    attachIframeListeners();
+    const iframeTimer = setInterval(attachIframeListeners, 2000);
+
     return () => {
+      clearInterval(iframeTimer);
       window.removeEventListener('mousemove', handleUserInteraction);
       window.removeEventListener('scroll', handleUserInteraction);
       window.removeEventListener('keydown', handleUserInteraction);
@@ -63,7 +87,8 @@ export default function PdfPreview() {
   useEffect(() => {
     if (!user || !token) return;
 
-    const INACTIVITY_LIMIT_MS = 15 * 60 * 1000; // 15 minutes without interaction = Pause tracking & show prompt
+    // 10 minutes without interaction = Pause tracking & show Still Reading prompt
+    const INACTIVITY_LIMIT_MS = 10 * 60 * 1000;
 
     const ticker = setInterval(() => {
       // 1. If tab is in background / minimized -> Pause accumulation
@@ -74,7 +99,7 @@ export default function PdfPreview() {
 
       const idleDuration = Date.now() - lastInteractionRef.current;
 
-      // 2. If idle for >= 15 minutes -> Show prompt and pause accumulation
+      // 2. If idle for >= 10 minutes -> Show prompt and pause accumulation
       if (idleDuration >= INACTIVITY_LIMIT_MS) {
         if (!isPromptVisibleRef.current) {
           isPromptVisibleRef.current = true;
@@ -84,13 +109,14 @@ export default function PdfPreview() {
         return;
       }
 
-      // 3. Otherwise user is genuinely reading!
+      // 3. Otherwise user is genuinely reading! Keep Reading Active!
       setIsReadingActive(true);
       activeSecondsAccumulatorRef.current += 1;
     }, 1000);
 
     return () => clearInterval(ticker);
   }, [user, token]);
+
 
 
   // Periodic 60-second ping (reduces API load by ~75% compared to 15s)
