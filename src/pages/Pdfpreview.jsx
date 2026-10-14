@@ -37,6 +37,11 @@ export default function PdfPreview() {
   useEffect(() => {
     const handleUserInteraction = () => {
       lastInteractionRef.current = Date.now();
+      if (isPromptVisibleRef.current) {
+        isPromptVisibleRef.current = false;
+        setShowStillReadingPrompt(false);
+        setIsReadingActive(true);
+      }
     };
 
     window.addEventListener('mousemove', handleUserInteraction, { passive: true });
@@ -58,8 +63,7 @@ export default function PdfPreview() {
   useEffect(() => {
     if (!user || !token) return;
 
-    const IDLE_THRESHOLD_MS = 60000;      // 60s without interaction = Idle
-    const INACTIVITY_PROMPT_MS = 180000;  // 3m without interaction = Still Reading prompt
+    const INACTIVITY_LIMIT_MS = 15 * 60 * 1000; // 15 minutes without interaction = Pause tracking & show prompt
 
     const ticker = setInterval(() => {
       // 1. If tab is in background / minimized -> Pause accumulation
@@ -70,8 +74,8 @@ export default function PdfPreview() {
 
       const idleDuration = Date.now() - lastInteractionRef.current;
 
-      // 2. If idle for > 3 minutes -> Show prompt and pause
-      if (idleDuration >= INACTIVITY_PROMPT_MS) {
+      // 2. If idle for >= 15 minutes -> Show prompt and pause accumulation
+      if (idleDuration >= INACTIVITY_LIMIT_MS) {
         if (!isPromptVisibleRef.current) {
           isPromptVisibleRef.current = true;
           setShowStillReadingPrompt(true);
@@ -80,19 +84,14 @@ export default function PdfPreview() {
         return;
       }
 
-      // 3. If idle for > 60 seconds -> Pause accumulation (no spam pings)
-      if (idleDuration >= IDLE_THRESHOLD_MS) {
-        setIsReadingActive(false);
-        return;
-      }
-
-      // 4. Otherwise user is genuinely reading!
+      // 3. Otherwise user is genuinely reading!
       setIsReadingActive(true);
       activeSecondsAccumulatorRef.current += 1;
     }, 1000);
 
     return () => clearInterval(ticker);
   }, [user, token]);
+
 
   // Periodic 60-second ping (reduces API load by ~75% compared to 15s)
   useEffect(() => {
