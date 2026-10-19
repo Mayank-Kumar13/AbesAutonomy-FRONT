@@ -33,18 +33,35 @@ export default function Pdfviewer({ file, isImageFlag, isDarkMode }) {
 
   const [isImage, setIsImage] = useState(initialIsImage);
 
+  const [fallbackUnavailable, setFallbackUnavailable] = useState(false);
+
   // Trigger fallback switch safely
-  const triggerFallback = useCallback(() => {
+  const triggerFallback = useCallback(async () => {
     if (fallbackAttempted) return;
     setFallbackAttempted(true);
 
     const fallback = getSupabaseFallbackUrl(file);
-    if (fallback && fallback !== activeFile) {
-      console.info("[Pdfviewer] Switching to Supabase Storage fallback URL:", fallback);
+    if (!fallback) {
+      setFallbackUnavailable(true);
+      return;
+    }
+
+    try {
+      const probe = await fetch(fallback, { method: 'GET', headers: { Range: 'bytes=0-10' } });
+      if (probe.ok || probe.status === 206) {
+        console.info("[Pdfviewer] Switching to Supabase Storage fallback URL:", fallback);
+        setActiveFile(fallback);
+        setIsUsingFallback(true);
+      } else {
+        console.warn("[Pdfviewer] Supabase fallback file does not exist (status " + probe.status + "):", fallback);
+        setFallbackUnavailable(true);
+      }
+    } catch {
+      // If probe was blocked by CORS, try loading activeFile fallback anyway
       setActiveFile(fallback);
       setIsUsingFallback(true);
     }
-  }, [file, activeFile, fallbackAttempted]);
+  }, [file, fallbackAttempted]);
 
   // For PDFs: preflight probe to detect ImageKit bandwidth limit (403, 429) or failure
   useEffect(() => {
@@ -132,7 +149,36 @@ export default function Pdfviewer({ file, isImageFlag, isDarkMode }) {
         </div>
       )}
 
-      {isImage ? (
+      {fallbackUnavailable ? (
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          minHeight: '80vh',
+          padding: '2rem',
+          textAlign: 'center',
+          color: '#e2e8f0'
+        }}>
+          <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📦</div>
+          <h3 style={{ color: '#f87171', fontSize: '1.25rem', marginBottom: '0.6rem' }}>Document Temporarily Unavailable</h3>
+          <p style={{ color: '#94a3b8', maxWidth: '520px', lineHeight: '1.6', fontSize: '0.9rem', margin: '0 auto 1rem auto' }}>
+            Primary storage (ImageKit) monthly bandwidth limit exceed ho chuka hai (429), aur ye specific file Supabase backup storage me pehle se sync nahi thi.
+          </p>
+          <div style={{
+            background: 'rgba(217, 164, 65, 0.1)',
+            border: '1px solid rgba(217, 164, 65, 0.3)',
+            borderRadius: '8px',
+            padding: '12px 18px',
+            maxWidth: '520px',
+            margin: '0 auto',
+            color: '#d9a441',
+            fontSize: '0.85rem'
+          }}>
+            💡 <strong>Admin:</strong> Kripya is file ko Admin Panel se dobara upload karein <em>"Also upload to Supabase Storage"</em> tick karke taaki ye turant retrieve hone lage.
+          </div>
+        </div>
+      ) : isImage ? (
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', background: isDarkMode ? '#111' : '#0f172a' }}>
           <img
             src={activeFile}
