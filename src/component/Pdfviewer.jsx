@@ -120,13 +120,14 @@ export default function Pdfviewer({ file, isImageFlag, isDarkMode }) {
   }
 
   const viewerName = user ? (user.name || user.email) : 'Guest User';
+  const isAdmin = user?.role === 'admin' || user?.role === 'coordinator';
   const filterStyle = isDarkMode ? 'invert(1) hue-rotate(180deg) brightness(0.9) contrast(1.1)' : 'none';
 
 
   return (
     <div style={{ position: 'relative', width: '100%', minHeight: '100vh', overflow: 'hidden' }}>
-      {/* Fallback storage indicator badge */}
-      {isUsingFallback && !fallbackUnavailable && (
+      {/* Fallback storage indicator badge - Admin only */}
+      {isUsingFallback && !fallbackUnavailable && isAdmin && (
         <div style={{
           position: 'absolute',
           top: '12px',
