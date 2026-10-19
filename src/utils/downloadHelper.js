@@ -1,3 +1,5 @@
+import { getSupabaseFallbackUrl, isImageKitThrottled, markImageKitFailure, markImageKitSuccess } from "./storageFallback";
+
 /**
  * Triggers a download from a Blob object in the browser.
  */
@@ -28,9 +30,10 @@ function triggerDirectDownload(url, filename) {
 
 /**
  * Robust note downloader:
- * 1. Attempts backend /notes/:id/download (which applies dynamic watermark).
- * 2. If backend download fails (401, 500, network error, etc.), falls back to fetching direct CDN/pdfUrl as blob.
- * 3. If blob fetch fails, triggers a direct browser download link to the CDN URL.
+ * 1. Attempts backend /notes/:id/download (which applies dynamic watermark and has Supabase fallback).
+ * 2. If backend download fails, falls back to fetching direct CDN/pdfUrl as blob.
+ * 3. If primary CDN fails (e.g. ImageKit bandwidth limit), attempts Supabase Storage fallback.
+ * 4. Triggers direct browser download link if blob fetch fails.
  */
 export async function downloadNoteFile({ noteId, pdfUrl, title }, index = 0) {
   const cleanTitle = (title || `document_${index + 1}`)
@@ -79,25 +82,70 @@ export async function downloadNoteFile({ noteId, pdfUrl, title }, index = 0) {
     }
   }
 
-  // Strategy 2: Direct CDN fetch as blob
+  // Strategy 2: Direct CDN fetch as blob with automatic Supabase fallback
   if (pdfUrl) {
+    const fallbackUrl = getSupabaseFallbackUrl(pdfUrl);
+    const throttled = isImageKitThrottled();
+
+    // 2a. If ImageKit is throttled and Supabase fallback exists, try Supabase first
+    if (throttled && fallbackUrl) {
+      try {
+        console.info("[downloadHelper] Primary provider throttled. Downloading directly from Supabase Storage fallback...");
+        const sbResponse = await fetch(fallbackUrl);
+        if (sbResponse.ok) {
+          const blob = await sbResponse.blob();
+          if (blob && blob.size > 0) {
+            triggerBlobDownload(blob, filename);
+            return;
+          }
+        }
+      } catch (sbErr) {
+        console.warn("[downloadHelper] Supabase fallback download failed:", sbErr);
+      }
+    }
+
+    // 2b. Attempt Primary ImageKit download
     try {
       const cdnResponse = await fetch(pdfUrl);
       if (cdnResponse.ok) {
+        markImageKitSuccess();
         const blob = await cdnResponse.blob();
         if (blob && blob.size > 0) {
           triggerBlobDownload(blob, filename);
           return;
         }
+      } else {
+        markImageKitFailure(cdnResponse.status);
+        console.warn(`Direct CDN fetch returned ${cdnResponse.status}. Attempting Supabase fallback...`);
       }
     } catch (err) {
-      console.warn("Direct CDN fetch failed. Falling back to direct link download...", err);
+      markImageKitFailure('network_error');
+      console.warn("Direct CDN fetch failed. Attempting Supabase fallback...", err);
     }
 
-    // Strategy 3: Direct link trigger
-    triggerDirectDownload(pdfUrl, filename);
+    // 2c. Fallback to Supabase Storage if primary failed
+    if (fallbackUrl) {
+      try {
+        console.info("[downloadHelper] Attempting Supabase Storage fallback blob download...");
+        const fbResponse = await fetch(fallbackUrl);
+        if (fbResponse.ok) {
+          const blob = await fbResponse.blob();
+          if (blob && blob.size > 0) {
+            triggerBlobDownload(blob, filename);
+            return;
+          }
+        }
+      } catch (fbErr) {
+        console.warn("[downloadHelper] Supabase Storage fallback fetch error:", fbErr);
+      }
+    }
+
+    // Strategy 3: Direct link trigger (using fallback if primary is throttled)
+    const targetUrl = (throttled && fallbackUrl) ? fallbackUrl : pdfUrl;
+    triggerDirectDownload(targetUrl, filename);
     return;
   }
 
   throw new Error("No download source available for this note.");
 }
+

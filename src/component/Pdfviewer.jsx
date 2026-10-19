@@ -1,45 +1,145 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useAuth } from "../auth/AuthContext";
+import { getSupabaseFallbackUrl, isImageKitThrottled, markImageKitFailure, markImageKitSuccess } from "../utils/storageFallback";
 
 export default function Pdfviewer({ file, isImageFlag, isDarkMode }) {
   const { user } = useAuth();
-  
-  const cleanFileUrl = file ? file.split('?')[0] : '';
-  const initialIsImage = isImageFlag || (file ? /\.(png|jpe?g|webp|gif|bmp|jfif|heic)$/i.test(cleanFileUrl) : false);
-  const isPdf = file ? /\.(pdf)$/i.test(cleanFileUrl) : true; // default to pdf if unknown
-  const isOffice = file ? /\.(docx?|pptx?|xlsx?)$/i.test(cleanFileUrl) : false;
+
+  const [activeFile, setActiveFile] = useState(file);
+  const [isUsingFallback, setIsUsingFallback] = useState(false);
+  const [fallbackAttempted, setFallbackAttempted] = useState(false);
+
+  // Sync activeFile when file prop changes
+  useEffect(() => {
+    if (isImageKitThrottled()) {
+      const fallback = getSupabaseFallbackUrl(file);
+      if (fallback) {
+        setActiveFile(fallback);
+        setIsUsingFallback(true);
+        setFallbackAttempted(true);
+        return;
+      }
+    }
+
+    setActiveFile(file);
+    setIsUsingFallback(false);
+    setFallbackAttempted(false);
+  }, [file]);
+
+  const cleanFileUrl = activeFile ? activeFile.split('?')[0] : '';
+  const initialIsImage = isImageFlag || (activeFile ? /\.(png|jpe?g|webp|gif|bmp|jfif|heic)$/i.test(cleanFileUrl) : false);
+  const isPdf = activeFile ? /\.(pdf)$/i.test(cleanFileUrl) : true;
+  const isOffice = activeFile ? /\.(docx?|pptx?|xlsx?)$/i.test(cleanFileUrl) : false;
 
   const [isImage, setIsImage] = useState(initialIsImage);
 
+  // Trigger fallback switch safely
+  const triggerFallback = useCallback(() => {
+    if (fallbackAttempted) return;
+    setFallbackAttempted(true);
+
+    const fallback = getSupabaseFallbackUrl(file);
+    if (fallback && fallback !== activeFile) {
+      console.info("[Pdfviewer] Switching to Supabase Storage fallback URL:", fallback);
+      setActiveFile(fallback);
+      setIsUsingFallback(true);
+    }
+  }, [file, activeFile, fallbackAttempted]);
+
+  // For PDFs: preflight probe to detect ImageKit bandwidth limit (403, 429) or failure
   useEffect(() => {
-    if (file && !initialIsImage) {
+    if (!file || isUsingFallback || fallbackAttempted) return;
+
+    // Only probe external ImageKit URLs
+    if (file.includes('ik.imagekit.io') || file.includes('imagekit')) {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 6000);
+
+      fetch(file, { method: 'GET', headers: { Range: 'bytes=0-10' }, signal: controller.signal })
+        .then((res) => {
+          clearTimeout(timer);
+          if (res.ok || res.status === 206) {
+            markImageKitSuccess();
+          } else {
+            console.warn(`[Pdfviewer] Primary provider probe failed with status ${res.status}. Falling back to Supabase...`);
+            markImageKitFailure(res.status);
+            triggerFallback();
+          }
+        })
+        .catch((err) => {
+          clearTimeout(timer);
+          console.warn("[Pdfviewer] Primary provider probe network error. Falling back to Supabase...", err.message);
+          markImageKitFailure('network_error');
+          triggerFallback();
+        });
+
+      return () => {
+        clearTimeout(timer);
+        controller.abort();
+      };
+    }
+  }, [file, isUsingFallback, fallbackAttempted, triggerFallback]);
+
+  useEffect(() => {
+    if (activeFile && !initialIsImage) {
       const img = new Image();
       img.onload = () => setIsImage(true);
-      img.src = file;
+      img.src = activeFile;
     }
-  }, [file, initialIsImage]);
+  }, [activeFile, initialIsImage]);
 
-  if (!file) {
+  if (!activeFile) {
     return <p style={{ textAlign: "center", padding: "20px" }}>Loading Document...</p>;
   }
 
-  let viewerUrl = file;
+  let viewerUrl = activeFile;
   if (isPdf && !isOffice) {
-    viewerUrl = `/pdfjs-6.1.200-dist/web/viewer.html?file=${encodeURIComponent(file)}`;
+    viewerUrl = `/pdfjs-6.1.200-dist/web/viewer.html?file=${encodeURIComponent(activeFile)}`;
   } else if (isOffice) {
-    viewerUrl = `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(file)}`;
+    viewerUrl = `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(activeFile)}`;
   } else if (!isImage) {
-    viewerUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(file)}&embedded=true`;
+    viewerUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(activeFile)}&embedded=true`;
   }
 
   const viewerName = user ? (user.name || user.email) : 'Guest User';
   const filterStyle = isDarkMode ? 'invert(1) hue-rotate(180deg) brightness(0.9) contrast(1.1)' : 'none';
 
+
   return (
     <div style={{ position: 'relative', width: '100%', minHeight: '100vh', overflow: 'hidden' }}>
+      {/* Fallback storage indicator badge */}
+      {isUsingFallback && (
+        <div style={{
+          position: 'absolute',
+          top: '12px',
+          right: '16px',
+          zIndex: 60,
+          backgroundColor: 'rgba(16, 185, 129, 0.95)',
+          color: '#ffffff',
+          padding: '6px 12px',
+          borderRadius: '8px',
+          fontSize: '12px',
+          fontWeight: 600,
+          display: 'flex',
+          alignItems: 'center',
+          gap: '6px',
+          boxShadow: '0 4px 15px rgba(0,0,0,0.5)',
+          backdropFilter: 'blur(8px)',
+          border: '1px solid rgba(255,255,255,0.2)'
+        }}>
+          <span style={{ fontSize: '14px' }}>🛡️</span>
+          <span>Backup Storage Active (Supabase)</span>
+        </div>
+      )}
+
       {isImage ? (
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', background: isDarkMode ? '#111' : '#0f172a' }}>
-          <img src={file} alt="Document View" style={{ maxWidth: '100%', maxHeight: '100vh', objectFit: 'contain', filter: filterStyle, transition: 'filter 0.3s ease' }} />
+          <img
+            src={activeFile}
+            alt="Document View"
+            onError={triggerFallback}
+            style={{ maxWidth: '100%', maxHeight: '100vh', objectFit: 'contain', filter: filterStyle, transition: 'filter 0.3s ease' }}
+          />
         </div>
       ) : (
         <iframe
@@ -56,6 +156,7 @@ export default function Pdfviewer({ file, isImageFlag, isDarkMode }) {
           title="PDF Viewer"
         />
       )}
+
       {/* CSS Watermark Overlay */}
       <div
         style={{

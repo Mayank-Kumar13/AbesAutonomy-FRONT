@@ -8,6 +8,7 @@ import SubjectManagement from './SubjectManagement';
 import CreditsManagement from './CreditsManagement';
 import AnalyticsDashboard from './AnalyticsDashboard';
 import TopReadersLeaderboard from './TopReadersLeaderboard';
+import SupabasePdfManager from './SupabasePdfManager';
 import { compressAndConvertToPdf } from '../../utils/pdfCompression';
 
 const BRANCHES_Y1 = ['electrical', 'electronics', 'common'];
@@ -851,6 +852,10 @@ export default function AdminPanel() {
         <button className={`admin-tab-btn ${tab === 'uploads' ? 'active' : ''}`} onClick={() => setTab('uploads')}>
           Uploads
         </button>
+        <button className={`admin-tab-btn ${tab === 'supabase' ? 'active' : ''}`} onClick={() => setTab('supabase')}>
+          PDF Storage (Supabase)
+        </button>
+
         {user?.role !== 'coordinator' && (
           <>
             <button className={`admin-tab-btn ${tab === 'reviews' ? 'active' : ''}`} onClick={() => setTab('reviews')}>
@@ -888,6 +893,11 @@ export default function AdminPanel() {
       {tab === 'topReaders' && (
         <TopReadersLeaderboard />
       )}
+
+      {tab === 'supabase' && (
+        <SupabasePdfManager />
+      )}
+
 
       {tab === 'subjects' && (
         <SubjectManagement />

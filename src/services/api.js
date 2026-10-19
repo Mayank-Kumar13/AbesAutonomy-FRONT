@@ -371,7 +371,14 @@ export const uploadApi = {
       method: 'DELETE',
     });
   },
+
+  async syncToSupabase() {
+    return request('/upload/sync-to-supabase', {
+      method: 'POST',
+    });
+  },
 };
+
 
 // ─────────────────────────────────────────────────────
 // Reviews API
