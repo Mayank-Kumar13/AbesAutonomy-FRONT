@@ -17,7 +17,7 @@ const BRANCHES = Array.from(new Set(['cse', 'it', 'me', 'aids', 'ds', 'aiml', 'e
 const RESOURCE_TYPES = ['theory', 'assignment', 'question_bank', 'pyq', 'handwritten', 'syllabus'];
 
 let fileEntryIdCounter = 0;
-const makeFileEntry = (file, defaultSyncToSupabase = false) => {
+const makeFileEntry = (file, defaultSyncToSupabase = true) => {
   const isCompressible = file.type.startsWith('image/') || file.type === 'application/pdf';
   const isLarge = file.size > 10 * 1024 * 1024; // > 10 MB
   
@@ -136,7 +136,7 @@ export default function AdminPanel() {
   const [notesLoading, setNotesLoading] = useState(false);
   const [notesError, setNotesError] = useState('');
   const [fileEntries, setFileEntries] = useState([]);
-  const [syncToSupabase, setSyncToSupabase] = useState(false);
+  const [syncToSupabase, setSyncToSupabase] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(null); // { done, total }
   const [uploadMsg, setUploadMsg] = useState(null); // { type: 'success' | 'error', text }

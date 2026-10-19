@@ -1,8 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
 
-const rawUrl = import.meta.env.VITE_SUPABASE_URL || '';
+const rawUrl = import.meta.env.VITE_SUPABASE_URL || 'https://optjhlvqgwupjmwtsqoe.supabase.co';
 const SUPABASE_URL = rawUrl.replace(/\/rest\/v1\/?$/, '').replace(/\/+$/, '');
-const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || '';
+const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || 'sb_publishable_2_pnIgs8oE-btVpyRcsu2w_39_kF4a8';
 export const BUCKET_NAME = 'pdfs';
 
 
