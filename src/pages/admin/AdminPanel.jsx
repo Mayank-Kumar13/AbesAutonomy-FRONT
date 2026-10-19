@@ -17,7 +17,7 @@ const BRANCHES = Array.from(new Set(['cse', 'it', 'me', 'aids', 'ds', 'aiml', 'e
 const RESOURCE_TYPES = ['theory', 'assignment', 'question_bank', 'pyq', 'handwritten', 'syllabus'];
 
 let fileEntryIdCounter = 0;
-const makeFileEntry = (file) => {
+const makeFileEntry = (file, defaultSyncToSupabase = false) => {
   const isCompressible = file.type.startsWith('image/') || file.type === 'application/pdf';
   const isLarge = file.size > 10 * 1024 * 1024; // > 10 MB
   
@@ -35,6 +35,7 @@ const makeFileEntry = (file) => {
     compress: (isLarge && isCompressible) ? true : false,
     targetSizeKb: (isLarge && isCompressible) ? 9500 : 500,
     autoCompressed: (isLarge && isCompressible),
+    syncToSupabase: defaultSyncToSupabase,
   };
 };
 
@@ -135,6 +136,7 @@ export default function AdminPanel() {
   const [notesLoading, setNotesLoading] = useState(false);
   const [notesError, setNotesError] = useState('');
   const [fileEntries, setFileEntries] = useState([]);
+  const [syncToSupabase, setSyncToSupabase] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(null); // { done, total }
   const [uploadMsg, setUploadMsg] = useState(null); // { type: 'success' | 'error', text }
@@ -383,7 +385,7 @@ export default function AdminPanel() {
     }
 
     if (validFiles.length > 0) {
-      setFileEntries((prev) => [...prev, ...validFiles.map(makeFileEntry)]);
+      setFileEntries((prev) => [...prev, ...validFiles.map((f) => makeFileEntry(f, syncToSupabase))]);
     }
 
     e.target.value = ''; // allow re-selecting the same file(s) again later
@@ -443,6 +445,8 @@ export default function AdminPanel() {
           branch: branchList,
           resourceType: entry.resourceType,
           year: entry.year,
+          syncToSupabase: entry.syncToSupabase !== undefined ? entry.syncToSupabase : syncToSupabase,
+          uploadToSupabase: entry.syncToSupabase !== undefined ? entry.syncToSupabase : syncToSupabase,
         };
 
         let fileToUpload = entry.file;
@@ -1226,6 +1230,76 @@ export default function AdminPanel() {
               </span>
             </div>
 
+            <div
+              className="supabase-sync-banner"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                padding: '0.75rem 1rem',
+                backgroundColor: syncToSupabase ? 'rgba(56, 189, 248, 0.08)' : '#0b0d10',
+                border: syncToSupabase ? '1px solid #38bdf8' : '1px solid #2d3748',
+                borderRadius: '8px',
+                margin: '0.4rem 0 0.8rem 0',
+                transition: 'all 0.2s ease',
+              }}
+            >
+              <input
+                id="global-sync-supabase"
+                type="checkbox"
+                checked={syncToSupabase}
+                onChange={(e) => {
+                  const checked = e.target.checked;
+                  setSyncToSupabase(checked);
+                  setFileEntries((prev) =>
+                    prev.map((entry) => ({ ...entry, syncToSupabase: checked }))
+                  );
+                }}
+                disabled={uploading}
+                style={{
+                  width: '18px',
+                  height: '18px',
+                  cursor: 'pointer',
+                  accentColor: '#38bdf8',
+                }}
+              />
+              <label
+                htmlFor="global-sync-supabase"
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '2px',
+                  cursor: 'pointer',
+                  userSelect: 'none',
+                  margin: 0,
+                  textTransform: 'none',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ fontSize: '0.9rem', fontWeight: 600, color: syncToSupabase ? '#38bdf8' : '#e2e8f0' }}>
+                    Also upload to Supabase Storage
+                  </span>
+                  <span
+                    style={{
+                      fontSize: '0.7rem',
+                      padding: '2px 7px',
+                      borderRadius: '4px',
+                      backgroundColor: syncToSupabase ? '#0284c7' : '#1e293b',
+                      color: syncToSupabase ? '#fff' : '#94a3b8',
+                      fontWeight: 600,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.04em',
+                    }}
+                  >
+                    {syncToSupabase ? 'Active' : 'Optional'}
+                  </span>
+                </div>
+                <span style={{ fontSize: '0.78rem', color: '#94a3b8', textTransform: 'none' }}>
+                  Tick hone par files ImageKit ke sath sath Supabase Storage (backup copy) me bhi upload hongi.
+                </span>
+              </label>
+            </div>
+
             {fileEntries.length > 0 && (
               <div className="upload-entries">
                 {fileEntries.map((entry) => (
@@ -1379,6 +1453,19 @@ export default function AdminPanel() {
                     </div>
                     
                     <div className="upload-field" style={{ display: 'flex', flexDirection: 'column', gap: '8px', paddingBottom: '10px' }}>
+                      <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', userSelect: 'none' }}>
+                        <input
+                          type="checkbox"
+                          checked={entry.syncToSupabase !== undefined ? entry.syncToSupabase : syncToSupabase}
+                          onChange={(e) => updateFileEntry(entry.id, 'syncToSupabase', e.target.checked)}
+                          disabled={uploading}
+                          style={{ accentColor: '#38bdf8', width: '16px', height: '16px' }}
+                        />
+                        <span style={{ fontSize: '0.85rem', color: (entry.syncToSupabase ?? syncToSupabase) ? '#38bdf8' : '#cbd5e1', fontWeight: 500 }}>
+                          Also upload to Supabase Storage (Backup copy)
+                        </span>
+                      </label>
+
                       {(entry.file.type.startsWith('image/') || entry.file.type === 'application/pdf') && (
                         <>
                           <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
@@ -1505,6 +1592,7 @@ export default function AdminPanel() {
                     <th>Year</th>
                     <th>Type</th>
                     <th>Status</th>
+                    <th>Storage</th>
                     <th>Views</th>
                     <th>Uploaded Date</th>
                     <th>Uploader</th>
@@ -1585,6 +1673,41 @@ export default function AdminPanel() {
                           <span style={{color: '#facc15'}}>Pending</span>
                         )}
                       </td>
+                      <td>
+                        {n.supabaseUrl || n.supabasePath ? (
+                          <span
+                            style={{
+                              color: '#38bdf8',
+                              fontSize: '0.75rem',
+                              padding: '2px 6px',
+                              borderRadius: '4px',
+                              backgroundColor: 'rgba(56, 189, 248, 0.12)',
+                              border: '1px solid rgba(56, 189, 248, 0.3)',
+                              whiteSpace: 'nowrap',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '4px',
+                            }}
+                            title={`Supabase Path: ${n.supabasePath || 'Saved'}`}
+                          >
+                            ☁️ Dual
+                          </span>
+                        ) : (
+                          <span
+                            style={{
+                              color: '#94a3b8',
+                              fontSize: '0.75rem',
+                              padding: '2px 6px',
+                              borderRadius: '4px',
+                              backgroundColor: 'rgba(148, 163, 184, 0.08)',
+                              whiteSpace: 'nowrap',
+                            }}
+                            title="Stored only on ImageKit"
+                          >
+                            IK Only
+                          </span>
+                        )}
+                      </td>
                       <td>{n.viewCount || 0}</td>
                       <td>{formatDate(n.createdAt)}</td>
                       <td>
@@ -1635,10 +1758,10 @@ export default function AdminPanel() {
                     </tr>
                   ))}
                   {!notesLoading && notes.length === 0 && (
-                    <tr><td colSpan={9} className="admin-empty">No notes uploaded yet</td></tr>
+                    <tr><td colSpan={10} className="admin-empty">No notes uploaded yet</td></tr>
                   )}
                   {notesLoading && (
-                    <tr><td colSpan={9} className="admin-empty">Loading notes...</td></tr>
+                    <tr><td colSpan={10} className="admin-empty">Loading notes...</td></tr>
                   )}
                 </tbody>
               </table>
