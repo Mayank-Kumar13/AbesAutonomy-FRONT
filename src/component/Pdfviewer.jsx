@@ -247,29 +247,28 @@ export default function Pdfviewer({ file, isImageFlag, isDarkMode }) {
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent'
             }}>
-              We are working on database
+              We are working on the database
             </h3>
 
-            {/* Hindi / Hinglish Message */}
+            {/* English Message only */}
             <p style={{
               color: '#cbd5e1',
-              fontSize: '0.96rem',
+              fontSize: '0.98rem',
               lineHeight: '1.6',
-              margin: '0 0 0.8rem 0',
+              margin: '0 0 0.7rem 0',
               maxWidth: '440px'
             }}>
-              Hum database ko upgrade aur optimize kar rahe hain. Ye document bohot jald available ho jayega.
+              We are currently optimizing and upgrading our database to provide a faster and more reliable experience.
             </p>
 
-            {/* English Secondary Note */}
             <p style={{
               color: '#94a3b8',
-              fontSize: '0.84rem',
+              fontSize: '0.88rem',
               lineHeight: '1.5',
               margin: '0 0 1.8rem 0',
               maxWidth: '440px'
             }}>
-              We are currently optimizing and syncing the database to serve you better. Please check back shortly!
+              This document will be accessible shortly. Thank you for your patience!
             </p>
 
             {/* Action Buttons */}
@@ -329,38 +328,6 @@ export default function Pdfviewer({ file, isImageFlag, isDarkMode }) {
                 <span>Go Back</span>
               </button>
             </div>
-
-            {/* Discreet Admin Notice (only visible to admin/coordinator) */}
-            {(user?.role === 'admin' || user?.role === 'coordinator') && (
-              <details style={{
-                marginTop: '1.75rem',
-                width: '100%',
-                textAlign: 'left',
-                background: 'rgba(217, 164, 65, 0.08)',
-                border: '1px solid rgba(217, 164, 65, 0.25)',
-                borderRadius: '10px',
-                padding: '10px 14px'
-              }}>
-                <summary style={{
-                  cursor: 'pointer',
-                  fontSize: '0.8rem',
-                  color: '#fbbf24',
-                  fontWeight: 600,
-                  userSelect: 'none'
-                }}>
-                  🛠️ Admin Notice (Click to expand)
-                </summary>
-                <p style={{
-                  marginTop: '8px',
-                  fontSize: '0.78rem',
-                  color: '#d9a441',
-                  lineHeight: '1.5',
-                  margin: '8px 0 0 0'
-                }}>
-                  ImageKit monthly limit (429) reach ho chuka hai aur ye file Supabase backup me sync nahi mili. Is file ko Admin Panel se dobara upload karein <em>"Also upload to Supabase Storage"</em> check karke taaki turant retrieve hone lage.
-                </p>
-              </details>
-            )}
           </div>
         </div>
       ) : isImage ? (
