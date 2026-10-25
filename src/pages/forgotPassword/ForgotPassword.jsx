@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { authApi } from "../../auth/authApi";
 import TurnstileWidget from "../../component/TurnstileWidget";
 import "../loginPage/LoginPage.css";
 
 export default function ForgotPassword() {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState("idle");
   const [error, setError] = useState("");
@@ -30,6 +31,15 @@ export default function ForgotPassword() {
   return (
     <div className="modal-overlay">
       <div className="modal-container">
+        <button 
+          type="button" 
+          className="modal-close-btn" 
+          onClick={() => navigate('/')} 
+          aria-label="Back to website"
+          title="Back to website"
+        >
+          ✕
+        </button>
         <div className="modal-content">
 
           <h2 className="modal-title">FORGOT<br />PASSWORD</h2>

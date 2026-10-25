@@ -224,6 +224,15 @@ function App() {
     return (
       <div className="modal-overlay">
         <div className="modal-container">
+          <button 
+            type="button" 
+            className="modal-close-btn" 
+            onClick={() => navigate('/')} 
+            aria-label="Back to website"
+            title="Back to website"
+          >
+            ✕
+          </button>
           <div className="modal-content">
 
             <h2 className="modal-title">VERIFY YOUR<br />IDENTITY</h2>
@@ -288,6 +297,15 @@ function App() {
   return (
     <div className="modal-overlay">
       <div className="modal-container">
+        <button 
+          type="button" 
+          className="modal-close-btn" 
+          onClick={() => navigate('/')} 
+          aria-label="Back to website"
+          title="Back to website"
+        >
+          ✕
+        </button>
         <div className="modal-content">
           
           <h2 className="modal-title">THE SCHOLAR'S<br />GATEWAY</h2>

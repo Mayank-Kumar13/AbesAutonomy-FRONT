@@ -40,6 +40,15 @@ export default function ResetPassword() {
   return (
     <div className="modal-overlay">
       <div className="modal-container">
+        <button 
+          type="button" 
+          className="modal-close-btn" 
+          onClick={() => navigate('/')} 
+          aria-label="Back to website"
+          title="Back to website"
+        >
+          ✕
+        </button>
         <div className="modal-content">
 
           <h2 className="modal-title">RESET<br />PASSWORD</h2>
