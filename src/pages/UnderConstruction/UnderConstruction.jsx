@@ -9,90 +9,57 @@ const UnderConstruction = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  const features = [
-    {
-      icon: '⚡',
-      title: 'Lightning Fast UI',
-      desc: 'Completely rebuilt interface with blazing performance',
-    },
-    {
-      icon: '📚',
-      title: 'Smart Study Hub',
-      desc: 'AI-powered study tools and intelligent resource discovery',
-    },
-    {
-      icon: '🔍',
-      title: 'Instant Search',
-      desc: 'Find notes, papers, and resources in milliseconds',
-    },
-    {
-      icon: '🛡️',
-      title: 'Enhanced Security',
-      desc: 'New authentication system with added protection',
-    },
-    {
-      icon: '📊',
-      title: 'Progress Tracking',
-      desc: 'Track your study progress and performance analytics',
-    },
-    {
-      icon: '👥',
-      title: 'Community',
-      desc: 'Collaborate with peers and share resources seamlessly',
-    },
-  ];
-
   return (
     <div className="uc-page">
-      {/* Ambient glow orbs */}
-      <div className="uc-glow-orbs" aria-hidden="true">
-        <div className="uc-orb uc-orb-1" />
-        <div className="uc-orb uc-orb-2" />
-        <div className="uc-orb uc-orb-3" />
+      {/* ── Animated glow blobs (visible behind the card) ── */}
+      <div className="uc-glow-layer" aria-hidden="true">
+        <div className="uc-blob uc-blob-1" />
+        <div className="uc-blob uc-blob-2" />
+        <div className="uc-blob uc-blob-3" />
+        <div className="uc-blob uc-blob-4" />
       </div>
 
-      {/* Noise overlay for texture */}
-      <div className="uc-noise" aria-hidden="true" />
+      {/* ── Single centered notice card ── */}
+      <div className="uc-notice">
+        {/* Top shine streak */}
+        <div className="uc-shine" />
 
-      <div className="uc-container">
-        {/* Hero Section */}
-        <div className="uc-hero">
-          <div className="uc-badge">
-            <span className="uc-badge-dot" />
-            <span>Opening Soon</span>
-          </div>
-
-          <h1 className="uc-heading">
-            ABES Autonomy
-            <span className="uc-version">2.0</span>
-          </h1>
-
-          <p className="uc-subheading">
-            Something extraordinary is being built. A completely reimagined
-            platform with powerful new features, stunning design, and unmatched
-            performance.
-          </p>
-
-          <p className="uc-hindi">
-            हम कुछ बेहतरीन नए फीचर्स के साथ जल्द वापस आ रहे हैं ✨
-          </p>
+        {/* Badge */}
+        <div className="uc-badge">
+          <span className="uc-dot" />
+          Opening Soon
         </div>
 
-        {/* Progress Glass Card */}
-        <div className="uc-glass-card uc-progress-card">
-          <div className="uc-card-shine" />
-          <div className="uc-progress-header">
-            <span className="uc-progress-emoji">🚀</span>
+        {/* Title */}
+        <h1 className="uc-title">
+          ABES Autonomy <span className="uc-v">2.0</span>
+        </h1>
+
+        {/* Subtitle */}
+        <p className="uc-sub">
+          We're building something extraordinary. A completely reimagined
+          platform with powerful new features, stunning design, and
+          unmatched performance.
+        </p>
+
+        <p className="uc-hindi">
+          हम कुछ बेहतरीन नए फीचर्स के साथ जल्द वापस आ रहे हैं ✨
+        </p>
+
+        {/* Divider */}
+        <div className="uc-divider" />
+
+        {/* Progress */}
+        <div className="uc-progress-section">
+          <div className="uc-progress-head">
+            <span className="uc-progress-icon">🚀</span>
             <div>
-              <h2 className="uc-progress-title">Development Progress</h2>
-              <p className="uc-progress-status">Almost there — final touches in progress</p>
+              <strong>Development Progress</strong>
+              <span className="uc-progress-status">Almost there — final touches</span>
             </div>
           </div>
-          <div className="uc-progress-track">
-            <div
-              className="uc-progress-fill"
-              style={{ width: `${progress}%` }}
-            />
+          <div className="uc-track">
+            <div className="uc-fill" style={{ width: `${progress}%` }} />
           </div>
           <div className="uc-progress-meta">
             <span>{progress}% Complete</span>
@@ -100,27 +67,46 @@ const UnderConstruction = () => {
           </div>
         </div>
 
-        {/* Features Grid */}
-        <h3 className="uc-section-label">What's Coming</h3>
-        <div className="uc-features-grid">
-          {features.map((f, i) => (
-            <div className="uc-glass-card uc-feature-card" key={i}>
-              <div className="uc-card-shine" />
-              <span className="uc-feature-icon">{f.icon}</span>
-              <h4 className="uc-feature-title">{f.title}</h4>
-              <p className="uc-feature-desc">{f.desc}</p>
-            </div>
-          ))}
+        {/* Divider */}
+        <div className="uc-divider" />
+
+        {/* Features */}
+        <p className="uc-feat-label">WHAT'S COMING</p>
+        <div className="uc-feat-grid">
+          <div className="uc-feat">
+            <span className="uc-feat-icon">⚡</span>
+            <span>Faster & Smarter UI</span>
+          </div>
+          <div className="uc-feat">
+            <span className="uc-feat-icon">📚</span>
+            <span>Upgraded Study Hub</span>
+          </div>
+          <div className="uc-feat">
+            <span className="uc-feat-icon">🔍</span>
+            <span>Instant Search</span>
+          </div>
+          <div className="uc-feat">
+            <span className="uc-feat-icon">🛡️</span>
+            <span>Enhanced Security</span>
+          </div>
+          <div className="uc-feat">
+            <span className="uc-feat-icon">📊</span>
+            <span>Progress Tracking</span>
+          </div>
+          <div className="uc-feat">
+            <span className="uc-feat-icon">👥</span>
+            <span>Community Features</span>
+          </div>
         </div>
 
-        {/* Bottom message */}
-        <div className="uc-bottom">
-          <p className="uc-thanks">
-            Thank you for your patience. We'll be back very soon.
-          </p>
-        </div>
+        {/* Footer message */}
+        <div className="uc-divider" />
+        <p className="uc-footer-msg">
+          Thank you for your patience.<br />
+          We'll be back very soon with an incredible new experience!
+        </p>
 
-        {/* Hidden admin link */}
+        {/* Admin link */}
         <Link
           to="/login"
           state={{ from: { pathname: '/admin' } }}

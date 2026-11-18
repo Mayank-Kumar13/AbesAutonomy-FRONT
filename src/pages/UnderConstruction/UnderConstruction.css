@@ -1,420 +1,433 @@
 /* ═══════════════════════════════════════════════════════
-   ABES Autonomy 2.0 — Opening Soon
-   Apple-style glassmorphism · deep black · blue glow
+   ABES Autonomy 2.0 — Opening Soon Notice
+   Single centered card · Apple glass · Animated glow
    ═══════════════════════════════════════════════════════ */
 
-/* ── Page ── */
+/* ── Full-page wrapper ── */
 .uc-page {
   min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: #000000;
-  color: #f5f5f7;
-  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text',
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display',
     'Helvetica Neue', system-ui, sans-serif;
-  position: relative;
-  overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  padding: 2rem 1.25rem;
+  position: relative;
+  overflow: hidden;
 }
 
-/* ── Noise texture overlay ── */
-.uc-noise {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  opacity: 0.03;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  z-index: 1;
-}
-
-/* ── Ambient glow orbs ── */
-.uc-glow-orbs {
+/* ══════════════════════════════════════════════════
+   ANIMATED GLOW BLOBS — clearly visible behind card
+   ══════════════════════════════════════════════════ */
+.uc-glow-layer {
   position: fixed;
   inset: 0;
   pointer-events: none;
   z-index: 0;
 }
 
-.uc-orb {
+.uc-blob {
   position: absolute;
   border-radius: 50%;
-  filter: blur(120px);
+  filter: blur(100px);
+  will-change: transform, opacity;
 }
 
-.uc-orb-1 {
-  width: 600px;
-  height: 600px;
-  background: radial-gradient(circle, rgba(0, 102, 255, 0.35) 0%, transparent 70%);
-  top: -150px;
-  right: -100px;
-  animation: orbFloat 10s ease-in-out infinite alternate;
+/* Top-right — large blue */
+.uc-blob-1 {
+  width: 550px;
+  height: 550px;
+  background: rgba(29, 78, 216, 0.55);
+  top: -10%;
+  right: -5%;
+  animation: blobMove1 8s ease-in-out infinite alternate;
 }
 
-.uc-orb-2 {
-  width: 500px;
-  height: 500px;
-  background: radial-gradient(circle, rgba(30, 64, 175, 0.30) 0%, transparent 70%);
-  bottom: -120px;
-  left: -80px;
-  animation: orbFloat 12s ease-in-out infinite alternate-reverse;
+/* Bottom-left — deep blue */
+.uc-blob-2 {
+  width: 480px;
+  height: 480px;
+  background: rgba(37, 99, 235, 0.45);
+  bottom: -12%;
+  left: -8%;
+  animation: blobMove2 10s ease-in-out infinite alternate;
 }
 
-.uc-orb-3 {
+/* Center — cyan accent */
+.uc-blob-3 {
   width: 350px;
   height: 350px;
-  background: radial-gradient(circle, rgba(56, 189, 248, 0.15) 0%, transparent 70%);
-  top: 45%;
+  background: rgba(56, 189, 248, 0.30);
+  top: 40%;
   left: 50%;
-  transform: translateX(-50%);
-  animation: orbFloat 8s ease-in-out infinite alternate;
+  transform: translate(-50%, -50%);
+  animation: blobMove3 7s ease-in-out infinite alternate;
 }
 
-/* ── Container ── */
-.uc-container {
+/* Top-left — subtle indigo */
+.uc-blob-4 {
+  width: 300px;
+  height: 300px;
+  background: rgba(99, 102, 241, 0.30);
+  top: -5%;
+  left: 15%;
+  animation: blobMove4 9s ease-in-out infinite alternate;
+}
+
+/* ══════════════════════════════════════════════════
+   NOTICE CARD — single centered glass panel
+   ══════════════════════════════════════════════════ */
+.uc-notice {
   position: relative;
   z-index: 2;
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 4rem 1.5rem 3rem;
-}
-
-/* ═══════════════════════════════════
-   Hero
-   ═══════════════════════════════════ */
-.uc-hero {
-  text-align: center;
-  margin-bottom: 3rem;
-}
-
-/* Badge */
-.uc-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: rgba(255, 255, 255, 0.06);
+  max-width: 580px;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.10);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  padding: 0.4rem 1.1rem;
-  border-radius: 999px;
-  font-size: 0.8rem;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.7);
-  letter-spacing: 0.03em;
-  margin-bottom: 1.5rem;
+  border-radius: 24px;
+  padding: 2.8rem 2.4rem 2rem;
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  box-shadow:
+    0 0 80px rgba(29, 78, 216, 0.15),
+    0 32px 64px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  text-align: center;
+  animation: cardBreath 6s ease-in-out infinite alternate;
 }
 
-.uc-badge-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: #3b82f6;
-  box-shadow: 0 0 8px rgba(59, 130, 246, 0.8);
-  animation: dotPulse 2s ease-in-out infinite;
-}
-
-/* Heading */
-.uc-heading {
-  font-size: 4rem;
-  font-weight: 700;
-  letter-spacing: -0.04em;
-  line-height: 1.08;
-  margin: 0 0 0.3rem 0;
-  color: #ffffff;
-}
-
-.uc-version {
-  display: inline-block;
-  background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 40%, #818cf8 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  font-weight: 800;
-  margin-left: 0.15em;
-}
-
-.uc-subheading {
-  font-size: 1.12rem;
-  color: rgba(255, 255, 255, 0.5);
-  max-width: 540px;
-  margin: 1.2rem auto 0.8rem;
-  line-height: 1.6;
-  font-weight: 400;
-}
-
-.uc-hindi {
-  font-size: 0.95rem;
-  color: rgba(255, 255, 255, 0.35);
-  margin: 0;
-  font-weight: 400;
-}
-
-/* ═══════════════════════════════════
-   Glass Card — shared base
-   ═══════════════════════════════════ */
-.uc-glass-card {
-  position: relative;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 20px;
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  overflow: hidden;
-}
-
-/* Shine / reflection streak on glass card */
-.uc-card-shine {
+/* Top-edge shine reflection */
+.uc-shine {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   height: 1px;
+  border-radius: 24px 24px 0 0;
   background: linear-gradient(
     90deg,
     transparent 0%,
-    rgba(255, 255, 255, 0.08) 20%,
-    rgba(255, 255, 255, 0.15) 50%,
-    rgba(255, 255, 255, 0.08) 80%,
+    rgba(255, 255, 255, 0.0) 15%,
+    rgba(255, 255, 255, 0.20) 50%,
+    rgba(255, 255, 255, 0.0) 85%,
     transparent 100%
   );
+  animation: shineSlide 4s ease-in-out infinite;
 }
 
-.uc-glass-card:hover {
-  border-color: rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.06);
+/* ── Badge ── */
+.uc-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.70);
+  padding: 0.35rem 1rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  margin-bottom: 1.5rem;
 }
 
-/* ═══════════════════════════════════
-   Progress Card
-   ═══════════════════════════════════ */
-.uc-progress-card {
-  padding: 1.8rem 2rem;
-  margin-bottom: 3rem;
-  transition: border-color 0.3s, background 0.3s;
+.uc-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #3b82f6;
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.9);
+  animation: dotPulse 2s ease-in-out infinite;
 }
 
-.uc-progress-header {
+/* ── Title ── */
+.uc-title {
+  font-size: 2.8rem;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  margin: 0 0 1.1rem 0;
+}
+
+.uc-v {
+  background: linear-gradient(135deg, #60a5fa, #3b82f6, #818cf8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 800;
+}
+
+/* ── Subtitle ── */
+.uc-sub {
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.45);
+  line-height: 1.6;
+  margin: 0 0 0.6rem 0;
+  max-width: 440px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.uc-hindi {
+  font-size: 0.88rem;
+  color: rgba(255, 255, 255, 0.28);
+  margin: 0 0 0.2rem 0;
+}
+
+/* ── Divider ── */
+.uc-divider {
+  width: 100%;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.07);
+  margin: 1.3rem 0;
+}
+
+/* ── Progress section ── */
+.uc-progress-section {
+  text-align: left;
+}
+
+.uc-progress-head {
   display: flex;
   align-items: center;
-  gap: 14px;
-  margin-bottom: 1.2rem;
+  gap: 12px;
+  margin-bottom: 0.9rem;
 }
 
-.uc-progress-emoji {
-  font-size: 2rem;
+.uc-progress-icon {
+  font-size: 1.8rem;
   line-height: 1;
-  filter: drop-shadow(0 0 12px rgba(59, 130, 246, 0.4));
+  filter: drop-shadow(0 0 10px rgba(59, 130, 246, 0.4));
 }
 
-.uc-progress-title {
-  font-size: 1.15rem;
+.uc-progress-head strong {
+  display: block;
+  font-size: 1rem;
   font-weight: 600;
   color: #ffffff;
-  margin: 0 0 0.15rem 0;
 }
 
 .uc-progress-status {
-  font-size: 0.85rem;
-  color: rgba(255, 255, 255, 0.4);
-  margin: 0;
+  display: block;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.35);
+  margin-top: 2px;
 }
 
-.uc-progress-track {
+.uc-track {
   width: 100%;
   height: 6px;
   background: rgba(255, 255, 255, 0.06);
   border-radius: 999px;
   overflow: hidden;
-  margin-bottom: 0.6rem;
+  margin-bottom: 0.5rem;
 }
 
-.uc-progress-fill {
+.uc-fill {
   height: 100%;
   border-radius: 999px;
-  background: linear-gradient(90deg, #3b82f6, #60a5fa, #818cf8);
-  transition: width 1.4s cubic-bezier(0.22, 1, 0.36, 1);
-  box-shadow: 0 0 14px rgba(59, 130, 246, 0.5);
+  background: linear-gradient(90deg, #2563eb, #3b82f6, #60a5fa);
+  box-shadow: 0 0 16px rgba(59, 130, 246, 0.6);
+  transition: width 1.6s cubic-bezier(0.22, 1, 0.36, 1);
   position: relative;
+  animation: fillGlow 2s ease-in-out infinite alternate;
 }
 
-.uc-progress-fill::after {
+.uc-fill::after {
   content: '';
   position: absolute;
-  right: 0;
-  top: -2px;
-  width: 10px;
-  height: 10px;
+  right: -4px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
   background: #ffffff;
-  box-shadow: 0 0 10px rgba(59, 130, 246, 0.8);
+  box-shadow: 0 0 12px rgba(59, 130, 246, 0.9), 0 0 4px #fff;
 }
 
 .uc-progress-meta {
   display: flex;
   justify-content: space-between;
-  font-size: 0.78rem;
-  color: rgba(255, 255, 255, 0.35);
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.30);
   font-weight: 500;
 }
 
-/* ═══════════════════════════════════
-   Features Grid
-   ═══════════════════════════════════ */
-.uc-section-label {
-  text-align: center;
-  font-size: 0.75rem;
+/* ── Features ── */
+.uc-feat-label {
+  font-size: 0.7rem;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.12em;
-  color: rgba(255, 255, 255, 0.3);
-  margin: 0 0 1.2rem 0;
+  letter-spacing: 0.14em;
+  color: rgba(255, 255, 255, 0.25);
+  margin: 0 0 1rem 0;
 }
 
-.uc-features-grid {
+.uc-feat-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 14px;
-  margin-bottom: 3rem;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 0.4rem;
 }
 
-.uc-feature-card {
-  padding: 1.5rem 1.3rem;
-  transition: border-color 0.3s, background 0.3s, transform 0.3s;
+.uc-feat {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  padding: 0.65rem 0.85rem;
+  font-size: 0.84rem;
+  color: rgba(255, 255, 255, 0.60);
+  transition: background 0.25s, border-color 0.25s, transform 0.25s;
 }
 
-.uc-feature-card:hover {
-  transform: translateY(-3px);
+.uc-feat:hover {
+  background: rgba(255, 255, 255, 0.07);
   border-color: rgba(59, 130, 246, 0.25);
-  box-shadow: 0 8px 40px rgba(59, 130, 246, 0.08);
+  transform: translateY(-1px);
 }
 
-.uc-feature-icon {
-  font-size: 1.6rem;
-  display: block;
-  margin-bottom: 0.75rem;
-  filter: grayscale(0.1);
+.uc-feat-icon {
+  font-size: 1.1rem;
+  flex-shrink: 0;
 }
 
-.uc-feature-title {
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: #ffffff;
-  margin: 0 0 0.35rem 0;
-}
-
-.uc-feature-desc {
-  font-size: 0.82rem;
-  color: rgba(255, 255, 255, 0.4);
-  margin: 0;
-  line-height: 1.45;
-  font-weight: 400;
-}
-
-/* ═══════════════════════════════════
-   Bottom
-   ═══════════════════════════════════ */
-.uc-bottom {
-  text-align: center;
-}
-
-.uc-thanks {
-  font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.3);
+/* ── Footer ── */
+.uc-footer-msg {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.28);
+  line-height: 1.55;
   margin: 0;
 }
 
-/* Admin link */
+/* ── Admin link ── */
 .uc-admin-link {
-  display: block;
-  text-align: center;
-  margin-top: 2.5rem;
-  color: rgba(255, 255, 255, 0.12);
-  font-size: 0.78rem;
+  display: inline-block;
+  margin-top: 1.2rem;
+  color: rgba(255, 255, 255, 0.08);
+  font-size: 0.75rem;
   text-decoration: none;
   transition: color 0.2s;
 }
 
 .uc-admin-link:hover {
-  color: rgba(255, 255, 255, 0.3);
+  color: rgba(255, 255, 255, 0.25);
 }
 
-/* ═══════════════════════════════════
-   Keyframes
-   ═══════════════════════════════════ */
-@keyframes orbFloat {
+/* ═══════════════════════════════════════════════════════
+   KEYFRAMES
+   ═══════════════════════════════════════════════════════ */
+
+/* Blob animations — large visible movement */
+@keyframes blobMove1 {
+  0%   { transform: translate(0, 0) scale(1);     opacity: 0.5; }
+  100% { transform: translate(-60px, 50px) scale(1.15); opacity: 0.7; }
+}
+
+@keyframes blobMove2 {
+  0%   { transform: translate(0, 0) scale(1);     opacity: 0.4; }
+  100% { transform: translate(50px, -40px) scale(1.2);  opacity: 0.6; }
+}
+
+@keyframes blobMove3 {
+  0%   { transform: translate(-50%, -50%) scale(0.9);  opacity: 0.25; }
+  100% { transform: translate(-50%, -50%) scale(1.2);  opacity: 0.4; }
+}
+
+@keyframes blobMove4 {
+  0%   { transform: translate(0, 0) scale(1);     opacity: 0.3; }
+  100% { transform: translate(30px, 40px) scale(1.1);  opacity: 0.5; }
+}
+
+/* Card breathing glow */
+@keyframes cardBreath {
   0% {
-    transform: translate(0, 0) scale(1);
-    opacity: 0.6;
+    box-shadow:
+      0 0 60px rgba(29, 78, 216, 0.10),
+      0 32px 64px rgba(0, 0, 0, 0.5),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08);
   }
   100% {
-    transform: translate(30px, -30px) scale(1.1);
-    opacity: 0.8;
+    box-shadow:
+      0 0 100px rgba(29, 78, 216, 0.22),
+      0 32px 64px rgba(0, 0, 0, 0.5),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08);
   }
 }
 
+/* Top shine slides across */
+@keyframes shineSlide {
+  0%   { opacity: 0.3; transform: translateX(-30%); }
+  50%  { opacity: 1;   transform: translateX(30%);  }
+  100% { opacity: 0.3; transform: translateX(-30%); }
+}
+
+/* Progress bar glow pulse */
+@keyframes fillGlow {
+  0%   { box-shadow: 0 0 10px rgba(59, 130, 246, 0.4); }
+  100% { box-shadow: 0 0 22px rgba(59, 130, 246, 0.8); }
+}
+
+/* Badge dot pulse */
 @keyframes dotPulse {
   0%, 100% {
     opacity: 1;
     box-shadow: 0 0 6px rgba(59, 130, 246, 0.6);
   }
   50% {
-    opacity: 0.5;
-    box-shadow: 0 0 14px rgba(59, 130, 246, 0.9);
+    opacity: 0.4;
+    box-shadow: 0 0 16px rgba(59, 130, 246, 1);
   }
 }
 
-/* ═══════════════════════════════════
-   Responsive
-   ═══════════════════════════════════ */
-@media (max-width: 768px) {
-  .uc-container {
-    padding: 3rem 1.25rem 2.5rem;
+/* ═══════════════════════════════════════════════════════
+   RESPONSIVE
+   ═══════════════════════════════════════════════════════ */
+@media (max-width: 640px) {
+  .uc-page {
+    padding: 1.5rem 1rem;
   }
 
-  .uc-heading {
-    font-size: 2.6rem;
+  .uc-notice {
+    padding: 2rem 1.3rem 1.5rem;
+    border-radius: 20px;
   }
 
-  .uc-subheading {
-    font-size: 1rem;
-  }
-
-  .uc-features-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-  }
-
-  .uc-progress-card {
-    padding: 1.4rem 1.3rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .uc-heading {
+  .uc-title {
     font-size: 2rem;
   }
 
-  .uc-features-grid {
+  .uc-sub {
+    font-size: 0.88rem;
+  }
+
+  .uc-feat-grid {
     grid-template-columns: 1fr;
-    gap: 10px;
   }
 
-  .uc-feature-card {
-    padding: 1.2rem 1.1rem;
-  }
-
-  .uc-progress-header {
-    flex-direction: column;
-    text-align: center;
-    gap: 8px;
-  }
-
-  .uc-orb-1 {
+  .uc-blob-1 {
     width: 350px;
     height: 350px;
   }
 
-  .uc-orb-2 {
+  .uc-blob-2 {
     width: 300px;
     height: 300px;
+  }
+
+  .uc-blob-3 {
+    width: 220px;
+    height: 220px;
+  }
+
+  .uc-blob-4 {
+    width: 180px;
+    height: 180px;
   }
 }
