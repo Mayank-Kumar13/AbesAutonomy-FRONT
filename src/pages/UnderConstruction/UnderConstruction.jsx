@@ -1,149 +1,126 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import {
-  Sparkles,
-  Rocket,
-  Zap,
-  BookOpen,
-  Layers,
-  Shield,
-  Clock,
-  Bell,
-  Search,
-  Users,
-  BarChart3,
-  ArrowRight,
-} from 'lucide-react';
 import './UnderConstruction.css';
 
 const UnderConstruction = () => {
-  /* ── Progress bar animation ── */
   const [progress, setProgress] = useState(0);
   useEffect(() => {
-    const timer = setTimeout(() => setProgress(85), 400);
+    const timer = setTimeout(() => setProgress(85), 600);
     return () => clearTimeout(timer);
   }, []);
 
+  const features = [
+    {
+      icon: '⚡',
+      title: 'Lightning Fast UI',
+      desc: 'Completely rebuilt interface with blazing performance',
+    },
+    {
+      icon: '📚',
+      title: 'Smart Study Hub',
+      desc: 'AI-powered study tools and intelligent resource discovery',
+    },
+    {
+      icon: '🔍',
+      title: 'Instant Search',
+      desc: 'Find notes, papers, and resources in milliseconds',
+    },
+    {
+      icon: '🛡️',
+      title: 'Enhanced Security',
+      desc: 'New authentication system with added protection',
+    },
+    {
+      icon: '📊',
+      title: 'Progress Tracking',
+      desc: 'Track your study progress and performance analytics',
+    },
+    {
+      icon: '👥',
+      title: 'Community',
+      desc: 'Collaborate with peers and share resources seamlessly',
+    },
+  ];
+
   return (
-    <div className="uc-wrapper">
-      {/* Background decorative orbs */}
-      <div className="uc-bg-decorations" aria-hidden="true">
-        <div className="uc-light-orb uc-orb-1" />
-        <div className="uc-light-orb uc-orb-2" />
-        <div className="uc-light-orb uc-orb-3" />
+    <div className="uc-page">
+      {/* Ambient glow orbs */}
+      <div className="uc-glow-orbs" aria-hidden="true">
+        <div className="uc-orb uc-orb-1" />
+        <div className="uc-orb uc-orb-2" />
+        <div className="uc-orb uc-orb-3" />
       </div>
 
-      <div className="uc-content">
-        {/* Top Badge */}
-        <div className="uc-top-badge">
-          <Sparkles className="uc-badge-icon" size={15} />
-          <span>MAJOR UPGRADE IN PROGRESS</span>
-          <Sparkles className="uc-badge-icon" size={15} />
+      {/* Noise overlay for texture */}
+      <div className="uc-noise" aria-hidden="true" />
+
+      <div className="uc-container">
+        {/* Hero Section */}
+        <div className="uc-hero">
+          <div className="uc-badge">
+            <span className="uc-badge-dot" />
+            <span>Opening Soon</span>
+          </div>
+
+          <h1 className="uc-heading">
+            ABES Autonomy
+            <span className="uc-version">2.0</span>
+          </h1>
+
+          <p className="uc-subheading">
+            Something extraordinary is being built. A completely reimagined
+            platform with powerful new features, stunning design, and unmatched
+            performance.
+          </p>
+
+          <p className="uc-hindi">
+            हम कुछ बेहतरीन नए फीचर्स के साथ जल्द वापस आ रहे हैं ✨
+          </p>
         </div>
 
-        {/* Main Title & Version */}
-        <h1 className="uc-title">
-          ABES Autonomy <span className="uc-version-highlight">2.0</span>
-        </h1>
-
-        {/* Opening Soon Banner */}
-        <div className="uc-coming-soon-banner">
-          <Rocket className="uc-rocket-icon" size={18} />
-          <span>Opening Soon with New Features!</span>
-        </div>
-
-        {/* Status / Progress Card */}
-        <div className="uc-status-card">
-          <div className="uc-status-icon">🚀</div>
-          <div className="uc-status-info">
-            <h2 className="uc-status-title">We're Almost Ready!</h2>
-            <p className="uc-status-subtitle">
-              हम कुछ बेहतरीन नए फीचर्स के साथ जल्द वापस आ रहे हैं
-            </p>
-            <div className="uc-progress-bar-wrapper">
-              <div className="uc-progress-bar">
-                <div
-                  className="uc-progress-fill"
-                  style={{ width: `${progress}%` }}
-                />
-              </div>
-              <span className="uc-progress-label">{progress}% Complete</span>
+        {/* Progress Glass Card */}
+        <div className="uc-glass-card uc-progress-card">
+          <div className="uc-card-shine" />
+          <div className="uc-progress-header">
+            <span className="uc-progress-emoji">🚀</span>
+            <div>
+              <h2 className="uc-progress-title">Development Progress</h2>
+              <p className="uc-progress-status">Almost there — final touches in progress</p>
             </div>
           </div>
+          <div className="uc-progress-track">
+            <div
+              className="uc-progress-fill"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+          <div className="uc-progress-meta">
+            <span>{progress}% Complete</span>
+            <span>Launching Soon</span>
+          </div>
         </div>
 
-        {/* Description */}
-        <p className="uc-description">
-          We are rebuilding our platform from the ground up to bring you a massively
-          improved experience. <strong>ABES Autonomy 2.0</strong> is packed with
-          powerful new tools, smoother performance, and a completely redesigned
-          interface.
-        </p>
-
-        {/* What's New Section */}
-        <div className="uc-whats-new-header">
-          <Zap size={16} />
-          <span>What's Coming in 2.0</span>
-        </div>
-
-        {/* Feature Highlights Grid */}
+        {/* Features Grid */}
+        <h3 className="uc-section-label">What's Coming</h3>
         <div className="uc-features-grid">
-          <div className="uc-feature-pill">
-            <Zap size={15} className="uc-feat-icon" />
-            <span>Faster & Smarter UI</span>
-          </div>
-          <div className="uc-feature-pill">
-            <BookOpen size={15} className="uc-feat-icon" />
-            <span>Upgraded Study Hub</span>
-          </div>
-          <div className="uc-feature-pill">
-            <Search size={15} className="uc-feat-icon" />
-            <span>Smart Search</span>
-          </div>
-          <div className="uc-feature-pill">
-            <Shield size={15} className="uc-feat-icon" />
-            <span>Enhanced Security</span>
-          </div>
-          <div className="uc-feature-pill">
-            <BarChart3 size={15} className="uc-feat-icon" />
-            <span>Progress Tracking</span>
-          </div>
-          <div className="uc-feature-pill">
-            <Users size={15} className="uc-feat-icon" />
-            <span>Community Features</span>
-          </div>
-          <div className="uc-feature-pill">
-            <Layers size={15} className="uc-feat-icon" />
-            <span>Better Resource Org</span>
-          </div>
-          <div className="uc-feature-pill">
-            <Clock size={15} className="uc-feat-icon" />
-            <span>Exam Countdown</span>
-          </div>
+          {features.map((f, i) => (
+            <div className="uc-glass-card uc-feature-card" key={i}>
+              <div className="uc-card-shine" />
+              <span className="uc-feature-icon">{f.icon}</span>
+              <h4 className="uc-feature-title">{f.title}</h4>
+              <p className="uc-feature-desc">{f.desc}</p>
+            </div>
+          ))}
         </div>
 
-        {/* GIF */}
-        <div className="uc-gif-container">
-          <img
-            src="https://media.giphy.com/media/RbDKaczqWovIugyJmW/giphy.gif"
-            alt="Developer working on the upgrade"
-            className="uc-working-gif"
-          />
+        {/* Bottom message */}
+        <div className="uc-bottom">
+          <p className="uc-thanks">
+            Thank you for your patience. We'll be back very soon.
+          </p>
         </div>
 
-        {/* Stay Tuned Banner */}
-        <div className="uc-stay-tuned-banner">
-          <Bell size={16} className="uc-bell-icon" />
-          <span>Stay Tuned — Something Amazing is Coming!</span>
-          <ArrowRight size={16} />
-        </div>
-
-        <p className="uc-check-back">
-          Thank you for your patience. We'll be back very soon with an incredible new
-          experience!
-        </p>
-
-        {/* Hidden link for admins to access the login page */}
+        {/* Hidden admin link */}
         <Link
           to="/login"
           state={{ from: { pathname: '/admin' } }}
