@@ -19,6 +19,7 @@ export default function PdfPreview() {
   const [showActualReviewModal, setShowActualReviewModal] = useState(false);
   const [showStillReadingPrompt, setShowStillReadingPrompt] = useState(false);
   const [isReadingActive, setIsReadingActive] = useState(true);
+  const [accessDenied, setAccessDenied] = useState(false);
   const [showPremiumModal, setShowPremiumModal] = useState(false);
   const [accessDeniedMessage, setAccessDeniedMessage] = useState("");
 
@@ -28,12 +29,14 @@ export default function PdfPreview() {
       notesApi.checkAccess(noteId)
         .then((res) => {
           if (res?.data && !res.data.allowed) {
+            setAccessDenied(true);
             setAccessDeniedMessage(res.data.message || 'You have used all 5 free document accesses. Upgrade to Premium for unlimited access.');
             setShowPremiumModal(true);
           }
         })
         .catch((err) => {
           if (err.status === 403 || err.data?.code === 'PREMIUM_REQUIRED') {
+            setAccessDenied(true);
             setAccessDeniedMessage(err.message || 'Active Premium subscription required to view this document.');
             setShowPremiumModal(true);
           }
@@ -345,7 +348,68 @@ export default function PdfPreview() {
         </div>
       </div>
 
-      <Pdfviewer file={viewerFileUrl} backendUrl={noteId ? `${API_BASE}/notes/${noteId}/pdf` : ''} isImageFlag={isImage} isDarkMode={isDarkMode} />
+      {accessDenied ? (
+        <div style={{
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: '#0a0d14',
+          color: '#e2e8f0',
+          padding: '2rem',
+          textAlign: 'center'
+        }}>
+          <div style={{
+            maxWidth: '520px',
+            background: '#111622',
+            border: '1px solid #d9a441',
+            borderRadius: '16px',
+            padding: '2.5rem 2rem',
+            boxShadow: '0 20px 40px rgba(0,0,0,0.7)'
+          }}>
+            <div style={{ fontSize: '48px', marginBottom: '16px' }}>🔒</div>
+            <h2 style={{ fontSize: '22px', fontWeight: 700, color: '#f8fafc', marginBottom: '12px' }}>
+              Document Access Locked
+            </h2>
+            <p style={{ color: '#94a3b8', fontSize: '14px', lineHeight: 1.6, marginBottom: '24px' }}>
+              {accessDeniedMessage || 'You have used all 5 free document accesses. Upgrade to ABES Autonomy Premium for unlimited access to all study materials.'}
+            </p>
+            <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+              <button
+                onClick={() => navigate(-1)}
+                style={{
+                  background: 'transparent',
+                  color: '#94a3b8',
+                  border: '1px solid #334155',
+                  padding: '10px 20px',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  fontWeight: 600
+                }}
+              >
+                Go Back
+              </button>
+              <button
+                onClick={() => setShowPremiumModal(true)}
+                style={{
+                  background: 'linear-gradient(135deg, #d9a441 0%, #b8860b 100%)',
+                  color: '#000',
+                  border: 'none',
+                  padding: '10px 24px',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  fontWeight: 700
+                }}
+              >
+                Upgrade to Premium
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <Pdfviewer file={viewerFileUrl} backendUrl={noteId ? `${API_BASE}/notes/${noteId}/pdf` : ''} isImageFlag={isImage} isDarkMode={isDarkMode} />
+      )}
 
       {/* "Still Reading?" Anti-AFK Modal */}
       {showStillReadingPrompt && (
