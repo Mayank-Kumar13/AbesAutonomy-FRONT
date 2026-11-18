@@ -250,6 +250,10 @@ export const notesApi = {
       method: 'POST',
     });
   },
+
+  async checkAccess(id) {
+    return request(`/notes/${id}/access`);
+  },
 };
 
 // ─────────────────────────────────────────────────────
@@ -536,4 +540,101 @@ export const analyticsApi = {
     const qs = new URLSearchParams(params).toString();
     return request(`/analytics/users?${qs}`);
   }
-};
+};
+
+// ─────────────────────────────────────────────────────
+// Premium & Payment API
+// ─────────────────────────────────────────────────────
+
+export const paymentApi = {
+  async getPlans() {
+    return request('/payments/plans');
+  },
+  async createOrder(planId) {
+    return request('/payments/create-order', {
+      method: 'POST',
+      body: JSON.stringify({ planId }),
+    });
+  },
+  async verifyPayment(verificationData) {
+    return request('/payments/verify', {
+      method: 'POST',
+      body: JSON.stringify(verificationData),
+    });
+  },
+  async getSubscriptionStatus() {
+    return request('/payments/subscription-status');
+  },
+};
+
+// ─────────────────────────────────────────────────────
+// AI Integrations API (Premium Only)
+// ─────────────────────────────────────────────────────
+
+export const aiApi = {
+  async chatAssistant(payload) {
+    return request('/ai/assistant/chat', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  },
+  async summarize(payload) {
+    return request('/ai/summarize', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  },
+};
+
+// ─────────────────────────────────────────────────────
+// Admin Premium Management API
+// ─────────────────────────────────────────────────────
+
+export const adminPremiumApi = {
+  async getAnalytics() {
+    return request('/admin/premium/analytics');
+  },
+  async getUsers(params = {}) {
+    const qs = new URLSearchParams(params).toString();
+    return request(`/admin/premium/users?${qs}`);
+  },
+  async getUserDetails(userId) {
+    return request(`/admin/premium/users/${userId}/details`);
+  },
+  async manualActivate(userId, data) {
+    return request(`/admin/premium/users/${userId}/manual-activate`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+  async manualExtend(userId, data) {
+    return request(`/admin/premium/users/${userId}/extend`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+  async manualRevoke(userId, data) {
+    return request(`/admin/premium/users/${userId}/revoke`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+  async getPayments(params = {}) {
+    const qs = new URLSearchParams(params).toString();
+    return request(`/admin/premium/payments?${qs}`);
+  },
+  async getAuditLogs(params = {}) {
+    const qs = new URLSearchParams(params).toString();
+    return request(`/admin/premium/audit-logs?${qs}`);
+  },
+  async getNotifications() {
+    return request('/admin/premium/notifications');
+  },
+  async markNotificationRead(data) {
+    return request('/admin/premium/notifications/mark-read', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+};
+

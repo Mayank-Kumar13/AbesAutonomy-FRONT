@@ -32,6 +32,8 @@ import { trackingApi } from './services/api';
 
 const Pdfpreview = lazy(() => import('./pages/Pdfpreview'));
 const AdminPanel = lazy(() => import('./pages/admin/AdminPanel'));
+const PremiumPage = lazy(() => import('./pages/premium/PremiumPage'));
+const PaymentResult = lazy(() => import('./pages/payment/PaymentResult'));
 
 const App = () => {
   useEffect(() => {
@@ -54,6 +56,10 @@ const App = () => {
       <Suspense fallback={<div className="flex h-screen items-center justify-center text-white"><div className="animate-spin h-8 w-8 border-4 border-blue-500 rounded-full border-t-transparent"></div></div>}>
         <Routes>
           <Route path="/" element={<HomeContent />} />
+          <Route path="/premium" element={<PremiumPage />} />
+          <Route path="/payment/success" element={<PaymentResult type="success" />} />
+          <Route path="/payment/failed" element={<PaymentResult type="failed" />} />
+          <Route path="/payment/pending" element={<PaymentResult type="pending" />} />
           <Route path="/resources" element={<ProtectedRoute><Resources/></ProtectedRoute>} />
           <Route path="/credits" element={<Credits />} />
           <Route path="/mvp-projects" element={<Amcat />} />

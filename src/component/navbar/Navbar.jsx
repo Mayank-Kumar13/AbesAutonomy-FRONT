@@ -195,6 +195,12 @@ const Navbar = () => {
         <ul className="nav-links">
           <li><NavLink to="/" onClick={() => setMobileMenuOpen(false)}>Home</NavLink></li>
           <li><NavLink to="/resources" onClick={() => setMobileMenuOpen(false)}>Resources</NavLink></li>
+          <li>
+            <NavLink to="/premium" onClick={() => setMobileMenuOpen(false)} style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+              <span style={{ fontSize: '13px', filter: 'drop-shadow(0 0 4px rgba(197, 172, 134, 0.6))' }}>👑</span>
+              <span>Premium</span>
+            </NavLink>
+          </li>
           <li><NavLink to="/mvp-projects" onClick={() => setMobileMenuOpen(false)}>MVP Projects</NavLink></li>
           <li><NavLink to="/credits" onClick={() => setMobileMenuOpen(false)}>Credits</NavLink></li>
         </ul>

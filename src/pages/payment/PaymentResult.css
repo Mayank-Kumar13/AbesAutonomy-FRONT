@@ -1,0 +1,152 @@
+/* ═══════════════════════════════════════════════════════
+   ABES Autonomy — Payment Status Pages CSS
+   ═══════════════════════════════════════════════════════ */
+
+.pay-res-page {
+  min-height: 80vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1.5rem;
+  background-color: #080a0e;
+  color: #e2e8f0;
+}
+
+.pay-res-card {
+  background: rgba(17, 21, 28, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  max-width: 520px;
+  width: 100%;
+  padding: 3rem 2.2rem;
+  text-align: center;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(16px);
+}
+
+.pay-res-card.success {
+  border-color: rgba(197, 172, 134, 0.4);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 30px rgba(197, 172, 134, 0.12);
+}
+
+.pay-res-card.failed {
+  border-color: rgba(239, 68, 68, 0.35);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 30px rgba(239, 68, 68, 0.1);
+}
+
+.pay-res-card.pending {
+  border-color: rgba(234, 179, 8, 0.35);
+}
+
+.pay-res-icon-wrap {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.5rem;
+}
+
+.pay-res-icon-wrap.success {
+  background: rgba(197, 172, 134, 0.15);
+  color: #C5AC86;
+  border: 2px solid #C5AC86;
+}
+
+.pay-res-icon-wrap.failed {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  border: 2px solid #ef4444;
+}
+
+.pay-res-icon-wrap.pending {
+  background: rgba(234, 179, 8, 0.15);
+  color: #eab308;
+  border: 2px solid #eab308;
+}
+
+.pay-res-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 0.5rem 0;
+}
+
+.pay-res-sub {
+  font-size: 0.95rem;
+  color: #94a3b8;
+  margin: 0 0 1.8rem 0;
+  line-height: 1.5;
+}
+
+.pay-res-details-box {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  padding: 1.2rem;
+  margin-bottom: 2rem;
+  text-align: left;
+}
+
+.pay-res-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.88rem;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.pay-res-row:last-child {
+  border-bottom: none;
+}
+
+.pay-res-label {
+  color: #94a3b8;
+}
+
+.pay-res-val {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.pay-res-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.pay-res-btn {
+  flex: 1;
+  padding: 0.85rem;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s;
+}
+
+.pay-res-btn.primary {
+  background: linear-gradient(135deg, #C5AC86 0%, #b2966e 100%);
+  color: #111215;
+  border: none;
+}
+
+.pay-res-btn.primary:hover {
+  background: linear-gradient(135deg, #dfc6a2 0%, #C5AC86 100%);
+  transform: translateY(-2px);
+}
+
+.pay-res-btn.secondary {
+  background: rgba(255, 255, 255, 0.06);
+  color: #cbd5e1;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.pay-res-btn.secondary:hover {
+  background: rgba(255, 255, 255, 0.1);
+}

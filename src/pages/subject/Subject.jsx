@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { FileText, Download } from "lucide-react";
 import { notesApi } from "../../services/api";
 import { downloadNoteFile } from "../../utils/downloadHelper";
+import PremiumUpgradeModal from "../../component/premium/PremiumUpgradeModal";
 
 const Subject = () => {
   const location = useLocation();
@@ -22,6 +23,7 @@ const Subject = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isDownloadingAll, setIsDownloadingAll] = useState(false);
+  const [showPremiumModal, setShowPremiumModal] = useState(false);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -90,6 +92,10 @@ const Subject = () => {
           );
         } catch (error) {
           console.error("Blob download failed for:", note.title, error);
+          if (error.status === 403 || error.data?.code === 'PREMIUM_REQUIRED') {
+            setShowPremiumModal(true);
+            break;
+          }
         }
 
         // Small delay between downloads so browsers don't block multiple files
@@ -210,6 +216,12 @@ const Subject = () => {
           </div>
         )}
       </div>
+
+      <PremiumUpgradeModal
+        isOpen={showPremiumModal}
+        message="You have used all 5 free document accesses. Upgrade to ABES Autonomy Premium for unlimited access."
+        onClose={() => setShowPremiumModal(false)}
+      />
     </main>
   );
 };

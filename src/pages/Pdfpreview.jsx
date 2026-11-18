@@ -6,6 +6,7 @@ import { useAuth } from "../auth/AuthContext";
 import ReviewModal from "../component/home/ReviewModal";
 import Navbar from "../component/navbar/Navbar";
 import { downloadNoteFile } from "../utils/downloadHelper";
+import PremiumUpgradeModal from "../component/premium/PremiumUpgradeModal";
 export default function PdfPreview() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -18,6 +19,27 @@ export default function PdfPreview() {
   const [showActualReviewModal, setShowActualReviewModal] = useState(false);
   const [showStillReadingPrompt, setShowStillReadingPrompt] = useState(false);
   const [isReadingActive, setIsReadingActive] = useState(true);
+  const [showPremiumModal, setShowPremiumModal] = useState(false);
+  const [accessDeniedMessage, setAccessDeniedMessage] = useState("");
+
+  // Pre-flight check for access rights on the document
+  useEffect(() => {
+    if (noteId) {
+      notesApi.checkAccess(noteId)
+        .then((res) => {
+          if (res?.data && !res.data.allowed) {
+            setAccessDeniedMessage(res.data.message || 'You have used all 5 free document accesses. Upgrade to Premium for unlimited access.');
+            setShowPremiumModal(true);
+          }
+        })
+        .catch((err) => {
+          if (err.status === 403 || err.data?.code === 'PREMIUM_REQUIRED') {
+            setAccessDeniedMessage(err.message || 'Active Premium subscription required to view this document.');
+            setShowPremiumModal(true);
+          }
+        });
+    }
+  }, [noteId]);
 
   // References to track genuine engagement & active read seconds
   const lastInteractionRef = useRef(Date.now());
@@ -208,8 +230,9 @@ export default function PdfPreview() {
   };
 
   const API_BASE = import.meta.env.VITE_API_URL || "/api";
-  // Directly use pdfUrl to load from CDN fast, rather than going through the backend which does slow dynamic watermarking on the fly.
-  const viewerFileUrl = pdfUrl || (noteId ? `${API_BASE}/notes/${noteId}/pdf` : "");
+  const viewerFileUrl = pdfUrl
+    ? (pdfUrl.startsWith('/api') && token ? `${pdfUrl}?token=${encodeURIComponent(token)}` : pdfUrl)
+    : (noteId ? `${API_BASE}/notes/${noteId}/pdf${token ? `?token=${encodeURIComponent(token)}` : ''}` : "");
 
   const [isDownloading, setIsDownloading] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -229,7 +252,12 @@ export default function PdfPreview() {
       });
     } catch (error) {
       console.error("PDF download error:", error);
-      alert("Failed to download PDF.");
+      if (error.status === 403 || error.data?.code === 'PREMIUM_REQUIRED' || error.message?.includes('Premium') || error.message?.includes('free')) {
+        setAccessDeniedMessage(error.message || 'You have used all 5 free document accesses. Upgrade to Premium for unlimited downloads.');
+        setShowPremiumModal(true);
+      } else {
+        alert("Failed to download PDF.");
+      }
     } finally {
       setIsDownloading(false);
     }
@@ -437,6 +465,19 @@ export default function PdfPreview() {
         onSuccess={() => {
           // If they successfully review, the next login/refresh will have hasReviewed=true
           // For now just close the modal
+        }}
+      />
+
+      <PremiumUpgradeModal
+        isOpen={showPremiumModal}
+        message={accessDeniedMessage}
+        onClose={() => {
+          setShowPremiumModal(false);
+          navigate(-1);
+        }}
+        onSuccess={() => {
+          setShowPremiumModal(false);
+          window.location.reload();
         }}
       />
     </div>

@@ -74,6 +74,13 @@ export async function downloadNoteFile({ noteId, pdfUrl, title }, index = 0) {
           triggerBlobDownload(blob, `${cleanTitle}.${determinedExt}`);
           return;
         }
+      } else if (response.status === 403) {
+        // Backend blocked download: quota exhausted or Premium required
+        const errorData = await response.json().catch(() => ({}));
+        const err = new Error(errorData.message || 'Premium subscription required to download this document.');
+        err.status = 403;
+        err.data = errorData;
+        throw err;
       } else {
         console.warn(`Backend download failed with status ${response.status}. Falling back to direct CDN...`);
       }

@@ -9,6 +9,7 @@ import CreditsManagement from './CreditsManagement';
 import AnalyticsDashboard from './AnalyticsDashboard';
 import TopReadersLeaderboard from './TopReadersLeaderboard';
 import SupabasePdfManager from './SupabasePdfManager';
+import PremiumManagement from './PremiumManagement';
 import { compressAndConvertToPdf } from '../../utils/pdfCompression';
 
 const BRANCHES_Y1 = ['electrical', 'electronics', 'common'];
@@ -845,6 +846,9 @@ export default function AdminPanel() {
             <button className={`admin-tab-btn ${tab === 'analytics' ? 'active' : ''}`} onClick={() => setTab('analytics')}>
               Analytics
             </button>
+            <button className={`admin-tab-btn ${tab === 'premium' ? 'active' : ''}`} onClick={() => setTab('premium')}>
+              👑 Premium
+            </button>
             <button className={`admin-tab-btn ${tab === 'users' ? 'active' : ''}`} onClick={() => setTab('users')}>
               Users
             </button>
@@ -892,6 +896,10 @@ export default function AdminPanel() {
 
       {tab === 'analytics' && user?.role !== 'coordinator' && (
         <AnalyticsDashboard />
+      )}
+
+      {tab === 'premium' && user?.role !== 'coordinator' && (
+        <PremiumManagement />
       )}
 
       {tab === 'topReaders' && (
