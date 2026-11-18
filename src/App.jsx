@@ -44,14 +44,15 @@ const App = () => {
   const path = location.pathname.toLowerCase();
   const isAuthPage = path === '/login' || path === '/forgot-password' || path === '/reset-password' || path.startsWith('/auth/');
   const hideNavAndFooter = isAuthPage || path === '/pdfpreview';
+  const isHomePage = path === '/';
 
   return (
     <GlobalStatusGuard>
       {!isAuthPage && <LoginToast />}
       {!isAuthPage && <LiveTracker />}
       {!isAuthPage && <GlobalAnnouncement />}
-      {!isAuthPage && <IntroOverlay />}
-      {!hideNavAndFooter && <Navbar />}
+      {!isAuthPage && !isHomePage && <IntroOverlay />}
+      {!hideNavAndFooter && !isHomePage && <Navbar />}
       <Scroll />
       <Suspense fallback={<div className="flex h-screen items-center justify-center text-white"><div className="animate-spin h-8 w-8 border-4 border-blue-500 rounded-full border-t-transparent"></div></div>}>
         <Routes>
@@ -81,7 +82,7 @@ const App = () => {
           <Route path="/admin" element={<AdminRoute><AdminPanel /></AdminRoute>} />
         </Routes>
       </Suspense>
-      {!hideNavAndFooter && <Footer />}
+      {!hideNavAndFooter && !isHomePage && <Footer />}
     </GlobalStatusGuard>
   )
 }

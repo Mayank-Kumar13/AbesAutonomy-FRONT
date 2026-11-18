@@ -1,396 +1,158 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
-import "./HomeContent.css";
-import buildingPhoto from "../../../IMAGES/BUILDING.png";
-import { Link } from "react-router-dom";
-import {
-  ClipboardList,
-  FlaskConical,
-  Copy,
-  BookOpen,
-  ArrowRight,
-  Star,
-  MessageSquare,
-  Pen,
-  Notebook,
-  FileText,
-  Heart,
-} from "lucide-react";
-import { reviewApi } from "../../services/api";
-import { useAuth } from "../../auth/AuthContext";
-import ReviewModal from "./ReviewModal";
+import { useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { ArrowDown, ArrowUpRight } from 'lucide-react';
+import HomeNavigation from './HomeNavigation';
+import CampusFallback from './CampusFallback';
+import { getJourneyState } from './journey';
+import './HomeContent.css';
 
-const cards = [
-  {
-    title: "SYLLABUS",
-    description: "Course syllabus & curriculum",
-    icon: <BookOpen size={34} />,
-    resourceType: "syllabus",
-  },
-  {
-    title: "THEORY",
-    description: "Academic notes and lecture slides.",
-    icon: <FileText size={34} />,
-    resourceType: "theory",
-  },
-  {
-    title: "PREVIOUS PAPERS",
-    description: "Previous year question papers and exam resources.",
-    icon: <Copy size={34} />,
-    resourceType: "pyq",
-  },
-  {
-    title: "HANDWRITTEN NOTES",
-    description: "Handwritten notes by Topper Student [10 SGPA]",
-    icon: <Notebook size={34} />,
-    resourceType: "handwritten",
-  },
-];
+export default function HomeContent() {
+  const journeyRef = useRef(null);
+  const canvasRef = useRef(null);
+  const stageRef = useRef(null);
+  const notesRef = useRef(null);
+  const [sceneReady, setSceneReady] = useState(false);
 
-const ReviewCard = ({ review }) => {
-  const { user, isAuthenticated } = useAuth();
-  const initial = (review.displayName || "U")[0].toUpperCase();
-  const date = new Date(review.createdAt).toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
-
-  const [reactions, setReactions] = useState(review.reactions || []);
-  const [likedByAdmin, setLikedByAdmin] = useState(review.likedByAdmin || false);
-  const [isReacting, setIsReacting] = useState(false);
-
-  const hasReacted = user ? reactions.includes(user._id) : false;
-
-  const handleReact = async () => {
-    if (!isAuthenticated) {
-      window.location.href = "/login";
-      return;
-    }
-    if (isReacting) return;
-    
-    setIsReacting(true);
-    
-    // Optimistic update
-    const previousReactions = [...reactions];
-    const previousLikedByAdmin = likedByAdmin;
-    
-    if (hasReacted) {
-      setReactions(reactions.filter(id => id !== user._id));
-      if (user.role === 'admin') setLikedByAdmin(false);
-    } else {
-      setReactions([...reactions, user._id]);
-      if (user.role === 'admin') setLikedByAdmin(true);
-    }
-
-    try {
-      const res = await reviewApi.toggleReaction(review._id);
-      if (res.data) {
-        setReactions(res.data.reactions || []);
-        setLikedByAdmin(res.data.likedByAdmin || false);
-      }
-    } catch (error) {
-      // Revert on error
-      setReactions(previousReactions);
-      setLikedByAdmin(previousLikedByAdmin);
-    } finally {
-      setIsReacting(false);
-    }
+  const skipToNotes = (event) => {
+    event.preventDefault();
+    const notes = notesRef.current;
+    // Native hash scrolling can stop short of an inert, overlapping section.
+    // A deliberate skip is immediate and moves keyboard focus to the destination.
+    notes.inert = false;
+    notes.style.opacity = 1;
+    window.scrollTo({ top: notes.getBoundingClientRect().top + window.scrollY, behavior: 'instant' });
+    notes.querySelector('h2').focus({ preventScroll: true });
   };
 
-  return (
-    <div className="review-card" aria-label={`Review by ${review.displayName}`}>
-      <div className="review-card-header">
-        <div className="review-avatar">{initial}</div>
-        <div className="review-meta">
-          <span className="review-name">{review.displayName}</span>
-          <span className="review-date">{date}</span>
-        </div>
-      </div>
-      <div className="review-stars" aria-label={`${review.rating} out of 5 stars`}>
-        {[1, 2, 3, 4, 5].map((s) => (
-          <Star
-            key={s}
-            size={14}
-            fill={s <= review.rating ? "#d4a373" : "none"}
-            color={s <= review.rating ? "#d4a373" : "#374151"}
-          />
-        ))}
-      </div>
-      <p className="review-text">{review.content}</p>
-      
-      <div className="review-actions">
-        <button 
-          className={`reaction-btn ${hasReacted ? 'reacted' : ''}`} 
-          onClick={handleReact}
-          aria-label={hasReacted ? "Remove reaction" : "React to review"}
-          disabled={isReacting}
-        >
-          <Heart 
-            size={16} 
-            fill={hasReacted ? "#d4a373" : "none"} 
-            color={hasReacted ? "#d4a373" : "#374151"} 
-          />
-          <span className="reaction-count">{reactions.length > 0 ? reactions.length : ''}</span>
-        </button>
-        {likedByAdmin && (
-          <span className="admin-liked-badge">
-            <Star size={12} fill="#d4a373" color="#d4a373" /> Liked by Admin
-          </span>
-        )}
-      </div>
-    </div>
-  );
-};
+  useEffect(() => {
+    const journey = journeyRef.current;
+    const stage = stageRef.current;
+    const canvas = canvasRef.current;
+    const notes = notesRef.current;
+    const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const finePointer = window.matchMedia('(pointer: fine)');
+    let disposed = false;
+    let scene;
+    let frame = 0;
+    let progress = 0;
+    let pointer = { x: 0, y: 0 };
+    let currentPointer = { x: 0, y: 0 };
+    let start = 0;
+    let distance = 1;
 
-const HomeContent = () => {
-  const [reviews, setReviews] = useState([]);
-  const [modalOpen, setModalOpen] = useState(false);
-  const { isAuthenticated } = useAuth();
-  const scrollRef = useRef(null);
-
-  const stats = React.useMemo(() => {
-    const total = reviews.length;
-    const dist = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
-    let sum = 0;
-    reviews.forEach(r => {
-      const rating = Math.floor(r.rating) || 5;
-      if (dist[rating] !== undefined) dist[rating]++;
-      sum += r.rating || 5;
-    });
-    return {
-      total,
-      average: total ? (sum / total).toFixed(1) : "0.0",
-      dist
+    const render = () => {
+      frame = 0;
+      if (disposed || document.hidden) return;
+      progress = Math.max(0, Math.min(1, (window.scrollY - start) / distance));
+      const state = getJourneyState(progress, motion.matches);
+      currentPointer.x += (pointer.x - currentPointer.x) * 0.09;
+      currentPointer.y += (pointer.y - currentPointer.y) * 0.09;
+      stage.style.setProperty('--title-rise', `${(1 - state.rise) * 110}%`);
+      stage.style.setProperty('--scene-opacity', 1 - state.fade);
+      stage.style.setProperty('--scene-scale', 1 + state.zoom * 1.8);
+      stage.style.setProperty('--cue-opacity', 1 - Math.min(progress * 7, 1));
+      stage.style.setProperty('--journey-progress', progress);
+      notes.style.opacity = motion.matches ? 1 : state.fade;
+      notes.inert = !motion.matches && state.fade < 0.5;
+      scene?.render(state, currentPointer, motion.matches);
+      if (!motion.matches && state.fade < 1 &&
+          (Math.abs(pointer.x - currentPointer.x) > 0.001 || Math.abs(pointer.y - currentPointer.y) > 0.001)) {
+        frame = requestAnimationFrame(render);
+      }
     };
-  }, [reviews]);
+    const schedule = () => {
+      if (!frame) frame = requestAnimationFrame(render);
+    };
+    const measure = () => {
+      start = journey.getBoundingClientRect().top + window.scrollY;
+      distance = Math.max(1, journey.offsetHeight - stage.offsetHeight);
+      scene?.resize(stage.clientWidth, stage.clientHeight);
+      schedule();
+    };
+    const onPointer = (event) => {
+      if (motion.matches || !finePointer.matches || progress > 0.8) return;
+      pointer = { x: event.clientX / stage.clientWidth * 2 - 1, y: event.clientY / stage.clientHeight * 2 - 1 };
+      schedule();
+    };
+    const resetPointer = () => { pointer = { x: 0, y: 0 }; schedule(); };
+    const onMotionChange = () => { resetPointer(); measure(); };
+    const onContextLost = (event) => {
+      event.preventDefault();
+      scene?.dispose();
+      scene = undefined;
+      setSceneReady(false);
+      measure();
+    };
+    const resizeObserver = new ResizeObserver(measure);
+    resizeObserver.observe(journey);
+    resizeObserver.observe(stage);
+    window.addEventListener('scroll', schedule, { passive: true });
+    window.addEventListener('resize', measure, { passive: true });
+    window.addEventListener('pageshow', measure);
+    document.addEventListener('visibilitychange', schedule);
+    stage.addEventListener('pointermove', onPointer, { passive: true });
+    stage.addEventListener('pointerleave', resetPointer);
+    canvas.addEventListener('webglcontextlost', onContextLost);
+    motion.addEventListener('change', onMotionChange);
+    measure();
 
-  const fetchReviews = useCallback(async () => {
-    try {
-      const res = await reviewApi.list(1, 50);
-      setReviews(res.data || []);
-    } catch {
-      // Silently fail — reviews are non-critical
-    }
+    // Keep the homepage usable while the optional, separately bundled 3D scene loads.
+    import('./campusScene').then(({ createCampusScene }) => {
+      if (disposed) return;
+      scene = createCampusScene(canvas);
+      measure();
+      cancelAnimationFrame(frame);
+      render();
+      setSceneReady(true);
+    }).catch(() => {
+      if (!disposed) { scene?.dispose(); scene = undefined; setSceneReady(false); }
+    });
+
+    return () => {
+      disposed = true;
+      cancelAnimationFrame(frame);
+      resizeObserver.disconnect();
+      window.removeEventListener('scroll', schedule);
+      window.removeEventListener('resize', measure);
+      window.removeEventListener('pageshow', measure);
+      document.removeEventListener('visibilitychange', schedule);
+      stage.removeEventListener('pointermove', onPointer);
+      stage.removeEventListener('pointerleave', resetPointer);
+      canvas.removeEventListener('webglcontextlost', onContextLost);
+      motion.removeEventListener('change', onMotionChange);
+      scene?.dispose();
+    };
   }, []);
 
-  useEffect(() => {
-    fetchReviews();
-  }, [fetchReviews]);
-
-  // Auto-scroll reviews every 6 seconds
-  useEffect(() => {
-    if (reviews.length === 0) return;
-    
-    const interval = setInterval(() => {
-      if (scrollRef.current) {
-        const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
-        const cardWidth = 300; // 280px card + 20px gap
-
-        if (scrollLeft + clientWidth >= scrollWidth - 10) {
-          scrollRef.current.scrollTo({ left: 0, behavior: "smooth" });
-        } else {
-          scrollRef.current.scrollTo({ left: scrollLeft + cardWidth, behavior: "smooth" });
-        }
-      }
-    }, 3000);
-
-    return () => clearInterval(interval);
-  }, [reviews]);
-
-  const handleWriteReview = () => {
-    if (!isAuthenticated) {
-      // Navigate to login — simple approach
-      window.location.href = "/login";
-      return;
-    }
-    setModalOpen(true);
-  };
-
   return (
-    <main className="home">
-
-      {/* WELCOME SECTION */}
-      <section className="welcome-section">
-
-        <h1 className="welcome-heading">
-          Welcome to Abes Autonomy
-        </h1>
-
-        <p className="welcome-quote">
-          "Success is the sum of small efforts, repeated day in and day out."
-        </p>
-
-      </section>
-
-      {/* ABOUT SECTION */}
-
-      <section className="about-section">
-
-        <div className="about-card">
-
-          <div className="why">WHY ABES AUTONOMY
-            
-            <p>
-               IS 
-               </p>
-              <div className="important">
-            IMPORTANT?
+    <div className="autonomy-home">
+      <HomeNavigation onSkipNotes={skipToNotes} />
+      <main>
+        <section className="campus-journey" id="campus" ref={journeyRef} aria-labelledby="campus-title">
+          <div className={`campus-stage${sceneReady ? ' is-3d-ready' : ''}`} ref={stageRef}>
+            <h1 className="home-sr-only" id="campus-title">ABES Autonomy</h1>
+            <div className="campus-sky" aria-hidden="true" />
+            <div className="campus-fallback" aria-hidden="true">
+              <div className="campus-fallback-title"><span>ABES</span><span>AUTONOMY</span></div>
+              <CampusFallback />
             </div>
-            </div>
-
-          <p>
-            Education is not just about learning,
-            it's about building a better tomorrow.
-          </p>
-
-          <span>– ABES Autonomy</span>
-
-        </div>
-
-        <div className="building-card">
-
-          <img
-            src={buildingPhoto}
-            alt="ABES Building"
-          />
-
-        </div>
-
-      </section>
-
-      {/* RESOURCE CARDS */}
-
-      <section className="resource-section">
-
-  {cards.map((card, index) => (
-
-    <Link
-      key={index}
-      to="/ChooseSubject"
-      state={{
-        year: 1,
-        resourceType: card.resourceType,
-        resourceTitle: card.title,
-      }}
-      className="resource-link"
-    >
-
-      <div className="resource-card">
-
-        <div className="card-icon">
-          {card.icon}
-        </div>
-
-        <h3>{card.title}</h3>
-
-        <p>{card.description}</p>
-
-        <button>
-          <ArrowRight size={18} />
-        </button>
-
-      </div>
-
-    </Link>
-
-  ))}
-
-</section>
-
-      {/* ════════════════ REVIEWS SECTION ════════════════ */}
-      <section className="reviews-live-section" role="region" aria-label="Student Reviews">
-        <div className="reviews-live-inner">
-
-          {/* Left Panel */}
-          <div className="reviews-left-panel">
-            <span className="reviews-badge">REVIEWS</span>
-            <h2 className="reviews-heading">
-              Student <span className="reviews-accent">Feedback</span>
-            </h2>
-            
-            {stats.total > 0 ? (
-              <div className="rating-summary">
-                <div className="rating-average-container">
-                  <span className="rating-average-number">{stats.average}</span>
-                  <div className="rating-average-details">
-                    <div className="rating-average-stars">
-                      {[1, 2, 3, 4, 5].map((s) => (
-                        <Star
-                          key={s}
-                          size={18}
-                          fill={s <= Math.round(stats.average) ? "#d4a373" : "none"}
-                          color={s <= Math.round(stats.average) ? "#d4a373" : "#374151"}
-                        />
-                      ))}
-                    </div>
-                    <span className="rating-total-count">{stats.total} reviews</span>
-                  </div>
-                </div>
-                
-                <div className="rating-distribution">
-                  {[5, 4, 3, 2, 1].map(star => {
-                    const count = stats.dist[star];
-                    const percentage = stats.total ? (count / stats.total) * 100 : 0;
-                    return (
-                      <div key={star} className="rating-bar-row">
-                        <span className="rating-bar-label">{star} <Star size={12} fill="#d4a373" color="#d4a373" /></span>
-                        <div className="rating-bar-track">
-                          <div className="rating-bar-fill" style={{ width: `${percentage}%` }}></div>
-                        </div>
-                        <span className="rating-bar-count">{count}</span>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            ) : (
-              <p className="reviews-description">
-                If you like ABES Autonomy, send your review to us and see
-                <span className="reviews-accent"> your name </span>
-                here!
-              </p>
-            )}
-
-            <button className="write-review-btn" onClick={handleWriteReview}>
-              <Pen size={16} />
-              Write a Review
-            </button>
+            <canvas className="campus-canvas" ref={canvasRef} aria-hidden="true" />
+            <div className="campus-vignette" aria-hidden="true" />
+            <div className="campus-caption" aria-hidden="true"><span>ABES ENGINEERING COLLEGE</span><span>GHAZIABAD, INDIA</span></div>
+            <a className="campus-scroll-cue" href="#all-notes" onClick={skipToNotes}><span>SCROLL TO EXPLORE</span><ArrowDown size={18} /></a>
+            <div className="campus-progress" aria-hidden="true"><span /></div>
           </div>
-
-          {/* Right Panel — Scrolling Reviews */}
-          <div className="reviews-right-panel">
-            {reviews.length === 0 ? (
-              <div className="reviews-empty">
-                <MessageSquare size={40} color="#d4a373" />
-                <h3>YOUR REVIEW WILL APPEAR HERE</h3>
-                <p>Help others by sharing your thoughts.</p>
-              </div>
-            ) : (
-              <div
-                className="reviews-scroll-container"
-                ref={scrollRef}
-                aria-live="polite"
-              >
-                <div className="reviews-scroll-track">
-                  {reviews.map((review, i) => (
-                    <ReviewCard key={`${review._id}-${i}`} review={review} />
-                  ))}
-                </div>
-              </div>
-            )}
+        </section>
+        <section className="home-notes" id="all-notes" ref={notesRef} aria-labelledby="notes-title">
+          <div className="notes-atmosphere" aria-hidden="true" />
+          <div className="notes-content">
+            <span className="notes-eyebrow">ABES AUTONOMY</span>
+            <h2 id="notes-title" tabIndex={-1}>Get your all<br /><em>notes here.</em></h2>
+            <Link to="/resources" className="notes-link"><span>Explore notes</span><ArrowUpRight size={22} /></Link>
           </div>
-
-        </div>
-      </section>
-
-      {/* Review Modal */}
-      <ReviewModal
-        isOpen={modalOpen}
-        onClose={() => setModalOpen(false)}
-        onSuccess={fetchReviews}
-      />
-  </main>
+          <div className="notes-bottom"><a href="#campus" aria-label="Back to the top">BACK TO TOP <ArrowUpRight size={14} /></a></div>
+        </section>
+      </main>
+    </div>
   );
-};
-
-export default HomeContent;
+}
