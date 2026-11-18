@@ -150,3 +150,27 @@
 .pay-res-btn.secondary:hover {
   background: rgba(255, 255, 255, 0.1);
 }
+
+@media (max-width: 480px) {
+  .pay-res-page {
+    padding: 2rem 1rem;
+  }
+  .pay-res-card {
+    padding: 2rem 1.2rem;
+    border-radius: 16px;
+  }
+  .pay-res-title {
+    font-size: 1.6rem;
+  }
+  .pay-res-actions {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .pay-res-row {
+    flex-direction: column;
+    gap: 2px;
+  }
+  .pay-res-val {
+    word-break: break-all;
+  }
+}

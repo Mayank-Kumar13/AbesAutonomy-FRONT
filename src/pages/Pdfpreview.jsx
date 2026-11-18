@@ -278,95 +278,58 @@ export default function PdfPreview() {
         <Navbar />
       </div>
 
-      <div style={{ display: "flex", width: "100%", zIndex: 10, position: 'relative', boxShadow: '0 2px 10px rgba(0,0,0,0.5)' }}>
+      <div className="pdf-toolbar">
         <button
           onClick={() => navigate(-1)}
-          style={{
-            flex: 1,
-            padding: "8px",
-            cursor: "pointer",
-            color: "black",
-            backgroundColor: "#d9a441",
-            border: "none",
-            fontSize: "16px",
-            fontWeight: "bold",
-          }}
+          className="pdf-toolbar-back"
+          title={`Back — ${title}`}
         >
-          ← Back — {title}
+          <span className="back-arrow">←</span>
+          <span className="back-title">Back — {title}</span>
         </button>
 
-        <button
-          onClick={() => setIsNavbarVisible(!isNavbarVisible)}
-          style={{
-            padding: "8px 20px",
-            cursor: "pointer",
-            color: "white",
-            backgroundColor: "#161b22",
-            border: "none",
-            fontSize: "16px",
-            fontWeight: "bold",
-            borderLeft: "1px solid #1a252f",
-            transition: "background-color 0.3s"
-          }}
-        >
-          {isNavbarVisible ? "▲ Hide Nav" : "▼ Show Nav"}
-        </button>
+        <div className="pdf-toolbar-actions">
+          <button
+            onClick={() => setIsNavbarVisible(!isNavbarVisible)}
+            className="pdf-toolbar-btn"
+            title={isNavbarVisible ? "Hide Navigation" : "Show Navigation"}
+          >
+            {isNavbarVisible ? "▲ Nav" : "▼ Nav"}
+          </button>
 
-        <button
-          onClick={() => setIsDarkMode(!isDarkMode)}
-          style={{
-            padding: "8px 20px",
-            cursor: "pointer",
-            color: "white",
-            backgroundColor: isDarkMode ? "#374151" : "#1f2937",
-            border: "none",
-            fontSize: "16px",
-            fontWeight: "bold",
-            borderLeft: "1px solid #1a252f",
-            transition: "background-color 0.3s"
-          }}
-        >
-          {isDarkMode ? "☀️ Light Mode" : "🌙 Dark Mode"}
-        </button>
+          <button
+            onClick={() => setIsDarkMode(!isDarkMode)}
+            className="pdf-toolbar-btn"
+            style={{ backgroundColor: isDarkMode ? "#374151" : "#1f2937" }}
+            title={isDarkMode ? "Light Mode" : "Dark Mode"}
+          >
+            {isDarkMode ? "☀️ Light" : "🌙 Dark"}
+          </button>
 
-        <button
-          onClick={handleDownload}
-          disabled={isDownloading || (!noteId && !pdfUrl && !viewerFileUrl)}
-          style={{
-            padding: "8px 20px",
-            cursor: isDownloading || (!noteId && !pdfUrl && !viewerFileUrl) ? "not-allowed" : "pointer",
-            color: "white",
-            backgroundColor: isDownloading ? "#555" : "#2c3e50",
-            border: "none",
-            fontSize: "16px",
-            fontWeight: "bold",
-            borderLeft: "1px solid #1a252f"
-          }}
-        >
-          {isDownloading ? "Downloading..." : (isImage ? "Download Image" : "Download File")}
-        </button>
+          <button
+            onClick={handleDownload}
+            disabled={isDownloading || (!noteId && !pdfUrl && !viewerFileUrl)}
+            className="pdf-toolbar-btn"
+            style={{ backgroundColor: isDownloading ? "#555" : "#2c3e50" }}
+          >
+            {isDownloading ? "..." : (isImage ? "📥 Image" : "📥 PDF")}
+          </button>
 
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px',
-          padding: '0 16px',
-          backgroundColor: '#11161d',
-          borderLeft: '1px solid #1a252f',
-          fontSize: '13px',
-          fontWeight: 600,
-          color: isReadingActive ? '#10b981' : '#f59e0b',
-          whiteSpace: 'nowrap'
-        }}>
-          <span style={{
-            display: 'inline-block',
-            width: '8px',
-            height: '8px',
-            borderRadius: '50%',
-            backgroundColor: isReadingActive ? '#10b981' : '#f59e0b',
-            boxShadow: isReadingActive ? '0 0 8px #10b981' : 'none'
-          }} />
-          {isReadingActive ? 'Reading Active' : 'Paused (Idle)'}
+          <div 
+            className="pdf-reading-status"
+            style={{ color: isReadingActive ? '#10b981' : '#f59e0b' }}
+          >
+            <span style={{
+              display: 'inline-block',
+              width: '8px',
+              height: '8px',
+              borderRadius: '50%',
+              backgroundColor: isReadingActive ? '#10b981' : '#f59e0b',
+              boxShadow: isReadingActive ? '0 0 8px #10b981' : 'none',
+              flexShrink: 0
+            }} />
+            <span className="reading-text">{isReadingActive ? 'Active' : 'Paused'}</span>
+          </div>
         </div>
       </div>
 
@@ -374,22 +337,25 @@ export default function PdfPreview() {
 
       {/* "Still Reading?" Anti-AFK Modal */}
       {showStillReadingPrompt && (
-        <div style={{
-          position: 'fixed',
-          bottom: '24px',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          zIndex: 9999,
-          backgroundColor: '#0d131f',
-          border: '1px solid #3b82f6',
-          boxShadow: '0 12px 35px rgba(0,0,0,0.85), 0 0 25px rgba(59,130,246,0.3)',
-          borderRadius: '12px',
-          padding: '14px 22px',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '16px',
-          maxWidth: '92%'
-        }}>
+        <div 
+          className="pdf-afk-modal"
+          style={{
+            position: 'fixed',
+            bottom: '24px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            zIndex: 9999,
+            backgroundColor: '#0d131f',
+            border: '1px solid #3b82f6',
+            boxShadow: '0 12px 35px rgba(0,0,0,0.85), 0 0 25px rgba(59,130,246,0.3)',
+            borderRadius: '12px',
+            padding: '14px 22px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '16px',
+            maxWidth: '92%'
+          }}
+        >
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <span style={{ fontSize: '24px' }}>📖</span>
             <div>
@@ -403,6 +369,7 @@ export default function PdfPreview() {
           </div>
           <button
             onClick={resetActivity}
+            className="pdf-afk-btn"
             style={{
               backgroundColor: '#d9a441',
               color: '#0b0d10',
@@ -480,6 +447,105 @@ export default function PdfPreview() {
           window.location.reload();
         }}
       />
+      <style>{`
+        .pdf-toolbar {
+          display: flex;
+          align-items: stretch;
+          width: 100%;
+          z-index: 10;
+          position: relative;
+          box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+          background: #11161d;
+        }
+        .pdf-toolbar-back {
+          flex: 1;
+          min-width: 0;
+          padding: 8px 14px;
+          cursor: pointer;
+          color: black;
+          background-color: #d9a441;
+          border: none;
+          font-size: 15px;
+          font-weight: bold;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+        .back-title {
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+        .pdf-toolbar-actions {
+          display: flex;
+          align-items: stretch;
+          flex-shrink: 0;
+        }
+        .pdf-toolbar-btn {
+          padding: 8px 16px;
+          cursor: pointer;
+          color: white;
+          background-color: #161b22;
+          border: none;
+          font-size: 14px;
+          font-weight: 600;
+          border-left: 1px solid #1a252f;
+          white-space: nowrap;
+          transition: background-color 0.2s;
+        }
+        .pdf-reading-status {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          padding: 0 14px;
+          background-color: #11161d;
+          border-left: 1px solid #1a252f;
+          font-size: 13px;
+          font-weight: 600;
+          white-space: nowrap;
+        }
+        @media (max-width: 768px) {
+          .pdf-toolbar {
+            flex-wrap: wrap;
+          }
+          .pdf-toolbar-back {
+            flex: 1 1 100%;
+            justify-content: center;
+            padding: 9px 12px;
+            font-size: 14px;
+          }
+          .pdf-toolbar-actions {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            border-top: 1px solid #1a252f;
+          }
+          .pdf-toolbar-btn {
+            flex: 1;
+            padding: 8px 6px;
+            font-size: 12px;
+            text-align: center;
+          }
+          .pdf-reading-status {
+            padding: 0 8px;
+            font-size: 12px;
+          }
+          .pdf-afk-modal {
+            flex-direction: column !important;
+            align-items: stretch !important;
+            text-align: center;
+            width: calc(100vw - 32px) !important;
+            bottom: 16px !important;
+            padding: 16px !important;
+          }
+          .pdf-afk-btn {
+            width: 100% !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }

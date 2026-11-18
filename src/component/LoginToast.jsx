@@ -49,6 +49,7 @@ const LoginToast = () => {
 
   return (
     <div
+      className="login-toast-card"
       style={{
         position: 'fixed',
         top: '28px',
@@ -140,6 +141,15 @@ const LoginToast = () => {
           to {
             opacity: 1;
             transform: translateY(0) scale(1);
+          }
+        }
+        @media (max-width: 480px) {
+          .login-toast-card {
+            top: 14px !important;
+            right: 14px !important;
+            left: 14px !important;
+            max-width: calc(100vw - 28px) !important;
+            padding: 12px 14px !important;
           }
         }
       `}</style>

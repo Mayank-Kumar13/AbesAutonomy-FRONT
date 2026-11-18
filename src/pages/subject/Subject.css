@@ -223,20 +223,30 @@
   .download-all {
     font-size: 15px;
     margin-bottom: 25px;
+    width: 100%;
+    justify-content: center;
   }
 
   .units-grid {
     grid-template-columns: 1fr;
+    gap: 20px;
   }
 
   .unit-card {
-    min-height: 280px;
-    padding: 35px 20px;
+    min-height: 240px;
+    padding: 28px 16px;
+    border-radius: 12px;
+  }
+
+  .unit-download-btn {
+    width: 100%;
+    min-width: 0;
   }
 
   .file-icon {
-    width: 55px;
-    height: 55px;
+    width: 50px;
+    height: 50px;
+    margin-bottom: 18px;
   }
 
   .unit-card h2 {

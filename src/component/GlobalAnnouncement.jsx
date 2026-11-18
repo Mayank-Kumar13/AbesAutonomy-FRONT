@@ -90,31 +90,37 @@ const GlobalAnnouncement = () => {
   };
 
   return (
-    <div style={{
-      position: 'fixed',
-      bottom: '30px',
-      right: '30px',
-      zIndex: 9999,
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'flex-end',
-      fontFamily: 'Inter, system-ui, sans-serif'
-    }}>
+    <div 
+      className="global-announcement-root"
+      style={{
+        position: 'fixed',
+        bottom: '30px',
+        right: '30px',
+        zIndex: 9999,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'flex-end',
+        fontFamily: 'Inter, system-ui, sans-serif'
+      }}
+    >
       {isOpen && (
-        <div style={{
-          backgroundColor: 'rgba(15, 20, 27, 0.85)',
-          backdropFilter: 'blur(16px)',
-          WebkitBackdropFilter: 'blur(16px)',
-          border: '1px solid rgba(212, 163, 115, 0.3)',
-          borderRadius: '16px',
-          padding: '24px',
-          marginBottom: '16px',
-          maxWidth: '380px',
-          width: 'calc(100vw - 60px)', // For smaller screens
-          boxShadow: '0 20px 40px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255,255,255,0.05) inset',
-          color: '#f5f5f5',
-          animation: 'slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1)'
-        }}>
+        <div 
+          className="global-announcement-box"
+          style={{
+            backgroundColor: 'rgba(15, 20, 27, 0.85)',
+            backdropFilter: 'blur(16px)',
+            WebkitBackdropFilter: 'blur(16px)',
+            border: '1px solid rgba(212, 163, 115, 0.3)',
+            borderRadius: '16px',
+            padding: '24px',
+            marginBottom: '16px',
+            maxWidth: '380px',
+            width: 'calc(100vw - 60px)',
+            boxShadow: '0 20px 40px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255,255,255,0.05) inset',
+            color: '#f5f5f5',
+            animation: 'slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1)'
+          }}
+        >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <Bell size={18} color="#d4a373" className="bell-shake" />
@@ -268,6 +274,17 @@ const GlobalAnnouncement = () => {
         }
         div::-webkit-scrollbar-thumb:hover {
           background: rgba(212, 163, 115, 0.6);
+        }
+        @media (max-width: 480px) {
+          .global-announcement-root {
+            bottom: 16px !important;
+            right: 16px !important;
+          }
+          .global-announcement-box {
+            width: calc(100vw - 32px) !important;
+            max-width: calc(100vw - 32px) !important;
+            padding: 18px 14px !important;
+          }
         }
       `}</style>
     </div>

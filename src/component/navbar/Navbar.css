@@ -1,147 +1,203 @@
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-.navbar{
-    width:100%;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    background:#0d1117;
-    padding:18px 60px;
-    position:sticky;
-    top:0;
-    z-index:100;
-    
+.navbar {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #0d1117;
+    padding: 18px 60px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.logo-section{
-    display:flex;
-    align-items:center;
-    gap:18px;
+.logo-link {
+    text-decoration: none;
+    color: inherit;
+    display: inline-block;
+}
+
+.logo-section {
+    display: flex;
+    align-items: center;
+    gap: 16px;
 }
 
 .logo-section svg {
-    width: 70px;
-    height: 70px;
+    width: 65px;
+    height: 65px;
     transition: width 0.3s, height 0.3s;
+    flex-shrink: 0;
 }
 
-.abesname{
-    color:white;
-    font-size:40px;
-    font-weight:bold;
-     font-family: "montserrat";
+.abesname {
+    color: white;
+    font-size: 34px;
+    font-weight: bold;
+    font-family: "montserrat", -apple-system, BlinkMacSystemFont, sans-serif;
+    letter-spacing: -0.5px;
+    white-space: nowrap;
+    margin: 0;
 }
 
-.nav-right{
-    display:flex;
-    align-items:center;
-    gap:35px;
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 32px;
 }
 
-ul{
-    display:flex;
-    list-style:none;
-    gap:35px;
+.nav-links {
+    display: flex;
+    list-style: none;
+    gap: 28px;
+    align-items: center;
+    margin: 0;
+    padding: 0;
 }
 
-ul li a{
-    position:relative;
-    display:inline-block;
-    color:white;
-    text-decoration:none;
-    font-size:17px;
-    padding:10px 0;
-    transition:.3s;
+.nav-links li a {
+    position: relative;
+    display: inline-block;
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+    padding: 10px 0;
+    transition: 0.3s;
+    white-space: nowrap;
 }
 
-ul li a:hover{
-    color:#d4a373;
+.nav-links li a:hover {
+    color: #d4a373;
 }
 
-ul li a::after{
-    content:"";
-    position:absolute;
-    left:50%;
-    bottom:-14px;
-    transform:translateX(-50%);
-    width:0;
-    height:2px;
-    background:#d4a373;
-    border-radius:50px;
-    transition:.3s;
+.nav-links li a::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: -8px;
+    transform: translateX(-50%);
+    width: 0;
+    height: 2px;
+    background: #d4a373;
+    border-radius: 50px;
+    transition: 0.3s;
 }
 
-ul li a:hover::after{
-    width:42px;
+.nav-links li a:hover::after {
+    width: 36px;
 }
 
-ul li a.active{
-    color:white;
+.nav-links li a.active {
+    color: #d4a373;
 }
 
-ul li a.active::after{
-    width:42px;
+.nav-links li a.active::after {
+    width: 36px;
 }
 
-.sign-in{
-    color:#d4a373;
-    font-size:22px;
-    cursor:pointer;
-    transition:.3s;
-    border:1px solid #d4a373;
-    padding:5px 15px;
+.sign-in {
+    color: #d4a373;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.3s;
+    border: 1px solid #d4a373;
+    border-radius: 8px;
+    padding: 8px 18px;
+    font-weight: 600;
+    white-space: nowrap;
 }
 
-.sign-in:hover{
-    color:white;
+.sign-in:hover {
+    color: #0d1117;
+    background: #d4a373;
 }
 
-.profile{
-    color:#d4a373;
-    cursor:pointer;
-    font-size:45px;
-    margin-top:5px;
+.profile {
+    color: #d4a373;
+    cursor: pointer;
+    font-size: 32px;
+    display: flex;
+    align-items: center;
 }
 
 .mobile-toggle {
     display: none;
     cursor: pointer;
-    z-index: 101;
+    z-index: 102;
+    padding: 6px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.04);
 }
 
-@media (max-width: 900px) {
+.nav-backdrop {
+    display: none;
+}
+
+@media (max-width: 960px) {
     .navbar {
-        padding: 15px 30px;
-    }
-    .abesname {
-        font-size: 28px;
+        padding: 14px 24px;
     }
     
+    .abesname {
+        font-size: 24px;
+    }
+    
+    .logo-section {
+        gap: 12px;
+    }
+
     .logo-section svg {
-        width: 49px;
-        height: 49px;
+        width: 46px;
+        height: 46px;
     }
     
     .mobile-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .nav-backdrop {
         display: block;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.65);
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+        z-index: 99;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+    }
+
+    .nav-backdrop.active {
+        opacity: 1;
+        pointer-events: auto;
     }
 
     .nav-right {
         position: fixed;
         top: 0;
         right: -100%;
-        width: 250px;
+        width: min(300px, 85vw);
         height: 100vh;
+        height: 100dvh;
         background: #0d1117;
         flex-direction: column;
-        justify-content: center;
-        transition: right 0.3s ease;
-        z-index: 100;
-        border-left: 1px solid #333;
+        justify-content: flex-start;
+        align-items: stretch;
+        padding: 80px 24px 30px;
+        transition: right 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        z-index: 101;
+        border-left: 1px solid #232d3b;
+        box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
+        overflow-y: auto;
     }
 
     .nav-right.active {
@@ -150,17 +206,68 @@ ul li a.active::after{
 
     .nav-links {
         flex-direction: column;
-        gap: 20px;
-        align-items: center;
+        gap: 14px;
+        align-items: stretch;
+        width: 100%;
+    }
+
+    .nav-links li a {
+        font-size: 17px;
+        padding: 10px 12px;
+        border-radius: 8px;
+        display: block;
+        width: 100%;
+    }
+
+    .nav-links li a:hover,
+    .nav-links li a.active {
+        background: rgba(212, 163, 115, 0.1);
+    }
+
+    .nav-links li a::after {
+        display: none;
     }
 
     .nav-right .profile {
+        margin-top: 24px;
+        padding-top: 18px;
+        border-top: 1px solid #1f2937;
+        width: 100%;
+    }
+
+    .nav-right .sign-in {
+        width: 100%;
+        text-align: center;
         margin-top: 20px;
     }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 480px) {
     .navbar {
-        padding: 15px 15px;
+        padding: 12px 14px;
     }
-}
+
+    .logo-section {
+        gap: 10px;
+    }
+
+    .logo-section svg {
+        width: 38px;
+        height: 38px;
+    }
+
+    .abesname {
+        font-size: 19px;
+    }
+}
+
+@media (max-width: 360px) {
+    .abesname {
+        font-size: 17px;
+    }
+
+    .logo-section svg {
+        width: 34px;
+        height: 34px;
+    }
+}

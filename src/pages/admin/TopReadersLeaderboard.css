@@ -343,6 +343,7 @@
 
 .readers-table {
   width: 100%;
+  min-width: 650px;
   border-collapse: collapse;
   text-align: left;
 }
@@ -490,4 +491,25 @@
 .empty-readers-icon {
   margin-bottom: 1rem;
   color: #64748b;
+}
+
+@media (max-width: 768px) {
+  .readers-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  .reader-search-input {
+    width: 100%;
+  }
+  .readers-table-wrap {
+    margin: 0 -0.75rem;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+@media (max-width: 480px) {
+  .podium-card {
+    padding: 1.1rem 0.9rem;
+  }
 }

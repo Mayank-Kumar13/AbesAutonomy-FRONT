@@ -115,7 +115,7 @@ const ChooseSubject = () => {
     <div className="choose-subject-wrapper">
       <div className="choose-subject-container">
         <div className="header-section">
-          <div style={{ color: '#d4a373', marginBottom: '16px', fontSize: '13px', fontWeight: '600', letterSpacing: '1px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div style={{ color: '#d4a373', marginBottom: '16px', fontSize: '13px', fontWeight: '600', letterSpacing: '1px', display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
             <span style={{ cursor: 'pointer', transition: 'color 0.2s' }} onMouseEnter={(e) => e.target.style.color = '#fff'} onMouseLeave={(e) => e.target.style.color = '#d4a373'} onClick={() => navigate('/resources')}>RESOURCES</span>
             <span>/</span>
             <span style={{ color: '#fff' }}>{resourceTitle.toUpperCase()}</span>

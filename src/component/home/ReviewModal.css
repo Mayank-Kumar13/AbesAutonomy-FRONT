@@ -27,6 +27,9 @@
   padding: 2.5rem;
   width: 100%;
   max-width: 480px;
+  max-height: 90vh;
+  max-height: 90dvh;
+  overflow-y: auto;
   position: relative;
   animation: slideUp 0.3s ease;
 }

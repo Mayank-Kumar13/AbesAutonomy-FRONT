@@ -315,6 +315,7 @@ hr {
   width: 100%;
   border-collapse: collapse;
   font-size: 0.85rem;
+  min-width: 540px;
 }
 
 .prof-history-table th,
@@ -373,4 +374,40 @@ hr {
     font-size: 34px;
   }
 
+}
+
+@media (max-width: 480px) {
+  .profile-page {
+    padding: 24px 10px;
+  }
+
+  .profile-card {
+    padding: 16px 12px;
+    border-radius: 14px;
+  }
+
+  .page-title {
+    font-size: 26px;
+  }
+
+  .page-subtitle {
+    margin-bottom: 24px;
+    font-size: 13.5px;
+  }
+
+  .prof-membership-banner {
+    padding: 1rem;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .prof-action-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .input-box input {
+    height: 48px;
+    font-size: 14px;
+  }
 }

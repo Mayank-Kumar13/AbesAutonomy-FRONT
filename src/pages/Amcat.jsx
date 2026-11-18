@@ -6,12 +6,13 @@ const Amcat = () => {
     <div style={{ 
       width: '100%', 
       minHeight: '100vh', 
+      minHeight: '100dvh',
       display: 'flex', 
       flexDirection: 'column', 
       alignItems: 'center', 
       justifyContent: 'center',
       backgroundColor: '#090c10', 
-      padding: '40px 20px',
+      padding: 'clamp(24px, 5vw, 40px) clamp(16px, 4vw, 24px)',
       color: '#C5AC86',
       fontFamily: 'inherit'
     }}>
@@ -20,17 +21,17 @@ const Amcat = () => {
         alt="MVP Projects Poster" 
         style={{ 
           maxWidth: '100%', 
-          maxHeight: '70vh',
+          maxHeight: '65vh',
           height: 'auto', 
           borderRadius: '12px', 
           boxShadow: '0 8px 24px rgba(0, 0, 0, 0.6)', 
-          marginBottom: '40px' 
+          marginBottom: 'clamp(20px, 4vw, 40px)' 
         }} 
       />
       
-      <div style={{ textAlign: 'center', maxWidth: '600px' }}>
-        <h2 style={{ marginBottom: '15px', fontSize: '28px', fontWeight: 'bold' }}>Got An Amazing Project? Just Pitch It</h2>
-        <p style={{ fontSize: '18px', marginBottom: '30px', lineHeight: '1.6', color: '#e0cfa5' }}>
+      <div style={{ textAlign: 'center', maxWidth: '600px', width: '100%' }}>
+        <h2 style={{ marginBottom: '14px', fontSize: 'clamp(1.25rem, 5vw, 28px)', fontWeight: 'bold' }}>Got An Amazing Project? Just Pitch It</h2>
+        <p style={{ fontSize: 'clamp(0.95rem, 3.5vw, 18px)', marginBottom: '24px', lineHeight: '1.6', color: '#e0cfa5' }}>
           If you have an Amazing Project, just DM us! We are always looking for innovative student projects to feature and collaborate on.
         </p>
         
@@ -41,16 +42,18 @@ const Amcat = () => {
           style={{
             display: 'inline-flex',
             alignItems: 'center',
-            gap: '12px',
+            justifyContent: 'center',
+            gap: '10px',
             backgroundColor: '#C5AC86',
             color: '#090c10',
-            padding: '14px 28px',
+            padding: '12px clamp(20px, 4vw, 28px)',
             borderRadius: '50px',
             textDecoration: 'none',
             fontWeight: 'bold',
-            fontSize: '18px',
+            fontSize: 'clamp(0.95rem, 3.5vw, 17px)',
             transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-            boxShadow: '0 4px 12px rgba(197, 172, 134, 0.3)'
+            boxShadow: '0 4px 12px rgba(197, 172, 134, 0.3)',
+            maxWidth: '100%'
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.transform = 'translateY(-2px)';

@@ -126,8 +126,30 @@
 }
 
 @media (max-width: 600px) {
+  .choose-subject-wrapper {
+    padding: 2rem 1rem 3.5rem;
+  }
+  .header-section {
+    margin-bottom: 2.2rem;
+    gap: 1.25rem;
+  }
+  .page-title {
+    font-size: 1.85rem;
+  }
+  .page-subtitle {
+    font-size: 0.88rem;
+  }
+  .semester-buttons {
+    gap: 0.4rem;
+  }
+  .sem-btn {
+    padding: 0 0.75rem;
+    height: 36px;
+    font-size: 0.8rem;
+  }
   .subject-grid {
     grid-template-columns: 1fr;
+    gap: 1.2rem;
   }
 }
 

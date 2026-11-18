@@ -184,6 +184,7 @@
 
 .pm-table {
   width: 100%;
+  min-width: 600px;
   border-collapse: collapse;
   font-size: 0.86rem;
 }
@@ -351,4 +352,93 @@
 .pm-modal-btn.danger {
   background: #ef4444;
   color: #ffffff;
+}
+
+/* ═══════════════════════════════════════════════════════
+   RESPONSIVE
+   ═══════════════════════════════════════════════════════ */
+
+@media (max-width: 768px) {
+  .pm-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .pm-title {
+    font-size: 1.35rem;
+  }
+
+  .pm-nav {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+    width: 100%;
+    padding: 4px;
+  }
+
+  .pm-nav-btn {
+    flex: 0 0 auto;
+    padding: 7px 12px;
+    font-size: 0.82rem;
+  }
+
+  .pm-metrics-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .pm-box {
+    padding: 1.25rem 1rem;
+    border-radius: 12px;
+  }
+
+  .pm-box-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .pm-controls {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .pm-input,
+  .pm-select {
+    width: 100%;
+  }
+
+  .pm-table-wrap {
+    margin: 0 -1rem;
+    border-radius: 0;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+@media (max-width: 480px) {
+  .pm-metrics-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .pm-metric-card {
+    padding: 1rem 0.9rem;
+  }
+
+  .pm-metric-val {
+    font-size: 1.45rem;
+  }
+
+  .pm-modal-card {
+    padding: 1.25rem 1rem;
+  }
+
+  .pm-modal-actions {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .pm-modal-btn {
+    width: 100%;
+  }
 }

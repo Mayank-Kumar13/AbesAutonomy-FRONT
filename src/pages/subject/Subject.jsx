@@ -127,7 +127,7 @@ const Subject = () => {
   return (
     <main className="subject-page">
       <div className="subject-container">
-        <div style={{ color: '#d4a373', marginBottom: '24px', fontSize: '13px', fontWeight: '600', letterSpacing: '1px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <div style={{ color: '#d4a373', marginBottom: '24px', fontSize: '13px', fontWeight: '600', letterSpacing: '1px', display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
           <span style={{ cursor: 'pointer', transition: 'color 0.2s' }} onMouseEnter={(e) => e.target.style.color = '#fff'} onMouseLeave={(e) => e.target.style.color = '#d4a373'} onClick={() => navigate('/resources')}>RESOURCES</span>
           <span>/</span>
           <span style={{ cursor: 'pointer', transition: 'color 0.2s' }} onMouseEnter={(e) => e.target.style.color = '#fff'} onMouseLeave={(e) => e.target.style.color = '#d4a373'} onClick={() => navigate(-1)}>{resourceTitle.toUpperCase()}</span>

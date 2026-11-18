@@ -1,23 +1,15 @@
-body {
-    margin: 0;
-    padding: 0;
-    min-height: 100vh;
-    background-color: #0B0D10;
-    color: #F4F1EA;
-    font-family: "Poppins", sans-serif;
-    overflow-x: hidden;
-}
-.details{
+.details {
     text-align: center;
-    margin: 40px 0;
+    margin: 40px 15px;
 }
-.details h2{
-    font-size: 3rem;
+
+.details h2 {
+    font-size: clamp(2rem, 5vw, 3rem);
     margin-bottom: 10px;
     font-family: Georgia, "Times New Roman", serif;
 }
 
-.details p{
+.details p {
     font-size: 1.1rem;
     color: #888;
 }
@@ -29,21 +21,27 @@ body {
     gap: 30px;                 
     flex-wrap: wrap;
     margin-top: 40px;
+    padding: 0 15px;
 }
-#contributor-heading{
-    font-size: 30px;
+
+#contributor-heading,
+.contributor-heading {
+    font-size: clamp(1.4rem, 4vw, 30px);
     color: white;
-    margin-left:0px;
+    margin-left: 0;
     margin-top: 20px;
+    font-family: Georgia, serif;
 }
-#contributor-card{
+
+#contributor-card,
+.contributor-card-wrap {
     margin-top: 20px;
 }
 
 /* Contributor sections use the small ContributorCard, so they can sit
    closer together than the big team cards. */
 .contributors-grid {
-    gap: 14px;
+    gap: 16px;
 }
 
 @media (max-width: 768px) {
@@ -55,7 +53,22 @@ body {
         padding: 0 15px;
     }
     .credits-container {
-        flex-direction: column;
-        align-items: center;
+        gap: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .details {
+        margin: 25px 12px;
+    }
+    .details h2 {
+        font-size: 1.85rem;
+    }
+    .credits-container {
+        gap: 16px;
+        margin-top: 25px;
+    }
+    .contributors-grid {
+        gap: 12px;
     }
 }

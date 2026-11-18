@@ -187,9 +187,15 @@ const Navbar = () => {
         </div>
       </Link>
 
-      <div className="mobile-toggle" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
-        {mobileMenuOpen ? <HiX size={28} color="#C5AC86" /> : <HiMenu size={28} color="#C5AC86" />}
+      <div className="mobile-toggle" onClick={() => setMobileMenuOpen(!mobileMenuOpen)} aria-label="Toggle navigation menu">
+        {mobileMenuOpen ? <HiX size={26} color="#C5AC86" /> : <HiMenu size={26} color="#C5AC86" />}
       </div>
+
+      <div 
+        className={`nav-backdrop ${mobileMenuOpen ? "active" : ""}`}
+        onClick={() => setMobileMenuOpen(false)}
+        aria-hidden="true"
+      />
 
       <div className={`nav-right ${mobileMenuOpen ? "active" : ""}`}>
         <ul className="nav-links">

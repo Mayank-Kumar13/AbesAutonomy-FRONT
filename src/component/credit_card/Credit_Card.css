@@ -1,105 +1,139 @@
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-.credit-card{
-    width:100%;
-    max-width:300px;
-    height:500px;
-    position:relative;
-    overflow:hidden;
-    border-radius:28px;
-    background:#111;
-    border:3px solid #2c2c2c;
-    cursor:pointer;
-    transition:.4s;
-    margin-bottom:30px;
+.credit-card {
+    width: 100%;
+    max-width: 300px;
+    height: 500px;
+    position: relative;
+    overflow: hidden;
+    border-radius: 28px;
+    background: #111;
+    border: 3px solid #2c2c2c;
+    cursor: pointer;
+    transition: 0.4s;
+    margin-bottom: 30px;
 }
 
-.credit-card:hover{
-    transform:translateY(-8px);
-    box-shadow:0 25px 50px rgba(0,0,0,.35);
+.credit-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.35);
 }
 
-.credit-card img{
-    width:100%;
-    height:100%;
-    object-fit:cover;
-    transition:.5s;
+.credit-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: 0.5s;
 }
 
-.credit-card:hover img{
-    transform:scale(1.08);
+.credit-card:hover img {
+    transform: scale(1.08);
 }
 
-.overlay{
-    position:absolute;
-    inset:0;
-    background:linear-gradient(
+.overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
         to top,
-        rgba(0,0,0,.96) 0%,
-        rgba(0,0,0,.70) 30%,
-        rgba(0,0,0,.15) 75%,
+        rgba(0, 0, 0, 0.96) 0%,
+        rgba(0, 0, 0, 0.70) 30%,
+        rgba(0, 0, 0, 0.15) 75%,
         transparent
     );
 }
-.content{
-    position:absolute;
-    left:22px;
-    right:22px;
-    bottom:22px;
-    color:white;
-}
-.year{
-    display:inline-block;
-    padding:6px 14px;
-    border-radius:30px;
-    background:rgba(0, 0, 0, 0.737);
-    color:white;
-    font-weight:500;
-    backdrop-filter:blur(8px);
-    font-size:12px;
-    margin-bottom:14px;
-    letter-spacing:.5px;
-}
-.content h2{
-    font-size:30px;
-    margin-bottom:6px;
-    font-family:Georgia, serif;
+
+.content {
+    position: absolute;
+    left: 22px;
+    right: 22px;
+    bottom: 22px;
+    color: white;
 }
 
-.content h4{
-    color:#d9a441;
-    font-weight:500;
-    margin-bottom:16px;
-}
-.end{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-}
-
-.socials{
-    display:flex;
-    gap:50px;
+.year {
+    display: inline-block;
+    padding: 6px 14px;
+    border-radius: 30px;
+    background: rgba(0, 0, 0, 0.737);
+    color: white;
+    font-weight: 500;
+    backdrop-filter: blur(8px);
+    font-size: 12px;
+    margin-bottom: 14px;
+    letter-spacing: 0.5px;
 }
 
-.socials a{
-    width:42px;
-    height:42px;
-    border-radius:50%;
-    background:rgba(255,255,255,.10);
-    backdrop-filter:blur(10px);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    color:white;
-    text-decoration:none;
-    transition:.3s;
+.content h2 {
+    font-size: 28px;
+    margin-bottom: 6px;
+    font-family: Georgia, serif;
 }
-.socials a:hover{
-    background:#d9a441;
-    color:#111;
+
+.content h4 {
+    color: #d9a441;
+    font-weight: 500;
+    margin-bottom: 16px;
+}
+
+.end {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.socials {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+}
+
+.socials a {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.10);
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+.socials a:hover {
+    background: #d9a441;
+    color: #111;
+}
+
+@media (max-width: 480px) {
+    .credit-card {
+        max-width: 280px;
+        height: 440px;
+        border-radius: 20px;
+        margin-bottom: 20px;
+    }
+    .content {
+        left: 16px;
+        right: 16px;
+        bottom: 16px;
+    }
+    .content h2 {
+        font-size: 24px;
+    }
+    .content h4 {
+        margin-bottom: 12px;
+        font-size: 14px;
+    }
+    .socials {
+        gap: 12px;
+    }
+    .socials a {
+        width: 36px;
+        height: 36px;
+    }
 }

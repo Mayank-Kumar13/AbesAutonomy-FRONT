@@ -226,3 +226,33 @@ p{
     grid-template-columns: 1fr;
   }
 }
+
+@media (max-width: 480px) {
+  .hero_section {
+    padding: 20px 14px;
+  }
+  .resources-section {
+    padding: 25px 0 40px;
+  }
+  .resource-card {
+    min-height: auto;
+    padding: 24px 16px;
+  }
+  .resource-icon {
+    width: 74px;
+    height: 74px;
+    margin-bottom: 16px;
+  }
+  .resource-card h2 {
+    font-size: 19px;
+  }
+  .resource-card p {
+    font-size: 14px;
+    min-height: auto;
+    margin-bottom: 20px;
+  }
+  .explore-button {
+    width: 100%;
+    padding: 10px 20px;
+  }
+}
