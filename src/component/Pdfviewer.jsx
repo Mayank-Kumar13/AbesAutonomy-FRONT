@@ -28,10 +28,18 @@ export default function Pdfviewer({ file, isImageFlag, isDarkMode }) {
   }, [file]);
 
   const cleanFileUrl = activeFile ? activeFile.split('?')[0] : '';
-  const initialIsImage = isImageFlag || (activeFile ? /\.(png|jpe?g|webp|gif|bmp|jfif|heic)$/i.test(cleanFileUrl) : false);
-  const isPdf = activeFile ? /\.(pdf)$/i.test(cleanFileUrl) : true;
-  const isOffice = activeFile ? /\.(docx?|pptx?|xlsx?)$/i.test(cleanFileUrl) : false;
+  const isOffice = cleanFileUrl ? /\.(docx?|pptx?|xlsx?)$/i.test(cleanFileUrl) : false;
+  const isExplicitImage = cleanFileUrl ? /\.(png|jpe?g|webp|gif|bmp|jfif|heic)$/i.test(cleanFileUrl) : false;
+  
+  // A resource is a PDF if:
+  // - It has .pdf extension
+  // - Or its clean URL ends with /pdf (like /api/notes/:id/pdf)
+  // - Or it's neither an office doc nor an image (almost all notes on ABES Autonomy are PDFs)
+  const isPdf = activeFile
+    ? (/\.(pdf)$/i.test(cleanFileUrl) || /\/pdf$/i.test(cleanFileUrl) || (!isOffice && !isExplicitImage && !isImageFlag))
+    : true;
 
+  const initialIsImage = !isPdf && (isImageFlag || isExplicitImage);
   const [isImage, setIsImage] = useState(initialIsImage);
 
   const [fallbackUnavailable, setFallbackUnavailable] = useState(false);
@@ -99,12 +107,12 @@ export default function Pdfviewer({ file, isImageFlag, isDarkMode }) {
   }, [file, isUsingFallback, fallbackAttempted, triggerFallback]);
 
   useEffect(() => {
-    if (activeFile && !initialIsImage) {
+    if (activeFile && !initialIsImage && !isPdf && !isOffice) {
       const img = new Image();
       img.onload = () => setIsImage(true);
       img.src = activeFile;
     }
-  }, [activeFile, initialIsImage]);
+  }, [activeFile, initialIsImage, isPdf, isOffice]);
 
   if (!activeFile) {
     return <p style={{ textAlign: "center", padding: "20px" }}>Loading Document...</p>;
@@ -112,7 +120,11 @@ export default function Pdfviewer({ file, isImageFlag, isDarkMode }) {
 
   let viewerUrl = activeFile;
   if (isPdf && !isOffice) {
-    viewerUrl = `/pdfjs-6.1.200-dist/web/viewer.html?file=${encodeURIComponent(activeFile)}`;
+    let resolvedPdfUrl = activeFile;
+    if (typeof window !== 'undefined' && activeFile.startsWith('/')) {
+      resolvedPdfUrl = `${window.location.origin}${activeFile}`;
+    }
+    viewerUrl = `/pdfjs-6.1.200-dist/web/viewer.html?file=${encodeURIComponent(resolvedPdfUrl)}`;
   } else if (isOffice) {
     viewerUrl = `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(activeFile)}`;
   } else if (!isImage) {

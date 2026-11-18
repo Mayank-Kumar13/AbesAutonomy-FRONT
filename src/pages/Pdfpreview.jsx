@@ -229,10 +229,22 @@ export default function PdfPreview() {
     setShowActualReviewModal(true);
   };
 
-  const API_BASE = import.meta.env.VITE_API_URL || "/api";
+  const API_BASE = (import.meta.env.VITE_API_URL && import.meta.env.VITE_API_URL.includes("abes.work"))
+    ? "/api"
+    : (import.meta.env.VITE_API_URL || "/api");
+
+  const effectiveToken = token || localStorage.getItem("token") || "";
+
+  const appendToken = (url, authToken) => {
+    if (!url || !authToken) return url;
+    if (url.includes('token=')) return url;
+    const sep = url.includes('?') ? '&' : '?';
+    return `${url}${sep}token=${encodeURIComponent(authToken)}`;
+  };
+
   const viewerFileUrl = pdfUrl
-    ? (pdfUrl.startsWith('/api') && token ? `${pdfUrl}?token=${encodeURIComponent(token)}` : pdfUrl)
-    : (noteId ? `${API_BASE}/notes/${noteId}/pdf${token ? `?token=${encodeURIComponent(token)}` : ''}` : "");
+    ? (pdfUrl.startsWith('/api') ? appendToken(pdfUrl, effectiveToken) : pdfUrl)
+    : (noteId ? appendToken(`${API_BASE}/notes/${noteId}/pdf`, effectiveToken) : "");
 
   const [isDownloading, setIsDownloading] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
