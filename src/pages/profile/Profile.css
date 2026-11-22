@@ -6,7 +6,7 @@
   min-height: 100vh;
   background-color: var(--bg-canvas, #060709);
   color: var(--text-primary, #F5F5F7);
-  padding: 100px 20px 120px;
+  padding: 130px 20px 120px;
   font-family: var(--font-family-sans);
   position: relative;
 }

@@ -1,12 +1,18 @@
 import React, { useEffect, useRef } from 'react';
 
 const SCRIPT_ID = 'cloudflare-turnstile-script';
+const isLocalhost = typeof window !== 'undefined' && 
+  (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+
+// Cloudflare's official dummy sitekey for testing (Always passes): '1x00000000000000000000AA'
 const SITE_KEY =
-  import.meta.env.VITE_TURNSTILE_SITE_KEY ||
-  import.meta.env.TURNSTILE_SITE_KEY ||
-  import.meta.env.VITE_CLOUDFLARE_TURNSTILE_SITE_KEY ||
-  import.meta.env.VITE_CLOUDFLARE_SITE_KEY ||
-  '0x4AAAAAAFV46cLibwXLAuAN';
+  (isLocalhost && !import.meta.env.VITE_TURNSTILE_SITE_KEY)
+    ? '1x00000000000000000000AA'
+    : (import.meta.env.VITE_TURNSTILE_SITE_KEY ||
+       import.meta.env.TURNSTILE_SITE_KEY ||
+       import.meta.env.VITE_CLOUDFLARE_TURNSTILE_SITE_KEY ||
+       import.meta.env.VITE_CLOUDFLARE_SITE_KEY ||
+       '0x4AAAAAAFV46cLibwXLAuAN');
 
 export default function TurnstileWidget({ onVerify, onExpire, theme = 'dark' }) {
   const containerRef = useRef(null);
@@ -43,8 +49,12 @@ export default function TurnstileWidget({ onVerify, onExpire, theme = 'dark' }) 
               onExpireRef.current();
             }
           },
-          'error-callback': () => {
-            if (isMounted && onExpireRef.current) {
+          'error-callback': (code) => {
+            console.warn('Turnstile notification:', code);
+            // In local development, ensure developer is never blocked by external captcha server issues
+            if (isLocalhost && isMounted && onVerifyRef.current) {
+              onVerifyRef.current('dev-dummy-turnstile-token');
+            } else if (isMounted && onExpireRef.current) {
               onExpireRef.current();
             }
           },

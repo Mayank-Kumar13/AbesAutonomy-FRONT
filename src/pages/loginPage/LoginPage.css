@@ -51,20 +51,22 @@
   color: #FFFFFF;
 }
 
-/* ─── FROSTED GLASS AUTH CARD ─── */
+/* ─── FROSTED GLASS AUTH CARD (APPLE iOS 27 LIQUID GLASS) ─── */
 .modal-container {
   position: relative;
   z-index: 10;
   width: 100%;
   max-width: 420px;
-  background: rgba(14, 17, 24, 0.88);
-  backdrop-filter: blur(36px) saturate(180%);
-  -webkit-backdrop-filter: blur(36px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.10);
-  border-radius: var(--radius-xl, 26px);
+  background: rgba(12, 15, 22, 0.88);
+  backdrop-filter: blur(40px) saturate(190%) contrast(102%);
+  -webkit-backdrop-filter: blur(40px) saturate(190%) contrast(102%);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: var(--radius-xl, 28px);
   box-shadow: 
-    0 28px 70px -10px rgba(0, 0, 0, 0.85),
-    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+    0 0 0 1px rgba(0, 0, 0, 0.75),
+    0 32px 80px -16px rgba(0, 0, 0, 0.90),
+    inset 0 1px 0.5px rgba(255, 255, 255, 0.28),
+    inset 0 -1px 0.5px rgba(0, 0, 0, 0.45);
   overflow: hidden;
 }
 
@@ -209,68 +211,119 @@
 }
 
 /* ─── OAUTH DIVIDER & BUTTONS ─── */
-.oauth-divider {
+.divider {
   display: flex;
   align-items: center;
   margin: 1.5rem 0 1.25rem;
   color: var(--text-tertiary, #6E6E73);
-  font-size: 0.8rem;
-  font-weight: 500;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
 }
 
-.oauth-divider::before,
-.oauth-divider::after {
+.divider::before,
+.divider::after {
   content: '';
   flex: 1;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.oauth-divider span {
-  padding: 0 0.85rem;
+.divider::before {
+  margin-right: 12px;
 }
 
-.oauth-buttons {
-  display: flex;
-  gap: 10px;
+.divider::after {
+  margin-left: 12px;
 }
 
-.oauth-btn {
-  flex: 1;
+/* OAuth Buttons (Google & GitHub) */
+.google-btn {
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 10px;
+  gap: 10px;
+  padding: 11px 20px;
   background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.09);
+  border: 1px solid rgba(255, 255, 255, 0.10);
   border-radius: var(--radius-pill, 9999px);
   color: var(--text-primary, #F5F5F7);
   font-family: var(--font-family-sans);
-  font-size: 0.85rem;
+  font-size: 0.88rem;
   font-weight: 550;
   cursor: pointer;
-  transition: all var(--duration-fast, 160ms) ease;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 
+    0 0 0 1px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    0 4px 12px rgba(0, 0, 0, 0.3);
+  transition: all var(--duration-fast, 160ms) var(--ease-apple);
   text-decoration: none;
 }
 
-.oauth-btn:hover {
-  background: rgba(255, 255, 255, 0.09);
-  border-color: rgba(255, 255, 255, 0.2);
+.google-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.22);
   color: #FFFFFF;
   transform: translateY(-1px);
+  box-shadow: 
+    0 0 0 1px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.20),
+    0 8px 20px rgba(0, 0, 0, 0.45);
 }
 
-.forgot-password-link {
-  text-align: right;
-  font-size: 0.8rem;
+.google-btn:active {
+  transform: translateY(0.5px);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.google-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+/* Footer Links & Text */
+.modal-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-top: 1.5rem;
+  text-align: center;
+}
+
+.forgot-link {
+  font-size: 0.84rem;
   color: var(--brand-gold, #C5AC86);
   text-decoration: none;
-  margin-top: -0.25rem;
+  font-weight: 500;
   transition: color 0.15s ease;
 }
 
-.forgot-password-link:hover {
+.forgot-link:hover {
   color: #FFFFFF;
+  text-decoration: underline;
+}
+
+.create-account {
+  margin: 0;
+  font-size: 0.84rem;
+  color: var(--text-secondary, #A1A1A6);
+}
+
+.create-account span {
+  color: #FFFFFF;
+  font-weight: 600;
+  cursor: pointer;
+  margin-left: 4px;
+  transition: color 0.15s ease;
+}
+
+.create-account span:hover {
+  color: var(--brand-gold, #C5AC86);
 }
 
 .error-message {

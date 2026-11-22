@@ -8,7 +8,7 @@
   background-color: var(--bg-canvas, #060709);
   color: var(--text-primary, #F5F5F7);
   font-family: var(--font-family-sans);
-  padding: 100px 24px 120px;
+  padding: 130px 24px 120px;
   position: relative;
   overflow: hidden;
 }
@@ -280,27 +280,43 @@
   color: #FFFFFF;
 }
 
-/* ─── COMPARISON & FAQ ─── */
+/* ─── COMPARISON & FAQ SECTIONS ─── */
 .prem-comparison-section,
 .prem-faq-section {
-  margin-top: 80px;
+  margin-top: 96px;
 }
 
-.prem-section-heading {
+.prem-section-header {
   text-align: center;
-  font-size: 28px;
+  margin-bottom: 40px;
+}
+
+.prem-section-title {
+  font-size: clamp(26px, 3.5vw, 36px);
   font-weight: 700;
   color: #FFFFFF;
-  margin: 0 0 36px 0;
-  letter-spacing: -0.02em;
+  margin: 0 0 10px 0;
+  letter-spacing: -0.03em;
 }
 
+.prem-section-sub {
+  font-size: 15px;
+  color: var(--text-secondary, #A1A1A6);
+  margin: 0;
+}
+
+/* ─── COMPARISON TABLE WRAPPER (APPLE FROSTED GLASS) ─── */
 .prem-comparison-table-wrap {
   border-radius: var(--radius-xl, 24px);
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(14, 17, 24, 0.65);
-  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(12, 15, 22, 0.85);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  box-shadow: 
+    0 0 0 1px rgba(0, 0, 0, 0.65),
+    0 20px 48px -10px rgba(0, 0, 0, 0.75),
+    inset 0 1px 0.5px rgba(255, 255, 255, 0.22);
 }
 
 .prem-table {
@@ -310,56 +326,153 @@
 
 .prem-table th,
 .prem-table td {
-  padding: 16px 20px;
+  padding: 18px 24px;
   text-align: left;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  font-size: 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  font-size: 14.5px;
 }
 
 .prem-table th {
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(255, 255, 255, 0.04);
   font-weight: 600;
   color: #FFFFFF;
+  letter-spacing: -0.01em;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
+.prem-table tbody tr {
+  transition: background var(--duration-fast, 160ms) ease;
+}
+
+.prem-table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.prem-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Status Badges */
+.prem-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: var(--radius-pill, 9999px);
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.prem-status-pill.success {
+  background: rgba(48, 209, 88, 0.12);
+  border: 1px solid rgba(48, 209, 88, 0.28);
+  color: #30D158;
+}
+
+.prem-status-pill.gold {
+  background: rgba(197, 172, 134, 0.14);
+  border: 1px solid rgba(197, 172, 134, 0.30);
+  color: var(--brand-gold, #C5AC86);
+}
+
+.prem-status-pill.locked {
+  background: rgba(255, 69, 58, 0.12);
+  border: 1px solid rgba(255, 69, 58, 0.25);
+  color: #FF453A;
+}
+
+.prem-status-text {
+  color: var(--text-secondary, #A1A1A6);
+  font-size: 14px;
+}
+
+/* ─── FAQ ACCORDION GRID (APPLE CLEAR GLASS) ─── */
 .prem-faq-grid {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  max-width: 800px;
+  gap: 14px;
+  max-width: 820px;
   margin: 0 auto;
 }
 
 .prem-faq-item {
-  border-radius: var(--radius-md, 16px);
+  border-radius: var(--radius-lg, 20px);
   overflow: hidden;
-  background: rgba(14, 17, 24, 0.65);
+  background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(16px);
-  transition: all 0.2s ease;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 
+    0 0 0 1px rgba(0, 0, 0, 0.4),
+    0 4px 16px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  transition: all var(--duration-normal, 260ms) var(--ease-apple);
 }
 
-.prem-faq-q {
-  padding: 18px 22px;
+.prem-faq-item:hover,
+.prem-faq-item.is-open {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow: 
+    0 0 0 1px rgba(0, 0, 0, 0.5),
+    0 8px 24px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.prem-faq-question {
+  width: 100%;
+  padding: 20px 24px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  background: transparent;
+  border: none;
   cursor: pointer;
+  font-family: var(--font-family-sans);
   font-weight: 600;
-  font-size: 15px;
+  font-size: 16px;
   color: #FFFFFF;
+  text-align: left;
+  letter-spacing: -0.01em;
+  transition: color var(--duration-fast, 160ms) ease;
 }
 
-.prem-faq-a {
-  padding: 0 22px 18px;
-  font-size: 14px;
-  line-height: 1.6;
+.prem-faq-question:hover {
+  color: var(--brand-gold, #C5AC86);
+}
+
+.faq-chevron {
+  color: var(--brand-gold, #C5AC86);
+  flex-shrink: 0;
+  transition: transform var(--duration-fast, 160ms) var(--ease-apple);
+}
+
+.prem-faq-answer {
+  padding: 0 24px 22px;
+  font-size: 14.5px;
+  line-height: 1.65;
   color: var(--text-secondary, #A1A1A6);
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  margin-top: -4px;
+  padding-top: 14px;
 }
 
 /* ─── RESPONSIVE ─── */
 @media (max-width: 800px) {
+  .prem-page {
+    padding: 105px 16px 80px;
+  }
+
   .prem-pricing-grid {
     grid-template-columns: 1fr;
+  }
+
+  .prem-table th,
+  .prem-table td {
+    padding: 14px 16px;
+    font-size: 13.5px;
   }
 }

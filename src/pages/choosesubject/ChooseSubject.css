@@ -7,7 +7,7 @@
   min-height: 100vh;
   background-color: var(--bg-canvas, #060709);
   color: var(--text-primary, #F5F5F7);
-  padding: 100px 24px 120px;
+  padding: 130px 24px 120px;
   font-family: var(--font-family-sans);
   overflow-x: hidden;
 }
@@ -276,7 +276,7 @@
 
 @media (max-width: 580px) {
   .choose-subject-wrapper {
-    padding: 85px 16px 80px;
+    padding: 105px 16px 80px;
   }
 
   .subject-grid {

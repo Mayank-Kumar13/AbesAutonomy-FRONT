@@ -7,7 +7,7 @@
   min-height: 100vh;
   background-color: var(--bg-canvas, #060709);
   color: var(--text-primary, #F5F5F7);
-  padding: 100px 24px 120px;
+  padding: 130px 24px 120px;
   overflow-x: hidden;
   font-family: var(--font-family-sans);
 }
@@ -208,10 +208,14 @@
 }
 
 .resource-glass-card:hover .card-explore-btn {
-  color: #0A0C10;
-  background: #F5F5F7;
-  border-color: rgba(255, 255, 255, 0.9);
-  box-shadow: 0 4px 14px rgba(255, 255, 255, 0.2);
+  color: #08090C !important;
+  background: #FFFFFF;
+  border-color: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 4px 14px rgba(255, 255, 255, 0.25);
+}
+
+.resource-glass-card:hover .card-explore-btn * {
+  color: #08090C !important;
 }
 
 .resource-glass-card:hover .explore-arrow {
@@ -228,7 +232,7 @@
 
 @media (max-width: 640px) {
   .resources-page-wrapper {
-    padding: 85px 16px 80px;
+    padding: 105px 16px 80px;
   }
 
   .resources-glass-grid {

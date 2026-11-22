@@ -14,7 +14,7 @@
   min-height: 100vh;
 }
 
-.autonomy-home a {
+.autonomy-home a:not(.glass-btn-primary):not(.glass-btn-secondary):not(.glass-btn-gold):not(.nav-signin-pill):not(.home-cta-btn):not(.home-sec-btn) {
   color: inherit;
   text-decoration: none;
 }
@@ -338,11 +338,22 @@
   padding: 13px 30px;
   font-size: 15.5px;
   font-weight: 600;
+  color: #08090C !important;
+}
+
+.home-cta-btn span,
+.home-cta-btn svg {
+  color: #08090C !important;
 }
 
 .home-sec-btn {
   padding: 13px 26px;
   font-size: 15.5px;
+  color: var(--text-primary, #F5F5F7) !important;
+}
+
+.home-sec-btn span {
+  color: var(--text-primary, #F5F5F7) !important;
 }
 
 /* ─── FOOTER LINK ─── */

@@ -239,68 +239,85 @@ export default function PremiumPage() {
 
         {/* Comparison Table */}
         <section className="prem-comparison-section">
-          <h2 className="prem-section-title">Plan Comparison</h2>
-          <p className="prem-section-sub">Transparent access control designed for students</p>
+          <div className="prem-section-header">
+            <h2 className="prem-section-title">Plan Comparison</h2>
+            <p className="prem-section-sub">Transparent access control designed for students</p>
+          </div>
 
-          <table className="prem-table">
-            <thead>
-              <tr>
-                <th>Feature / Resource</th>
-                <th>Free Student</th>
-                <th>Premium Member</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Previous Year Questions (PYQs)</td>
-                <td><span style={{ color: '#4ade80', fontWeight: 600 }}>Unlimited Free Forever</span></td>
-                <td><span style={{ color: '#4ade80', fontWeight: 600 }}>Unlimited Free Forever</span></td>
-              </tr>
-              <tr>
-                <td>Theory & Subject Notes</td>
-                <td>5 Free Document Accesses</td>
-                <td><span style={{ color: '#C5AC86', fontWeight: 600 }}>Unlimited Access</span></td>
-              </tr>
-              <tr>
-                <td>Question Banks & Assignments</td>
-                <td>5 Free Document Accesses</td>
-                <td><span style={{ color: '#C5AC86', fontWeight: 600 }}>Unlimited Access</span></td>
-              </tr>
-              <tr>
-                <td>AI Study Assistant</td>
-                <td><span style={{ color: '#f87171' }}>Locked</span></td>
-                <td><span style={{ color: '#C5AC86', fontWeight: 600 }}>Included (Unlimited)</span></td>
-              </tr>
-              <tr>
-                <td>Dynamic Watermarked Downloads</td>
-                <td>Free allowance only</td>
-                <td><span style={{ color: '#C5AC86', fontWeight: 600 }}>Unlimited</span></td>
-              </tr>
-              <tr>
-                <td>Student Profile Badge</td>
-                <td>Free Member</td>
-                <td><span style={{ color: '#C5AC86', fontWeight: 600 }}>★ Premium Badge</span></td>
-              </tr>
-            </tbody>
-          </table>
+          <div className="prem-comparison-table-wrap glass-frosted">
+            <table className="prem-table">
+              <thead>
+                <tr>
+                  <th>Feature / Resource</th>
+                  <th>Free Student</th>
+                  <th>Premium Member</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Previous Year Questions (PYQs)</td>
+                  <td><span className="prem-status-pill success">Unlimited Free Forever</span></td>
+                  <td><span className="prem-status-pill success">Unlimited Free Forever</span></td>
+                </tr>
+                <tr>
+                  <td>Theory & Subject Notes</td>
+                  <td><span className="prem-status-text">5 Free Document Accesses</span></td>
+                  <td><span className="prem-status-pill gold">Unlimited Access</span></td>
+                </tr>
+                <tr>
+                  <td>Question Banks & Assignments</td>
+                  <td><span className="prem-status-text">5 Free Document Accesses</span></td>
+                  <td><span className="prem-status-pill gold">Unlimited Access</span></td>
+                </tr>
+                <tr>
+                  <td>AI Study Assistant</td>
+                  <td><span className="prem-status-pill locked">Locked</span></td>
+                  <td><span className="prem-status-pill gold">Included (Unlimited)</span></td>
+                </tr>
+                <tr>
+                  <td>Dynamic Watermarked Downloads</td>
+                  <td><span className="prem-status-text">Free allowance only</span></td>
+                  <td><span className="prem-status-pill gold">Unlimited</span></td>
+                </tr>
+                <tr>
+                  <td>Student Profile Badge</td>
+                  <td><span className="prem-status-text">Free Member</span></td>
+                  <td><span className="prem-status-pill gold">★ Premium Badge</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </section>
 
         {/* FAQs */}
         <section className="prem-faq-section">
-          <h2 className="prem-section-title">Frequently Asked Questions</h2>
-          <p className="prem-section-sub">Everything you need to know about ABES Autonomy Premium</p>
+          <div className="prem-section-header">
+            <h2 className="prem-section-title">Frequently Asked Questions</h2>
+            <p className="prem-section-sub">Everything you need to know about ABES Autonomy Premium</p>
+          </div>
 
-          {faqs.map((faq, idx) => (
-            <div key={idx} className="prem-faq-item">
-              <div className="prem-faq-question" onClick={() => toggleFaq(idx)}>
-                <span>{faq.q}</span>
-                {openFaq === idx ? <ChevronUp size={18} color="#C5AC86" /> : <ChevronDown size={18} color="#94a3b8" />}
+          <div className="prem-faq-grid">
+            {faqs.map((faq, idx) => (
+              <div key={idx} className={`prem-faq-item glass-clear ${openFaq === idx ? 'is-open' : ''}`}>
+                <button 
+                  type="button"
+                  className="prem-faq-question" 
+                  onClick={() => toggleFaq(idx)}
+                  aria-expanded={openFaq === idx}
+                >
+                  <span>{faq.q}</span>
+                  {openFaq === idx ? (
+                    <ChevronUp size={18} className="faq-chevron" />
+                  ) : (
+                    <ChevronDown size={18} className="faq-chevron" />
+                  )}
+                </button>
+                {openFaq === idx && (
+                  <div className="prem-faq-answer anim-fade-in">{faq.a}</div>
+                )}
               </div>
-              {openFaq === idx && (
-                <div className="prem-faq-answer">{faq.a}</div>
-              )}
-            </div>
-          ))}
+            ))}
+          </div>
         </section>
 
         {/* Trust & Security Footer */}

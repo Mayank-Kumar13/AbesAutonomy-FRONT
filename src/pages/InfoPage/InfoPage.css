@@ -6,7 +6,7 @@
 .info-page-wrapper {
   background-color: var(--bg-canvas, #060709);
   min-height: 100vh;
-  padding: 100px 1.5rem 120px;
+  padding: 130px 1.5rem 120px;
   font-family: var(--font-family-sans);
   color: var(--text-primary, #F5F5F7);
   position: relative;
