@@ -21,17 +21,17 @@
 }
 
 .analytics-select, .analytics-input {
-  background: #0b0d10;
-  color: #e2e8f0;
-  border: 1px solid #2d3748;
+  background: rgba(255, 255, 255, 0.04);
+  color: #FFFFFF;
+  border: 1px solid rgba(255, 255, 255, 0.09);
   padding: 0.5rem 1rem;
-  border-radius: 8px;
+  border-radius: var(--radius-sm, 10px);
   outline: none;
   font-size: 0.9rem;
 }
 
 .analytics-select:focus, .analytics-input:focus {
-  border-color: #4ade80;
+  border-color: rgba(255, 255, 255, 0.28);
 }
 
 .analytics-cards {
@@ -41,13 +41,15 @@
 }
 
 .analytics-card {
-  background: #111827;
-  border: 1px solid #1f2937;
-  border-radius: 12px;
+  background: rgba(14, 17, 24, 0.72);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-md, 16px);
   padding: 1.5rem;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.12);
 }
 
 .analytics-card-title {

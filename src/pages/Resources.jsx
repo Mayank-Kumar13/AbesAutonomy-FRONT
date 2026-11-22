@@ -1,19 +1,18 @@
 import React from "react";
 import "./Resources.css";
-import { Search } from "lucide-react";
-import { useState } from "react";
 import {
   FileText,
   ClipboardList,
   FlaskConical,
   CircleHelp,
   Notebook,
-  BookOpen
+  BookOpen,
+  ArrowRight,
+  Sparkles
 } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
-import { notesApi } from "../services/api";
+import { Link } from "react-router-dom";
 
-// Map frontend card IDs to backend resourceType values
+// Map frontend card IDs to backend resourceType values (Must remain exact)
 const RESOURCE_TYPE_MAP = {
   1: "theory",
   2: "assignment",
@@ -23,201 +22,114 @@ const RESOURCE_TYPE_MAP = {
   6: "syllabus",
 };
 
-const Resources = () => {
-  const [selectedYear, setSelectedYear] = useState(1);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [searchResults, setSearchResults] = useState(null);
-  const [searching, setSearching] = useState(false);
-  const navigate = useNavigate();
-
-  const resourceCards = [
+const resourceCards = [
   {
     id: 1,
     title: "THEORY NOTES",
-    description: "Academic notes & lecture slides",
+    description: "Verified academic notes, unit-wise modules, and faculty lecture presentations.",
     icon: FileText,
+    badge: "Core Curriculum",
   },
   {
     id: 5,
     title: "HANDWRITTEN NOTES",
-    description: "Handwritten notes by Topper Students",
+    description: "High-yield, handwritten notes contributed by semester toppers for intuitive learning.",
     icon: Notebook,
+    badge: "Topper Curated",
   },
   {
     id: 6,
     title: "SYLLABUS",
-    description: "Course syllabus & curriculum",
+    description: "Official branch-wise academic syllabus, course structure, and mark distributions.",
     icon: BookOpen,
+    badge: "Official",
   },
   {
     id: 4,
-    title: "PYQ QUESTION",
-    description: "Previous year exam papers",
+    title: "PYQ PAPERS",
+    description: "Previous year semester examination papers with question pattern analysis.",
     icon: CircleHelp,
+    badge: "Exam Prep",
   },
   {
     id: 2,
     title: "ASSIGNMENTS",
-    description: "Problem sets & projects",
+    description: "Structured problem sets, tutorial sheets, and lab assignment guidelines.",
     icon: ClipboardList,
+    badge: "Practice",
   },
   {
     id: 3,
     title: "QUESTION BANKS",
-    description: "Comprehensive question banks",
+    description: "Exhaustive question banks covering frequent exam topics and numerical problems.",
     icon: FlaskConical,
+    badge: "Revision",
   },
 ];
 
-  const handleSearch = async (e) => {
-    e.preventDefault();
-    if (!searchQuery.trim() || searchQuery.trim().length < 2) return;
-
-    setSearching(true);
-    try {
-      const result = await notesApi.search(searchQuery.trim());
-      setSearchResults(result);
-    } catch (err) {
-      console.error("Search failed:", err);
-      setSearchResults({ data: [], pagination: { total: 0 } });
-    } finally {
-      setSearching(false);
-    }
-  };
-
-  const handleSearchKeyDown = (e) => {
-    if (e.key === "Enter") {
-      handleSearch(e);
-    }
-  };
-
+const Resources = () => {
   return (
-    <div className="main">
+    <div className="resources-page-wrapper">
+      <div className="resources-ambient-light" aria-hidden="true" />
+      
+      <div className="resources-content-container">
+        {/* Header Section */}
+        <header className="resources-header anim-slide-up">
+          <div className="resources-tag-pill">
+            <Sparkles size={13} className="tag-icon" />
+            <span>ACADEMIC ARCHIVE</span>
+          </div>
+          <h1 className="resources-title">
+            Academic Resources
+          </h1>
+          <p className="resources-subtitle">
+            Select a learning category below to discover organized, branch-specific notes, syllabus guides,
+            and preparation papers designed for ABES Engineering College students.
+          </p>
+        </header>
 
-      <div className="hero_section">
-        <h1>RESOURCES</h1>
+        {/* 6 Liquid Glass Category Cards Grid */}
+        <section className="resources-grid-section" aria-label="Resource Categories">
+          <div className="resources-glass-grid">
+            {resourceCards.map((card) => {
+              const Icon = card.icon;
 
-        <p>
-          Your one-stop destination for academic materials, notes, labs,
-          <br />
-          assignments, and previous year papers.
-        </p>
+              return (
+                <Link
+                  to="/ChooseSubject"
+                  state={{
+                    resourceType: RESOURCE_TYPE_MAP[card.id],
+                    resourceTitle: card.title,
+                  }}
+                  className="resource-card-link"
+                  key={card.id}
+                >
+                  <article className="resource-glass-card glass-clear">
+                    <div className="card-top-row">
+                      <div className="resource-icon-bubble">
+                        <Icon size={26} strokeWidth={1.6} />
+                      </div>
+                      <span className="resource-category-badge">{card.badge}</span>
+                    </div>
+
+                    <div className="card-body">
+                      <h2 className="resource-card-title">{card.title}</h2>
+                      <p className="resource-card-desc">{card.description}</p>
+                    </div>
+
+                    <div className="card-action-row">
+                      <span className="card-explore-btn">
+                        <span>Explore</span>
+                        <ArrowRight size={15} className="explore-arrow" />
+                      </span>
+                    </div>
+                  </article>
+                </Link>
+              );
+            })}
+          </div>
+        </section>
       </div>
-
-      {/* <section className="search-section">
-
-        <div className="search-box">
-          <Search className="search-icon" size={22} />
-
-          <input
-            type="text"
-            placeholder="Search for subjects, courses, notes, PYQs..."
-            value={searchQuery}
-            onChange={(e) => {
-              setSearchQuery(e.target.value);
-              if (!e.target.value.trim()) setSearchResults(null);
-            }}
-            onKeyDown={handleSearchKeyDown}
-          />
-        </div>
-
-        {/* Search results 
-        {searching && (
-          <p style={{ color: "#d4a373", marginTop: "20px" }}>Searching...</p>
-        )}
-        {searchResults && !searching && (
-          <div style={{ width: "60%", marginTop: "20px" }}>
-            <p style={{ color: "#888", marginBottom: "10px" }}>
-              {searchResults.pagination?.total || 0} result(s) found
-            </p>
-            {searchResults.data?.map((note) => (
-              <div
-                key={note._id}
-                onClick={() => {
-                  const isImg = note.pdfUrl ? /\.(png|jpe?g|webp)$/i.test(note.pdfUrl.split('?')[0]) : false;
-                  navigate("/pdfpreview", {
-                    state: { pdfUrl: note.pdfUrl, title: note.title, noteId: note._id, subject: note.subject, isImage: isImg },
-                  });
-                }}
-                style={{
-                  padding: "12px 16px",
-                  marginBottom: "8px",
-                  background: "#11161d",
-                  border: "1px solid #222d38",
-                  borderRadius: "8px",
-                  cursor: "pointer",
-                  transition: "border-color 0.3s",
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.borderColor = "#d4a373")}
-                onMouseLeave={(e) => (e.currentTarget.style.borderColor = "#222d38")}
-              >
-                <strong style={{ color: "#f5f5f5" }}>{note.title}</strong>
-                <p style={{ color: "#888", fontSize: "13px", margin: "4px 0 0" }}>
-                  {note.subject} · {note.branch} · Year {note.year} · {note.resourceType}
-                </p>
-              </div>
-            ))}
-          </div>
-        )}
-      </section> */}
-
-      {/* <div className="year-selector">
-
-  <span className="year-label">
-    YEAR
-  </span>
-
-  {[1, 2, 3, 4].map((year) => (
-    <button
-      key={year}
-      className={`year-button ${
-        selectedYear === year ? "active" : ""
-      }`}
-      onClick={() => setSelectedYear(year)}
-    >
-      {year}
-    </button>
-  ))}
-
-</div> */}
-<section className="resources-section">
-
-  <div className="resources-grid">
-
-    {resourceCards.map((card) => {
-
-      const Icon = card.icon;
-
-      return (
-        <Link
-          to="/ChooseSubject"
-          state={{
-            resourceType: RESOURCE_TYPE_MAP[card.id],
-            resourceTitle: card.title,
-          }}
-          style={{ textDecoration: 'none', color: 'inherit' }}
-          key={card.id}
-        >
-        <div className="resource-card" key={card.id}>
-          <div className="resource-icon">
-            <Icon size={42} strokeWidth={1.5} />
-          </div>
-          <h2>{card.title}</h2>
-          <p>{card.description}</p>
-          <button className="explore-button">
-            Explore
-            <span>→</span>
-          </button>
-        </div>
-        </Link>
-      );
-
-    })}
-
-  </div>
-
-</section>
-
     </div>
   );
 };

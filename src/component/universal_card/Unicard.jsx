@@ -1,22 +1,26 @@
 import React from "react";
 import "./Unicard.css";
 
-const Unicard = (props) => {
+const Unicard = ({ icon, heading, para, btnn }) => {
   return (
-    <div className="card">
-
-      <div className="logo">
-        {props.icon}
+    <article className="unicard-root card glass-clear">
+      <div className="unicard-specular" aria-hidden="true" />
+      
+      <div className="unicard-icon-wrap logo">
+        {icon}
       </div>
 
-      <h2 className="heading">{props.heading}</h2>
+      <div className="unicard-content">
+        <h2 className="unicard-heading heading">{heading}</h2>
+        <p className="unicard-para para">{para}</p>
+      </div>
 
-      <p className="para">{props.para}</p>
-
-      <button className="btnn">
-        {props.btnn}
-      </button>
-    </div>
+      <div className="unicard-footer">
+        <span className="unicard-btn btnn">
+          {btnn}
+        </span>
+      </div>
+    </article>
   );
 };
 

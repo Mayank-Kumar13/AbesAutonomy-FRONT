@@ -13,7 +13,6 @@ const LoginToast = () => {
   };
 
   useEffect(() => {
-    // Check if user just logged in via sessionStorage
     const flag = sessionStorage.getItem('just_logged_in');
     const storedName = sessionStorage.getItem('just_logged_in_name');
     if (flag) {
@@ -25,7 +24,6 @@ const LoginToast = () => {
       setVisible(true);
     }
 
-    // Custom event listener so any flow can trigger it programmatically
     const handleLoginEvent = (e) => {
       showToast(e?.detail?.name || '');
     };
@@ -48,109 +46,74 @@ const LoginToast = () => {
   if (!visible) return null;
 
   return (
-    <div
-      className="login-toast-card"
-      style={{
-        position: 'fixed',
-        top: '28px',
-        right: '28px',
-        zIndex: 10000,
-        display: 'flex',
-        alignItems: 'center',
-        gap: '14px',
-        backgroundColor: 'rgba(15, 20, 28, 0.94)',
-        backdropFilter: 'blur(16px)',
-        WebkitBackdropFilter: 'blur(16px)',
-        border: '1px solid rgba(74, 222, 128, 0.4)',
-        boxShadow: '0 16px 40px rgba(0, 0, 0, 0.6), 0 0 25px rgba(34, 197, 94, 0.25)',
-        borderRadius: '14px',
-        padding: '16px 20px',
-        color: '#f8fafc',
-        fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
-        maxWidth: '400px',
-        animation: 'loginToastSlideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
-      }}
+    <div 
+      className="login-toast-island glass-frosted anim-slide-up"
+      role="status"
+      aria-live="polite"
     >
-      <div
-        style={{
-          width: '38px',
-          height: '38px',
-          borderRadius: '50%',
-          backgroundColor: 'rgba(34, 197, 94, 0.15)',
-          border: '1px solid rgba(74, 222, 128, 0.4)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          color: '#4ade80',
-          flexShrink: 0,
-        }}
-      >
-        <CheckCircle2 size={22} />
+      <div className="toast-content-wrap">
+        <CheckCircle2 size={18} className="toast-check-icon" />
+        <span className="toast-text">
+          {userName ? `Welcome back, ${userName.split(' ')[0]}` : 'Signed in successfully'}
+        </span>
       </div>
-
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <h4
-          style={{
-            margin: '0 0 2px 0',
-            fontSize: '15px',
-            fontWeight: '600',
-            color: '#4ade80',
-            letterSpacing: '0.3px',
-          }}
-        >
-          Successfully Logged In!
-        </h4>
-        <p
-          style={{
-            margin: 0,
-            fontSize: '13px',
-            color: '#94a3b8',
-            lineHeight: 1.4,
-          }}
-        >
-          {userName ? `Welcome back, ${userName}!` : 'Welcome back to ABES Autonomy.'}
-        </p>
-      </div>
-
-      <button
+      <button 
+        type="button"
+        className="toast-close-btn"
         onClick={() => setVisible(false)}
-        style={{
-          background: 'transparent',
-          border: 'none',
-          color: '#64748b',
-          cursor: 'pointer',
-          padding: '4px',
-          borderRadius: '6px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          transition: 'color 0.2s ease',
-        }}
-        onMouseEnter={(e) => (e.currentTarget.style.color = '#cbd5e1')}
-        onMouseLeave={(e) => (e.currentTarget.style.color = '#64748b')}
+        aria-label="Dismiss toast"
       >
-        <X size={16} />
+        <X size={14} />
       </button>
 
       <style>{`
-        @keyframes loginToastSlideIn {
-          from {
-            opacity: 0;
-            transform: translateY(-20px) scale(0.95);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-          }
+        .login-toast-island {
+          position: fixed;
+          top: 80px;
+          left: 50%;
+          transform: translateX(-50%);
+          z-index: 99999;
+          display: flex;
+          align-items: center;
+          gap: 14px;
+          padding: 8px 16px 8px 12px;
+          border-radius: var(--radius-pill, 9999px);
+          box-shadow: 0 16px 40px -8px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+          font-family: var(--font-family-sans, -apple-system, sans-serif);
         }
-        @media (max-width: 480px) {
-          .login-toast-card {
-            top: 14px !important;
-            right: 14px !important;
-            left: 14px !important;
-            max-width: calc(100vw - 28px) !important;
-            padding: 12px 14px !important;
-          }
+
+        .toast-content-wrap {
+          display: flex;
+          align-items: center;
+          gap: 9px;
+        }
+
+        .toast-check-icon {
+          color: var(--status-success, #30D158);
+        }
+
+        .toast-text {
+          font-size: 13.5px;
+          font-weight: 600;
+          color: #FFFFFF;
+          white-space: nowrap;
+        }
+
+        .toast-close-btn {
+          background: rgba(255, 255, 255, 0.05);
+          border: none;
+          color: var(--text-secondary, #A1A1A6);
+          border-radius: 50%;
+          width: 20px;
+          height: 20px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+        }
+
+        .toast-close-btn:hover {
+          color: #FFFFFF;
         }
       `}</style>
     </div>

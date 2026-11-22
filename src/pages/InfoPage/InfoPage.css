@@ -1,61 +1,89 @@
+/**
+ * ABES AUTONOMY — INFO PAGES LIQUID GLASS STYLES
+ * (About, Contact, Contribute, Terms, Privacy Policy)
+ */
+
 .info-page-wrapper {
-  background-color: #0a0c10;
+  background-color: var(--bg-canvas, #060709);
   min-height: 100vh;
-  padding: 4rem 1.5rem;
-  font-family: system-ui, -apple-system, sans-serif;
-  color: #ffffff;
+  padding: 100px 1.5rem 120px;
+  font-family: var(--font-family-sans);
+  color: var(--text-primary, #F5F5F7);
+  position: relative;
+}
+
+.info-page-wrapper::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 800px;
+  height: 400px;
+  background: radial-gradient(ellipse at 50% 0%, rgba(197, 172, 134, 0.07) 0%, transparent 65%);
+  pointer-events: none;
 }
 
 .info-container {
-  max-width: 800px;
+  max-width: 860px;
   margin: 0 auto;
+  position: relative;
+  z-index: 1;
+  background: rgba(14, 17, 24, 0.72);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: var(--radius-xl, 26px);
+  padding: 48px 40px;
+  box-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.14);
 }
 
 .info-title {
-  font-family: "Times New Roman", Georgia, serif;
-  font-size: 2.5rem;
-  color: #c89b63;
+  font-size: clamp(28px, 4.5vw, 42px);
+  font-weight: 700;
+  color: #FFFFFF;
+  letter-spacing: -0.03em;
   margin-bottom: 2rem;
-  border-bottom: 1px solid #1f2937;
-  padding-bottom: 1rem;
-  letter-spacing: 0.05em;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 1.25rem;
 }
 
 .info-heading {
-  font-family: "Times New Roman", Georgia, serif;
-  font-size: 1.5rem;
-  color: #e2e8f0;
-  margin: 2.5rem 0 1rem 0;
+  font-size: 1.35rem;
+  font-weight: 650;
+  color: #FFFFFF;
+  letter-spacing: -0.015em;
+  margin: 2.25rem 0 1rem 0;
 }
 
 .info-text {
-  color: #9ca3af;
-  line-height: 1.8;
+  color: var(--text-secondary, #A1A1A6);
+  line-height: 1.75;
   margin-bottom: 1.25rem;
-  font-size: 1rem;
+  font-size: 0.95rem;
 }
 
 .info-list {
-  color: #9ca3af;
-  line-height: 1.8;
+  color: var(--text-secondary, #A1A1A6);
+  line-height: 1.75;
   margin-bottom: 1.25rem;
   padding-left: 1.5rem;
 }
 
 .info-list li {
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.5rem;
 }
 
 .highlight {
-  color: #c89b63;
-  font-weight: 500;
+  color: var(--brand-gold, #C5AC86);
+  font-weight: 550;
 }
 
 @media (max-width: 768px) {
   .info-page-wrapper {
-    padding: 3rem 1rem;
+    padding: 85px 1rem 80px;
   }
-  .info-title {
-    font-size: 2rem;
+  .info-container {
+    padding: 28px 20px;
   }
 }

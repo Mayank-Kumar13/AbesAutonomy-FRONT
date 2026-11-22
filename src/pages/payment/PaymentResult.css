@@ -1,100 +1,107 @@
-/* ═══════════════════════════════════════════════════════
-   ABES Autonomy — Payment Status Pages CSS
-   ═══════════════════════════════════════════════════════ */
+/**
+ * ABES AUTONOMY — PAYMENT RESULT LIQUID GLASS STYLES
+ */
 
 .pay-res-page {
-  min-height: 80vh;
+  min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 3rem 1.5rem;
-  background-color: #080a0e;
-  color: #e2e8f0;
+  padding: 100px 20px 80px;
+  background-color: var(--bg-canvas, #060709);
+  color: var(--text-primary, #F5F5F7);
+  font-family: var(--font-family-sans);
+  position: relative;
+}
+
+.pay-res-page::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 700px;
+  height: 350px;
+  background: radial-gradient(ellipse at 50% 0%, rgba(197, 172, 134, 0.08) 0%, transparent 65%);
+  pointer-events: none;
 }
 
 .pay-res-card {
-  background: rgba(17, 21, 28, 0.9);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 20px;
   max-width: 520px;
   width: 100%;
-  padding: 3rem 2.2rem;
+  padding: 44px 36px;
+  border-radius: var(--radius-xl, 28px);
+  background: rgba(14, 17, 24, 0.88);
+  backdrop-filter: blur(36px) saturate(180%);
+  -webkit-backdrop-filter: blur(36px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  box-shadow: 
+    0 28px 70px -10px rgba(0, 0, 0, 0.85),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
   text-align: center;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(16px);
-}
-
-.pay-res-card.success {
-  border-color: rgba(197, 172, 134, 0.4);
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 30px rgba(197, 172, 134, 0.12);
-}
-
-.pay-res-card.failed {
-  border-color: rgba(239, 68, 68, 0.35);
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 30px rgba(239, 68, 68, 0.1);
-}
-
-.pay-res-card.pending {
-  border-color: rgba(234, 179, 8, 0.35);
+  position: relative;
+  z-index: 1;
 }
 
 .pay-res-icon-wrap {
-  width: 72px;
-  height: 72px;
+  width: 68px;
+  height: 68px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 auto 1.5rem;
+  margin: 0 auto 24px;
 }
 
 .pay-res-icon-wrap.success {
-  background: rgba(197, 172, 134, 0.15);
-  color: #C5AC86;
-  border: 2px solid #C5AC86;
+  background: rgba(48, 209, 88, 0.12);
+  border: 1px solid rgba(48, 209, 88, 0.3);
+  color: var(--status-success, #30D158);
 }
 
 .pay-res-icon-wrap.failed {
-  background: rgba(239, 68, 68, 0.15);
-  color: #ef4444;
-  border: 2px solid #ef4444;
+  background: rgba(255, 69, 58, 0.12);
+  border: 1px solid rgba(255, 69, 58, 0.3);
+  color: var(--status-error, #FF453A);
 }
 
 .pay-res-icon-wrap.pending {
-  background: rgba(234, 179, 8, 0.15);
-  color: #eab308;
-  border: 2px solid #eab308;
+  background: rgba(255, 159, 10, 0.12);
+  border: 1px solid rgba(255, 159, 10, 0.3);
+  color: var(--status-warning, #FF9F0A);
 }
 
 .pay-res-title {
-  font-size: 2rem;
+  margin: 0 0 12px;
+  font-size: 26px;
   font-weight: 700;
-  color: #ffffff;
-  margin: 0 0 0.5rem 0;
+  color: #FFFFFF;
+  letter-spacing: -0.02em;
 }
 
 .pay-res-sub {
-  font-size: 0.95rem;
-  color: #94a3b8;
-  margin: 0 0 1.8rem 0;
-  line-height: 1.5;
+  margin: 0 0 28px;
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--text-secondary, #A1A1A6);
 }
 
 .pay-res-details-box {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 12px;
-  padding: 1.2rem;
-  margin-bottom: 2rem;
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-md, 16px);
+  padding: 16px 20px;
+  margin-bottom: 32px;
   text-align: left;
 }
 
 .pay-res-row {
   display: flex;
   justify-content: space-between;
-  font-size: 0.88rem;
-  padding: 6px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  align-items: center;
+  padding: 8px 0;
+  font-size: 13.5px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .pay-res-row:last-child {
@@ -102,75 +109,53 @@
 }
 
 .pay-res-label {
-  color: #94a3b8;
+  color: var(--text-tertiary, #6E6E73);
 }
 
-.pay-res-val {
-  color: #ffffff;
-  font-weight: 600;
+.pay-res-value {
+  color: #FFFFFF;
+  font-weight: 550;
 }
 
 .pay-res-actions {
   display: flex;
   gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
 }
 
 .pay-res-btn {
-  flex: 1;
-  padding: 0.85rem;
-  border-radius: 10px;
+  padding: 11px 24px;
+  border-radius: var(--radius-pill, 9999px);
+  font-size: 14px;
   font-weight: 600;
-  font-size: 0.95rem;
-  cursor: pointer;
   text-decoration: none;
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
   gap: 8px;
-  transition: all 0.2s;
+  transition: all var(--duration-fast, 160ms) var(--ease-apple);
 }
 
 .pay-res-btn.primary {
-  background: linear-gradient(135deg, #C5AC86 0%, #b2966e 100%);
-  color: #111215;
-  border: none;
+  background: #F5F5F7;
+  color: #0A0C10;
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
 }
 
 .pay-res-btn.primary:hover {
-  background: linear-gradient(135deg, #dfc6a2 0%, #C5AC86 100%);
-  transform: translateY(-2px);
+  background: #FFFFFF;
+  transform: translateY(-1px);
 }
 
 .pay-res-btn.secondary {
-  background: rgba(255, 255, 255, 0.06);
-  color: #cbd5e1;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.05);
+  color: #F5F5F7;
+  border: 1px solid rgba(255, 255, 255, 0.09);
 }
 
 .pay-res-btn.secondary:hover {
-  background: rgba(255, 255, 255, 0.1);
-}
-
-@media (max-width: 480px) {
-  .pay-res-page {
-    padding: 2rem 1rem;
-  }
-  .pay-res-card {
-    padding: 2rem 1.2rem;
-    border-radius: 16px;
-  }
-  .pay-res-title {
-    font-size: 1.6rem;
-  }
-  .pay-res-actions {
-    flex-direction: column;
-    gap: 10px;
-  }
-  .pay-res-row {
-    flex-direction: column;
-    gap: 2px;
-  }
-  .pay-res-val {
-    word-break: break-all;
-  }
+  background: rgba(255, 255, 255, 0.10);
+  border-color: rgba(255, 255, 255, 0.18);
+  color: #FFFFFF;
 }

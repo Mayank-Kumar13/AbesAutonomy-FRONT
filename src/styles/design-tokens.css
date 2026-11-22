@@ -1,0 +1,114 @@
+/**
+ * ABES AUTONOMY — DESIGN TOKENS
+ * Apple-inspired Liquid Glass Design System
+ * Single source of truth for colors, typography, spacing, radii, elevations, and transitions.
+ */
+
+:root {
+  /* ─── COLOR PALETTE: OBSIDIAN & SURFACES ─── */
+  --bg-canvas: #060709;
+  --bg-primary: #0A0C10;
+  --bg-secondary: #0F1217;
+  --bg-tertiary: #141720;
+  --bg-elevated: #181C26;
+
+  /* ─── LIQUID GLASS MATERIAL PALETTE ─── */
+  /* Frosted Glass: high diffusion, high specular top reflection, structured depth */
+  --glass-frosted-bg: rgba(14, 16, 22, 0.72);
+  --glass-frosted-bg-hover: rgba(20, 23, 31, 0.78);
+  --glass-frosted-border: rgba(255, 255, 255, 0.09);
+  --glass-frosted-border-hover: rgba(255, 255, 255, 0.18);
+  --glass-frosted-specular: inset 0 1px 0 0 rgba(255, 255, 255, 0.15);
+  --glass-frosted-blur: 28px;
+
+  /* Clear Glass: highly transparent, subtle edge catch, pure clarity */
+  --glass-clear-bg: rgba(255, 255, 255, 0.025);
+  --glass-clear-bg-hover: rgba(255, 255, 255, 0.055);
+  --glass-clear-border: rgba(255, 255, 255, 0.07);
+  --glass-clear-border-hover: rgba(255, 255, 255, 0.15);
+  --glass-clear-specular: inset 0 1px 0 0 rgba(255, 255, 255, 0.10);
+  --glass-clear-blur: 16px;
+
+  /* Diffused Glass: ambient backdrops, secondary panels */
+  --glass-diffused-bg: rgba(10, 12, 16, 0.55);
+  --glass-diffused-border: rgba(255, 255, 255, 0.04);
+  --glass-diffused-blur: 40px;
+
+  /* ─── TYPOGRAPHY: APPLE OFF-WHITES & GRAPHITES ─── */
+  --text-primary: #F5F5F7;
+  --text-secondary: #A1A1A6;
+  --text-tertiary: #6E6E73;
+  --text-muted: #48484A;
+  --text-inverted: #0A0C10;
+
+  /* ─── BRAND ACCENTS & HERITAGE ─── */
+  --brand-gold: #C5AC86;
+  --brand-gold-light: #DFCAAA;
+  --brand-gold-dim: #8E7858;
+  --brand-gold-glow: rgba(197, 172, 134, 0.16);
+
+  /* Apple-inspired subtle ambient light sheens */
+  --glow-subtle: rgba(255, 255, 255, 0.04);
+  --glow-cyan-sheen: rgba(56, 189, 248, 0.08);
+  --glow-indigo-sheen: rgba(99, 102, 241, 0.06);
+
+  /* Status Colors */
+  --status-success: #30D158;
+  --status-success-bg: rgba(48, 209, 88, 0.12);
+  --status-warning: #FF9F0A;
+  --status-warning-bg: rgba(255, 159, 10, 0.12);
+  --status-error: #FF453A;
+  --status-error-bg: rgba(255, 69, 58, 0.12);
+  --status-info: #0A84FF;
+  --status-info-bg: rgba(10, 132, 255, 0.12);
+
+  /* ─── TYPOGRAPHY STACK ─── */
+  --font-family-sans: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Inter", system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-family-serif: "New York", "Times New Roman", Georgia, serif;
+  --font-family-mono: "SF Mono", "JetBrains Mono", Menlo, Consolas, Monaco, monospace;
+
+  /* Type Scale */
+  --text-xs: 0.75rem;    /* 12px */
+  --text-sm: 0.844rem;   /* 13.5px */
+  --text-base: 0.938rem; /* 15px */
+  --text-md: 1.063rem;   /* 17px */
+  --text-lg: 1.25rem;    /* 20px */
+  --text-xl: 1.5rem;     /* 24px */
+  --text-2xl: 1.875rem;  /* 30px */
+  --text-3xl: 2.375rem;  /* 38px */
+  --text-4xl: 3rem;      /* 48px */
+  --text-5xl: 3.75rem;   /* 60px */
+
+  /* ─── SPACING SCALE ─── */
+  --space-2xs: 4px;
+  --space-xs: 8px;
+  --space-sm: 12px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+  --space-3xl: 64px;
+  --space-4xl: 96px;
+
+  /* ─── BORDER RADII (SMOOTH SQUIRCLE / PILL) ─── */
+  --radius-xs: 6px;
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 22px;
+  --radius-xl: 28px;
+  --radius-pill: 9999px;
+
+  /* ─── ELEVATION SHADOWS ─── */
+  --shadow-sm: 0 4px 12px -2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 8px 24px -4px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 20px 48px -12px rgba(0, 0, 0, 0.7);
+  --shadow-island: 0 16px 36px -8px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(255, 255, 255, 0.08);
+
+  /* ─── TRANSITIONS & EASINGS ─── */
+  --ease-apple: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-apple-soft: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --duration-fast: 160ms;
+  --duration-normal: 260ms;
+  --duration-smooth: 400ms;
+}

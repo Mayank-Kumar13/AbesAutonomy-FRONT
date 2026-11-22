@@ -1,95 +1,102 @@
-.card {
-    width: 100%;
-    max-width: 320px;
-    margin: 0 auto;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    background: #0d1117;
-    border: 1px solid #232d3b;
-    border-radius: 18px;
-    padding: 30px 20px;
-    text-align: center;
-    box-sizing: border-box;
-    transition: all 0.3s ease;
+/**
+ * ABES AUTONOMY — UNICARD LIQUID GLASS STYLES
+ * High-clarity interactive subject cards with smooth specular reflection.
+ */
+
+.unicard-root.card {
+  position: relative;
+  width: 100%;
+  min-height: 250px;
+  padding: 28px 24px;
+  border-radius: var(--radius-lg, 22px);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+  text-align: left;
+  cursor: pointer;
+  box-sizing: border-box;
 }
 
-.card:hover {
-    border: 1px solid #c89b63;
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35), 0 0 20px rgba(217, 162, 79, 0.05);
-    transform: translateY(-6px);
+.unicard-specular {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.22), transparent);
 }
 
-.logo {
-    width: 75px;
-    height: 75px;
-    border: 1px solid #c89b63;
-    border-radius: 50%;
-    margin: 0 auto;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: #c89b63;
-    font-size: 35px;
-    flex-shrink: 0;
+.unicard-icon-wrap.logo {
+  width: 50px;
+  height: 50px;
+  border-radius: var(--radius-md, 16px);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--brand-gold, #C5AC86);
+  margin-bottom: 20px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  transition: transform var(--duration-fast, 160ms) var(--ease-apple),
+              color var(--duration-fast, 160ms) ease;
 }
 
-.heading {
-    margin-top: 20px;
-    color: white;
-    font-family: "Times New Roman", serif;
-    font-size: 20px;
+.unicard-root:hover .unicard-icon-wrap.logo {
+  transform: scale(1.08);
+  color: #FFFFFF;
+  background: rgba(197, 172, 134, 0.14);
+  border-color: rgba(197, 172, 134, 0.32);
 }
 
-.para {
-    margin-top: 12px;
-    color: #b8c1cc;
-    line-height: 1.6;
-    flex-grow: 1;
+.unicard-content {
+  flex: 1;
+  margin-bottom: 20px;
 }
 
-.btnn {
-    margin-top: 20px;
-    padding: 10px 28px;
-    border: 1px solid #c89b63;
-    background: transparent;
-    color: #c89b63;
-    border-radius: 10px;
-    cursor: pointer;
-    height: auto;
-    width: auto;
-    font-weight: 500;
-    transition: all 0.3s ease;
+.unicard-heading.heading {
+  margin: 0 0 8px;
+  font-family: var(--font-family-sans);
+  font-size: 19px;
+  font-weight: 650;
+  color: #FFFFFF;
+  letter-spacing: -0.015em;
+  line-height: 1.25;
 }
 
-.btnn:hover {
-    background: #c89b63;
-    color: #0d1117;
+.unicard-para.para {
+  margin: 0;
+  font-family: var(--font-family-sans);
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--text-secondary, #A1A1A6);
 }
 
-@media (max-width: 480px) {
-    .card {
-        padding: 24px 16px;
-        max-width: 100%;
-        border-radius: 14px;
-    }
-    .logo {
-        width: 60px;
-        height: 60px;
-        font-size: 28px;
-    }
-    .heading {
-        font-size: 18px;
-        margin-top: 14px;
-    }
-    .para {
-        font-size: 13.5px;
-        margin-top: 8px;
-    }
-    .btnn {
-        padding: 8px 22px;
-        font-size: 14px;
-        margin-top: 16px;
-    }
+.unicard-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.unicard-btn.btnn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-pill, 9999px);
+  color: var(--text-secondary, #A1A1A6);
+  font-family: var(--font-family-sans);
+  font-size: 13px;
+  font-weight: 600;
+  transition: all var(--duration-fast, 160ms) var(--ease-apple);
+}
+
+.unicard-root:hover .unicard-btn.btnn {
+  color: #0A0C10;
+  background: #F5F5F7;
+  border-color: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 4px 14px rgba(255, 255, 255, 0.2);
 }

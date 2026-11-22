@@ -1,0 +1,207 @@
+/**
+ * ABES AUTONOMY — LIQUID GLASS MATERIALS
+ * Reusable frosted, clear, and diffused glass utility classes.
+ * Optimized for desktop crispness, specular illumination, and mobile efficiency.
+ */
+
+/* ─── 1. FROSTED GLASS (High Diffusion, Modals, Navbars, Floating Shelves) ─── */
+.glass-frosted {
+  background: var(--glass-frosted-bg, rgba(14, 16, 22, 0.72));
+  backdrop-filter: blur(var(--glass-frosted-blur, 28px)) saturate(180%);
+  -webkit-backdrop-filter: blur(var(--glass-frosted-blur, 28px)) saturate(180%);
+  border: 1px solid var(--glass-frosted-border, rgba(255, 255, 255, 0.09));
+  box-shadow: 
+    var(--shadow-lg, 0 20px 48px -12px rgba(0, 0, 0, 0.7)),
+    var(--glass-frosted-specular, inset 0 1px 0 0 rgba(255, 255, 255, 0.15));
+  transition: 
+    background var(--duration-normal, 260ms) var(--ease-apple, cubic-bezier(0.16, 1, 0.3, 1)),
+    border-color var(--duration-normal, 260ms) var(--ease-apple, cubic-bezier(0.16, 1, 0.3, 1)),
+    box-shadow var(--duration-normal, 260ms) var(--ease-apple, cubic-bezier(0.16, 1, 0.3, 1)),
+    transform var(--duration-normal, 260ms) var(--ease-apple, cubic-bezier(0.16, 1, 0.3, 1));
+}
+
+.glass-frosted:hover {
+  border-color: var(--glass-frosted-border-hover, rgba(255, 255, 255, 0.18));
+}
+
+/* ─── 2. CLEAR GLASS (Interactive Cards, Action Controls, Pills) ─── */
+.glass-clear {
+  background: var(--glass-clear-bg, rgba(255, 255, 255, 0.025));
+  backdrop-filter: blur(var(--glass-clear-blur, 16px)) saturate(160%);
+  -webkit-backdrop-filter: blur(var(--glass-clear-blur, 16px)) saturate(160%);
+  border: 1px solid var(--glass-clear-border, rgba(255, 255, 255, 0.07));
+  box-shadow: 
+    var(--shadow-md, 0 8px 24px -4px rgba(0, 0, 0, 0.5)),
+    var(--glass-clear-specular, inset 0 1px 0 0 rgba(255, 255, 255, 0.10));
+  transition: 
+    background var(--duration-normal, 260ms) var(--ease-apple, cubic-bezier(0.16, 1, 0.3, 1)),
+    border-color var(--duration-normal, 260ms) var(--ease-apple, cubic-bezier(0.16, 1, 0.3, 1)),
+    box-shadow var(--duration-normal, 260ms) var(--ease-apple, cubic-bezier(0.16, 1, 0.3, 1)),
+    transform var(--duration-normal, 260ms) var(--ease-apple, cubic-bezier(0.16, 1, 0.3, 1));
+}
+
+.glass-clear:hover {
+  background: var(--glass-clear-bg-hover, rgba(255, 255, 255, 0.055));
+  border-color: var(--glass-clear-border-hover, rgba(255, 255, 255, 0.16));
+  box-shadow: 
+    0 14px 32px -6px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.18),
+    0 0 24px rgba(255, 255, 255, 0.03);
+  transform: translateY(-2px);
+}
+
+/* ─── 3. DIFFUSED GLASS (Atmospheric backings, subtle panels) ─── */
+.glass-diffused {
+  background: var(--glass-diffused-bg, rgba(10, 12, 16, 0.55));
+  backdrop-filter: blur(var(--glass-diffused-blur, 40px));
+  -webkit-backdrop-filter: blur(var(--glass-diffused-blur, 40px));
+  border: 1px solid var(--glass-diffused-border, rgba(255, 255, 255, 0.04));
+}
+
+/* ─── REUSABLE LIQUID GLASS BUTTONS ─── */
+/* Pill Button — Apple style white/silver primary */
+.glass-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs, 8px);
+  padding: 10px 22px;
+  background: #F5F5F7;
+  color: #0A0C10;
+  font-family: var(--font-family-sans);
+  font-size: var(--text-base, 15px);
+  font-weight: 550;
+  letter-spacing: -0.01em;
+  border-radius: var(--radius-pill, 9999px);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+  text-decoration: none;
+  transition: all var(--duration-fast, 160ms) var(--ease-apple);
+}
+
+.glass-btn-primary:hover {
+  background: #FFFFFF;
+  transform: translateY(-1px) scale(1.01);
+  box-shadow: 0 8px 24px rgba(255, 255, 255, 0.18), 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.glass-btn-primary:active {
+  transform: translateY(0.5px) scale(0.99);
+  background: #E5E5EA;
+}
+
+/* Glass Secondary Button — Translucent Pill */
+.glass-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs, 8px);
+  padding: 10px 20px;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-primary, #F5F5F7);
+  font-family: var(--font-family-sans);
+  font-size: var(--text-base, 15px);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  border-radius: var(--radius-pill, 9999px);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  cursor: pointer;
+  text-decoration: none;
+  transition: all var(--duration-fast, 160ms) var(--ease-apple);
+}
+
+.glass-btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.09);
+  border-color: rgba(255, 255, 255, 0.18);
+  color: #FFFFFF;
+  transform: translateY(-1px);
+}
+
+.glass-btn-secondary:active {
+  transform: translateY(0.5px) scale(0.99);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+/* Gold Accent Pill Button (Refined brand element) */
+.glass-btn-gold {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs, 8px);
+  padding: 10px 22px;
+  background: linear-gradient(180deg, #DFCAAA 0%, #C5AC86 100%);
+  color: #12141A;
+  font-family: var(--font-family-sans);
+  font-size: var(--text-base, 15px);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  border-radius: var(--radius-pill, 9999px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 0 6px 20px rgba(197, 172, 134, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  text-decoration: none;
+  transition: all var(--duration-fast, 160ms) var(--ease-apple);
+}
+
+.glass-btn-gold:hover {
+  background: linear-gradient(180deg, #E8D7BF 0%, #D0B894 100%);
+  transform: translateY(-1px) scale(1.01);
+  box-shadow: 0 8px 28px rgba(197, 172, 134, 0.35);
+}
+
+/* ─── REUSABLE GLASS INPUTS ─── */
+.glass-input {
+  width: 100%;
+  padding: 12px 18px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-md, 16px);
+  color: var(--text-primary, #F5F5F7);
+  font-family: var(--font-family-sans);
+  font-size: var(--text-base, 15px);
+  outline: none;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.4);
+  transition: all var(--duration-fast, 160ms) var(--ease-apple);
+}
+
+.glass-input::placeholder {
+  color: var(--text-tertiary, #6E6E73);
+}
+
+.glass-input:focus {
+  border-color: rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.05);
+  box-shadow: 
+    0 0 0 3px rgba(255, 255, 255, 0.08),
+    inset 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+/* ─── ACCESSIBILITY: FOCUS VISIBLE ─── */
+:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.5);
+  outline-offset: 3px;
+}
+
+/* ─── MOBILE PERFORMANCE PASS ─── */
+@media (max-width: 768px) {
+  .glass-frosted {
+    backdrop-filter: blur(16px) saturate(140%);
+    -webkit-backdrop-filter: blur(16px) saturate(140%);
+    background: rgba(14, 16, 22, 0.88);
+  }
+  .glass-clear {
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    background: rgba(22, 25, 33, 0.65);
+  }
+  .glass-diffused {
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+}

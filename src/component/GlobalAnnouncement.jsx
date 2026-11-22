@@ -75,7 +75,7 @@ const GlobalAnnouncement = () => {
                   href={word} 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  style={{ color: '#d4a373', textDecoration: 'none', fontWeight: '500', borderBottom: '1px dashed #d4a373' }}
+                  className="announcement-link"
                 >
                   {word}
                 </a>{' '}
@@ -90,201 +90,209 @@ const GlobalAnnouncement = () => {
   };
 
   return (
-    <div 
-      className="global-announcement-root"
-      style={{
-        position: 'fixed',
-        bottom: '30px',
-        right: '30px',
-        zIndex: 9999,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'flex-end',
-        fontFamily: 'Inter, system-ui, sans-serif'
-      }}
-    >
+    <div className="global-announcement-root">
       {isOpen && (
-        <div 
-          className="global-announcement-box"
-          style={{
-            backgroundColor: 'rgba(15, 20, 27, 0.85)',
-            backdropFilter: 'blur(16px)',
-            WebkitBackdropFilter: 'blur(16px)',
-            border: '1px solid rgba(212, 163, 115, 0.3)',
-            borderRadius: '16px',
-            padding: '24px',
-            marginBottom: '16px',
-            maxWidth: '380px',
-            width: 'calc(100vw - 60px)',
-            boxShadow: '0 20px 40px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255,255,255,0.05) inset',
-            color: '#f5f5f5',
-            animation: 'slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1)'
-          }}
-        >
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Bell size={18} color="#d4a373" className="bell-shake" />
-              <h4 style={{ margin: 0, fontSize: '16px', color: '#d4a373', fontWeight: '600', letterSpacing: '0.5px' }}>
-                Announcement
-              </h4>
+        <div className="global-announcement-box glass-frosted anim-scale-in">
+          <div className="announcement-header">
+            <div className="announcement-title-wrap">
+              <div className="announcement-bell-bubble">
+                <Bell size={15} className="bell-shake" />
+              </div>
+              <h4>College Announcement</h4>
             </div>
             <button 
+              type="button"
+              className="announcement-close-btn"
               onClick={() => setIsOpen(false)}
-              style={{ 
-                background: 'rgba(255,255,255,0.05)', 
-                border: 'none', 
-                color: '#a0aec0', 
-                cursor: 'pointer', 
-                padding: '6px',
-                borderRadius: '50%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                transition: 'all 0.2s ease'
-              }}
-              onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.1)'; e.currentTarget.style.color = '#fff'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; e.currentTarget.style.color = '#a0aec0'; }}
+              aria-label="Close announcement"
             >
-              <X size={16} />
+              <X size={15} />
             </button>
           </div>
-          <div style={{ 
-            margin: 0, 
-            fontSize: '14.5px', 
-            lineHeight: '1.6', 
-            color: '#cbd5e1',
-            maxHeight: '400px',
-            overflowY: 'auto',
-            paddingRight: '4px'
-          }}>
+
+          <div className="announcement-body">
             {formatMessage(announcement.message)}
           </div>
           
-          <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'flex-start', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '16px' }}>
+          <div className="announcement-footer">
             <button
+              type="button"
               onClick={handleReact}
               disabled={hasReacted}
-              style={{
-                background: hasReacted ? 'rgba(239, 68, 68, 0.15)' : 'rgba(255, 255, 255, 0.05)',
-                border: hasReacted ? '1px solid rgba(239, 68, 68, 0.3)' : '1px solid rgba(255, 255, 255, 0.1)',
-                color: hasReacted ? '#ef4444' : '#a0aec0',
-                padding: '6px 14px',
-                borderRadius: '20px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                cursor: hasReacted ? 'default' : 'pointer',
-                fontSize: '13px',
-                fontWeight: '600',
-                transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
-              }}
-              onMouseEnter={(e) => { 
-                if (!hasReacted) {
-                  e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)'; 
-                  e.currentTarget.style.color = '#ef4444'; 
-                  e.currentTarget.style.borderColor = 'rgba(239, 68, 68, 0.3)';
-                  e.currentTarget.style.transform = 'scale(1.05)';
-                }
-              }}
-              onMouseLeave={(e) => { 
-                if (!hasReacted) {
-                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)'; 
-                  e.currentTarget.style.color = '#a0aec0'; 
-                  e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)';
-                  e.currentTarget.style.transform = 'scale(1)';
-                }
-              }}
+              className={`announcement-react-btn ${hasReacted ? 'has-reacted' : ''}`}
             >
-              <Heart size={16} fill={hasReacted ? '#ef4444' : 'none'} className={hasReacted ? 'heart-beat' : ''} />
-              {announcement.reactions || 0}
+              <Heart size={14} fill={hasReacted ? '#FF453A' : 'none'} className={hasReacted ? 'heart-beat' : ''} />
+              <span>{announcement.reactions || 0}</span>
             </button>
           </div>
         </div>
       )}
-      
-      {!isOpen && (
-        <button
-          onClick={() => setIsOpen(true)}
-          style={{
-            backgroundColor: '#d4a373',
-            color: '#11161d',
-            border: 'none',
-            borderRadius: '50%',
-            width: '56px',
-            height: '56px',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            cursor: 'pointer',
-            boxShadow: '0 8px 24px rgba(212, 163, 115, 0.4)',
-            transition: 'transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-            animation: 'pulseGlow 2s infinite'
-          }}
-          onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
-          onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-        >
-          <Bell size={26} />
-        </button>
-      )}
+
+      {/* Floating Bell Toggle Button */}
+      <button
+        type="button"
+        className={`announcement-bell-trigger glass-frosted ${isOpen ? 'is-active' : ''}`}
+        onClick={() => setIsOpen(!isOpen)}
+        aria-label="Toggle announcement"
+      >
+        <Bell size={20} className="bell-icon" />
+        {!hasReacted && <span className="announcement-pulse-dot" />}
+      </button>
 
       <style>{`
-        @keyframes slideUp {
-          from { opacity: 0; transform: translateY(30px) scale(0.95); }
-          to { opacity: 1; transform: translateY(0) scale(1); }
+        .global-announcement-root {
+          position: fixed;
+          bottom: 26px;
+          right: 26px;
+          z-index: 9999;
+          display: flex;
+          flex-direction: column;
+          align-items: flex-end;
+          font-family: var(--font-family-sans, -apple-system, sans-serif);
         }
-        @keyframes pulseGlow {
-          0% { box-shadow: 0 0 0 0 rgba(212, 163, 115, 0.6); }
-          70% { box-shadow: 0 0 0 15px rgba(212, 163, 115, 0); }
-          100% { box-shadow: 0 0 0 0 rgba(212, 163, 115, 0); }
+
+        .global-announcement-box {
+          margin-bottom: 14px;
+          max-width: 380px;
+          width: calc(100vw - 52px);
+          padding: 22px;
+          border-radius: var(--radius-xl, 24px);
+          box-shadow: 0 24px 60px -10px rgba(0, 0, 0, 0.85), inset 0 1px 0 rgba(255, 255, 255, 0.16);
         }
-        @keyframes bellShake {
-          0% { transform: rotate(0); }
-          15% { transform: rotate(15deg); }
-          30% { transform: rotate(-15deg); }
-          45% { transform: rotate(10deg); }
-          60% { transform: rotate(-10deg); }
-          75% { transform: rotate(5deg); }
-          90% { transform: rotate(-5deg); }
-          100% { transform: rotate(0); }
+
+        .announcement-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 14px;
         }
-        .bell-shake {
-          animation: bellShake 2.5s infinite;
-          transform-origin: top center;
+
+        .announcement-title-wrap {
+          display: flex;
+          align-items: center;
+          gap: 10px;
         }
-        @keyframes heartBeat {
-          0% { transform: scale(1); }
-          14% { transform: scale(1.3); }
-          28% { transform: scale(1); }
-          42% { transform: scale(1.3); }
-          70% { transform: scale(1); }
+
+        .announcement-bell-bubble {
+          width: 30px;
+          height: 30px;
+          border-radius: 50%;
+          background: rgba(197, 172, 134, 0.12);
+          border: 1px solid rgba(197, 172, 134, 0.25);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: var(--brand-gold, #C5AC86);
         }
-        .heart-beat {
-          animation: heartBeat 1s ease-in-out;
+
+        .announcement-title-wrap h4 {
+          margin: 0;
+          font-size: 14.5px;
+          font-weight: 650;
+          color: #FFFFFF;
+          letter-spacing: -0.01em;
         }
-        /* Custom scrollbar for the popup text area */
-        div::-webkit-scrollbar {
-          width: 4px;
+
+        .announcement-close-btn {
+          width: 28px;
+          height: 28px;
+          border-radius: 50%;
+          background: rgba(255, 255, 255, 0.05);
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          color: var(--text-secondary, #A1A1A6);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          transition: all 0.15s ease;
         }
-        div::-webkit-scrollbar-track {
-          background: rgba(255, 255, 255, 0.02);
+
+        .announcement-close-btn:hover {
+          background: rgba(255, 255, 255, 0.12);
+          color: #FFFFFF;
         }
-        div::-webkit-scrollbar-thumb {
-          background: rgba(212, 163, 115, 0.3);
-          border-radius: 4px;
+
+        .announcement-body {
+          font-size: 14px;
+          line-height: 1.6;
+          color: var(--text-secondary, #A1A1A6);
+          max-height: 320px;
+          overflow-y: auto;
+          padding-right: 4px;
         }
-        div::-webkit-scrollbar-thumb:hover {
-          background: rgba(212, 163, 115, 0.6);
+
+        .announcement-link {
+          color: var(--brand-gold, #C5AC86);
+          text-decoration: underline;
+          text-underline-offset: 3px;
         }
-        @media (max-width: 480px) {
-          .global-announcement-root {
-            bottom: 16px !important;
-            right: 16px !important;
-          }
-          .global-announcement-box {
-            width: calc(100vw - 32px) !important;
-            max-width: calc(100vw - 32px) !important;
-            padding: 18px 14px !important;
-          }
+
+        .announcement-footer {
+          margin-top: 18px;
+          padding-top: 14px;
+          border-top: 1px solid rgba(255, 255, 255, 0.07);
+        }
+
+        .announcement-react-btn {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          padding: 5px 12px;
+          background: rgba(255, 255, 255, 0.04);
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          border-radius: var(--radius-pill, 9999px);
+          color: var(--text-secondary, #A1A1A6);
+          font-size: 12.5px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+
+        .announcement-react-btn:hover:not(:disabled) {
+          background: rgba(255, 69, 58, 0.12);
+          border-color: rgba(255, 69, 58, 0.3);
+          color: var(--status-error, #FF453A);
+        }
+
+        .announcement-react-btn.has-reacted {
+          background: rgba(255, 69, 58, 0.12);
+          border-color: rgba(255, 69, 58, 0.3);
+          color: var(--status-error, #FF453A);
+          cursor: default;
+        }
+
+        /* ─── BELL TRIGGER ─── */
+        .announcement-bell-trigger {
+          width: 50px;
+          height: 50px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: var(--brand-gold, #C5AC86);
+          cursor: pointer;
+          position: relative;
+          box-shadow: 0 12px 30px -4px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+          transition: all var(--duration-fast, 160ms) var(--ease-apple);
+        }
+
+        .announcement-bell-trigger:hover,
+        .announcement-bell-trigger.is-active {
+          transform: scale(1.06);
+          color: #FFFFFF;
+          border-color: rgba(255, 255, 255, 0.22);
+        }
+
+        .announcement-pulse-dot {
+          position: absolute;
+          top: 11px;
+          right: 11px;
+          width: 9px;
+          height: 9px;
+          background: var(--status-error, #FF453A);
+          border: 2px solid #060709;
+          border-radius: 50%;
+          box-shadow: 0 0 10px rgba(255, 69, 58, 0.8);
         }
       `}</style>
     </div>

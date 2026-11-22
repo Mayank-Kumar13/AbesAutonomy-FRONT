@@ -1,7 +1,19 @@
 import React, { useState, useEffect } from "react";
 import "./Subject.css";
-import { useLocation, useNavigate } from "react-router-dom";
-import { FileText, Download } from "lucide-react";
+import { useLocation, useNavigate, Link } from "react-router-dom";
+import { 
+  FileText, 
+  Download, 
+  ArrowRight, 
+  ChevronRight, 
+  BookOpen, 
+  Eye, 
+  CheckCircle2, 
+  AlertCircle,
+  Inbox,
+  Sparkles,
+  Loader2
+} from "lucide-react";
 import { notesApi } from "../../services/api";
 import { downloadNoteFile } from "../../utils/downloadHelper";
 import PremiumUpgradeModal from "../../component/premium/PremiumUpgradeModal";
@@ -24,6 +36,7 @@ const Subject = () => {
   const [error, setError] = useState(null);
   const [isDownloadingAll, setIsDownloadingAll] = useState(false);
   const [showPremiumModal, setShowPremiumModal] = useState(false);
+  const [downloadingId, setDownloadingId] = useState(null);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -69,6 +82,26 @@ const Subject = () => {
     });
   };
 
+  const handleDownloadSingle = async (e, note) => {
+    e.stopPropagation();
+    if (downloadingId === note._id) return;
+    setDownloadingId(note._id);
+    try {
+      await downloadNoteFile({
+        noteId: note._id,
+        pdfUrl: note.pdfUrl,
+        title: note.title,
+      });
+    } catch (err) {
+      console.error("Download failed:", err);
+      if (err.status === 403 || err.data?.code === 'PREMIUM_REQUIRED') {
+        setShowPremiumModal(true);
+      }
+    } finally {
+      setDownloadingId(null);
+    }
+  };
+
   const handleDownloadAll = async () => {
     if (!notes || notes.length === 0) {
       alert("No notes available to download.");
@@ -97,132 +130,175 @@ const Subject = () => {
             break;
           }
         }
-
-        // Small delay between downloads so browsers don't block multiple files
-        if (i < notes.length - 1) {
-          await new Promise((res) => setTimeout(res, 600));
-        }
       }
     } finally {
       setIsDownloadingAll(false);
     }
   };
 
-  // Group notes by unit for display
-  const groupedByUnit = {};
-  notes.forEach((note) => {
-    const unitKey = note.unit || 0;
-    if (!groupedByUnit[unitKey]) groupedByUnit[unitKey] = [];
-    groupedByUnit[unitKey].push(note);
-  });
-
-  // If no notes are fetched, do not show fallback units.
-  const displayUnits = Object.keys(groupedByUnit)
-    .sort((a, b) => Number(a) - Number(b))
-    .map((unitKey) => ({
-      unitNumber: Number(unitKey),
-      notes: groupedByUnit[unitKey],
-    }));
+  // Group notes by Unit
+  const groupedNotes = notes.reduce((acc, note) => {
+    const unit = note.unit ? `Unit ${note.unit}` : "General Notes";
+    if (!acc[unit]) acc[unit] = [];
+    acc[unit].push(note);
+    return acc;
+  }, {});
 
   return (
-    <main className="subject-page">
-      <div className="subject-container">
-        <div style={{ color: '#d4a373', marginBottom: '24px', fontSize: '13px', fontWeight: '600', letterSpacing: '1px', display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-          <span style={{ cursor: 'pointer', transition: 'color 0.2s' }} onMouseEnter={(e) => e.target.style.color = '#fff'} onMouseLeave={(e) => e.target.style.color = '#d4a373'} onClick={() => navigate('/resources')}>RESOURCES</span>
-          <span>/</span>
-          <span style={{ cursor: 'pointer', transition: 'color 0.2s' }} onMouseEnter={(e) => e.target.style.color = '#fff'} onMouseLeave={(e) => e.target.style.color = '#d4a373'} onClick={() => navigate(-1)}>{resourceTitle.toUpperCase()}</span>
-          <span>/</span>
-          <span style={{ color: '#fff' }}>{heading.toUpperCase()}</span>
-        </div>
-        <div className="subject-heading">
-          <h1>{heading}</h1>
+    <div className="subject-page-wrapper">
+      <div className="subject-ambient-light" aria-hidden="true" />
 
-          <p>
-            Download all {para} study materials
-            <br />
-            organized by units.
-          </p>
-        </div>
+      <div className="subject-page-container">
+        {/* Breadcrumb Navigation */}
+        <nav className="subject-breadcrumb" aria-label="Breadcrumb">
+          <Link to="/resources" className="breadcrumb-link">RESOURCES</Link>
+          <ChevronRight size={14} className="breadcrumb-sep" />
+          <Link 
+            to="/ChooseSubject" 
+            state={{ resourceType, resourceTitle }} 
+            className="breadcrumb-link"
+          >
+            {resourceTitle.toUpperCase()}
+          </Link>
+          <ChevronRight size={14} className="breadcrumb-sep" />
+          <span className="breadcrumb-current">{heading}</span>
+        </nav>
 
-        <button
-          className="download-all"
-          onClick={handleDownloadAll}
-          disabled={isDownloadingAll}
-          title={isDownloadingAll ? "Downloading notes..." : "Download all notes"}
-        >
-          <Download size={22} />
-          <span>{isDownloadingAll ? "DOWNLOADING..." : "DOWNLOAD ALL"}</span>
-        </button>
+        {/* Subject Header */}
+        <header className="subject-header">
+          <div className="subject-header-info">
+            <div className="subject-tags-row">
+              <span className="subject-tag">Year {year}</span>
+              <span className="subject-tag">{branch.toUpperCase()}</span>
+              <span className="subject-tag">{notes.length} Documents</span>
+            </div>
+            <h1 className="subject-main-title">{heading}</h1>
+            <p className="subject-main-subtitle">{para}</p>
+          </div>
 
+          {/* Action Row */}
+          {notes.length > 0 && (
+            <div className="subject-header-actions">
+              <button
+                type="button"
+                className="glass-btn-secondary download-all-btn"
+                onClick={handleDownloadAll}
+                disabled={isDownloadingAll}
+              >
+                {isDownloadingAll ? (
+                  <>
+                    <Loader2 size={16} className="animate-spin" />
+                    <span>Downloading Archive...</span>
+                  </>
+                ) : (
+                  <>
+                    <Download size={16} />
+                    <span>Download All Notes</span>
+                  </>
+                )}
+              </button>
+            </div>
+          )}
+        </header>
+
+        {/* Content Section */}
         {loading ? (
-          <div style={{ textAlign: "center", padding: "60px 0", color: "#b9b8b5" }}>
-            <p>Loading notes...</p>
+          <div className="subject-loading-state">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="subject-unit-skeleton skeleton-shimmer" />
+            ))}
           </div>
         ) : error ? (
-          <div style={{ textAlign: "center", padding: "60px 0", color: "#e57373" }}>
+          <div className="subject-error-state glass-clear">
+            <AlertCircle size={32} className="error-icon" />
+            <h3>Unable to Load Notes</h3>
             <p>{error}</p>
           </div>
-        ) : displayUnits.length === 0 ? (
-          <div style={{ textAlign: "center", padding: "60px 0", color: "#b9b8b5" }}>
-            <p>No resources found for this subject yet.</p>
+        ) : notes.length === 0 ? (
+          <div className="subject-empty-state glass-clear">
+            <div className="empty-bubble">
+              <Inbox size={32} />
+            </div>
+            <h3>No Notes Uploaded Yet</h3>
+            <p>Notes for {heading} are currently being curated and uploaded by our academic coordinators.</p>
           </div>
         ) : (
-          <div className="units-grid">
-            {displayUnits.map((unitData) =>
-              unitData.notes.length > 1 ? (
-                // Multiple files share this unit (common for PYQs, which usually
-                // don't have a meaningful "unit") — show each one as its own card.
-                unitData.notes.map((note) => (
-                  <div
-                    className="unit-card"
-                    key={note._id}
-                    onClick={() => handlePreview(note)}
-                    style={{ cursor: "pointer" }}
-                  >
-                    <FileText className="file-icon" />
-                    <h2 style={{ marginBottom: "16px" }}>
-                      {note.title}
-                    </h2>
-                    <button className="unit-download-btn">
-                      <span>Preview</span>
-                    </button>
+          <div className="subject-units-flow">
+            {Object.entries(groupedNotes).map(([unitName, unitNotes]) => (
+              <section key={unitName} className="unit-glass-panel glass-frosted" aria-label={unitName}>
+                <div className="unit-panel-header">
+                  <div className="unit-title-wrap">
+                    <BookOpen size={18} className="unit-icon" />
+                    <h2 className="unit-title">{unitName}</h2>
                   </div>
-                ))
-              ) : (
-                <div
-                  className="unit-card"
-                  key={unitData.unitNumber}
-                  onClick={() => {
-                    if (unitData.notes.length > 0) {
-                      handlePreview(unitData.notes[0]);
-                    }
-                  }}
-                  style={{ cursor: unitData.notes.length > 0 ? "pointer" : "default" }}
-                >
-                  <FileText className="file-icon" />
-                  <h2 style={unitData.notes.length > 0 ? { marginBottom: "16px" } : {}}>
-                    {unitData.notes.length > 0
-                      ? unitData.notes[0].title
-                      : `Unit ${unitData.unitNumber}`}
-                  </h2>
-                  <button className="unit-download-btn">
-                    <span>
-                      {unitData.notes.length > 0 ? "Preview" : "Coming Soon"}
-                    </span>
-                  </button>
+                  <span className="unit-notes-count">{unitNotes.length} file{unitNotes.length > 1 ? 's' : ''}</span>
                 </div>
-              )
-            )}
+
+                <div className="unit-notes-list">
+                  {unitNotes.map((note) => (
+                    <article 
+                      key={note._id} 
+                      className="note-row-item glass-clear"
+                      onClick={() => handlePreview(note)}
+                    >
+                      <div className="note-left-col">
+                        <div className="note-file-bubble">
+                          <FileText size={20} />
+                        </div>
+                        <div className="note-meta-block">
+                          <h3 className="note-title">{note.title}</h3>
+                          <div className="note-specs-row">
+                            <span className="note-spec-badge">{note.resourceType || resourceType}</span>
+                            {note.unit && <span className="note-spec-badge">Unit {note.unit}</span>}
+                            {note.viewsCount > 0 && <span className="note-views-text">{note.viewsCount} reads</span>}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="note-right-actions">
+                        <button
+                          type="button"
+                          className="glass-btn-primary note-preview-btn"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handlePreview(note);
+                          }}
+                        >
+                          <Eye size={14} />
+                          <span>Preview</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          className="glass-icon-btn note-dl-btn"
+                          aria-label={`Download ${note.title}`}
+                          onClick={(e) => handleDownloadSingle(e, note)}
+                          disabled={downloadingId === note._id}
+                        >
+                          {downloadingId === note._id ? (
+                            <Loader2 size={16} className="animate-spin" />
+                          ) : (
+                            <Download size={16} />
+                          )}
+                        </button>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              </section>
+            ))}
           </div>
         )}
-      </div>
 
-      <PremiumUpgradeModal
-        isOpen={showPremiumModal}
-        message="You have used all 5 free document accesses. Upgrade to ABES Autonomy Premium for unlimited access."
-        onClose={() => setShowPremiumModal(false)}
-      />
-    </main>
+        {/* Premium Upgrade Modal if user hits premium gate */}
+        {showPremiumModal && (
+          <PremiumUpgradeModal 
+            isOpen={showPremiumModal} 
+            onClose={() => setShowPremiumModal(false)} 
+          />
+        )}
+      </div>
+    </div>
   );
 };
 

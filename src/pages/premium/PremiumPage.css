@@ -1,18 +1,18 @@
-/* ═══════════════════════════════════════════════════════
-   ABES Autonomy — Premium Landing Page CSS
-   ═══════════════════════════════════════════════════════ */
+/**
+ * ABES AUTONOMY — PREMIUM LANDING & PRICING LIQUID GLASS STYLES
+ * Inspired by modern Apple and Forma AI dark pricing cards.
+ */
 
 .prem-page {
   min-height: 100vh;
-  background-color: #080a0e;
-  color: #e2e8f0;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  padding: 4rem 1.5rem 6rem;
+  background-color: var(--bg-canvas, #060709);
+  color: var(--text-primary, #F5F5F7);
+  font-family: var(--font-family-sans);
+  padding: 100px 24px 120px;
   position: relative;
   overflow: hidden;
 }
 
-/* Background glows */
 .prem-bg-decorations {
   position: absolute;
   inset: 0;
@@ -21,156 +21,153 @@
   z-index: 0;
 }
 
-.prem-glow-orb {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(120px);
-  opacity: 0.25;
-}
-
 .prem-orb-1 {
-  width: 500px;
-  height: 500px;
-  background: #C5AC86;
-  top: -100px;
+  position: absolute;
+  top: -80px;
   left: 50%;
   transform: translateX(-50%);
-}
-
-.prem-orb-2 {
-  width: 400px;
+  width: 700px;
   height: 400px;
-  background: #f59e0b;
-  bottom: 10%;
-  right: 5%;
+  background: radial-gradient(ellipse at 50% 0%, rgba(197, 172, 134, 0.09) 0%, rgba(56, 189, 248, 0.03) 40%, transparent 70%);
 }
 
 .prem-container {
-  max-width: 1050px;
+  max-width: 1080px;
   margin: 0 auto;
   position: relative;
   z-index: 1;
 }
 
-/* Hero */
+/* ─── HERO ─── */
 .prem-hero {
   text-align: center;
   max-width: 720px;
-  margin: 0 auto 3.5rem;
+  margin: 0 auto 56px;
 }
 
 .prem-badge {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: rgba(197, 172, 134, 0.12);
-  border: 1px solid rgba(197, 172, 134, 0.35);
-  color: #C5AC86;
-  padding: 0.4rem 1.1rem;
-  border-radius: 9999px;
-  font-size: 0.8rem;
+  background: rgba(197, 172, 134, 0.10);
+  border: 1px solid rgba(197, 172, 134, 0.22);
+  color: var(--brand-gold, #C5AC86);
+  padding: 5px 16px;
+  border-radius: var(--radius-pill, 9999px);
+  font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
-  margin-bottom: 1.25rem;
+  margin-bottom: 20px;
 }
 
 .prem-heading {
-  font-size: 3.2rem;
-  font-weight: 800;
-  color: #ffffff;
-  margin: 0 0 1rem 0;
-  line-height: 1.15;
-  letter-spacing: -0.03em;
+  font-size: clamp(34px, 5.5vw, 56px);
+  font-weight: 750;
+  color: #FFFFFF;
+  margin: 0 0 18px 0;
+  line-height: 1.1;
+  letter-spacing: -0.035em;
 }
 
 .prem-heading span {
-  background: linear-gradient(135deg, #dfc6a2 0%, #C5AC86 50%, #b2966e 100%);
+  background: linear-gradient(180deg, #FFFFFF 0%, #DFCAAA 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .prem-description {
-  font-size: 1.15rem;
-  color: #94a3b8;
+  font-size: clamp(15px, 1.6vw, 17.5px);
+  color: var(--text-secondary, #A1A1A6);
   line-height: 1.6;
-  margin: 0 0 1.5rem 0;
+  margin: 0 0 24px 0;
 }
 
 .prem-pyq-banner {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: rgba(34, 197, 94, 0.08);
-  border: 1px solid rgba(34, 197, 94, 0.3);
-  color: #86efac;
-  padding: 0.6rem 1.3rem;
-  border-radius: 12px;
-  font-size: 0.9rem;
+  background: rgba(48, 209, 88, 0.08);
+  border: 1px solid rgba(48, 209, 88, 0.22);
+  color: #A3E7B7;
+  padding: 8px 18px;
+  border-radius: var(--radius-pill, 9999px);
+  font-size: 13.5px;
   font-weight: 600;
 }
 
-/* Pricing Section */
+/* ─── PRICING CARDS GRID (FORMA AI / APPLE STYLE) ─── */
 .prem-pricing-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, 1fr);
   gap: 24px;
-  margin-bottom: 4rem;
+  margin-bottom: 70px;
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .prem-plan-card {
-  background: rgba(17, 21, 28, 0.85);
-  border: 1.5px solid rgba(255, 255, 255, 0.08);
-  border-radius: 22px;
-  padding: 2.5rem 2rem;
+  background: rgba(14, 17, 24, 0.72);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: var(--radius-xl, 26px);
+  padding: 38px 32px;
   position: relative;
-  backdrop-filter: blur(16px);
   display: flex;
   flex-direction: column;
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 
+    0 20px 48px -12px rgba(0, 0, 0, 0.7),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14);
+  transition: all var(--duration-normal, 260ms) var(--ease-apple);
 }
 
 .prem-plan-card:hover {
   transform: translateY(-4px);
-  border-color: rgba(197, 172, 134, 0.5);
-  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.6), 0 0 30px rgba(197, 172, 134, 0.12);
+  border-color: rgba(255, 255, 255, 0.18);
+  box-shadow: 0 24px 60px -10px rgba(0, 0, 0, 0.8), 0 0 24px rgba(255, 255, 255, 0.04);
 }
 
+/* Recommended Tier with glowing border catch */
 .prem-plan-card.best-value {
-  border-color: #C5AC86;
-  background: linear-gradient(180deg, rgba(28, 33, 44, 0.95) 0%, rgba(17, 21, 28, 0.95) 100%);
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5), 0 0 25px rgba(197, 172, 134, 0.18);
+  border-color: rgba(197, 172, 134, 0.35);
+  box-shadow: 
+    0 24px 55px -10px rgba(0, 0, 0, 0.8),
+    0 0 30px rgba(197, 172, 134, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22);
 }
 
 .prem-best-tag {
   position: absolute;
-  top: -14px;
-  right: 24px;
-  background: linear-gradient(90deg, #C5AC86, #dfc6a2);
-  color: #111215;
-  font-size: 0.75rem;
-  font-weight: 800;
-  padding: 4px 12px;
-  border-radius: 9999px;
+  top: -12px;
+  right: 28px;
+  background: linear-gradient(180deg, #DFCAAA 0%, #C5AC86 100%);
+  color: #0A0C10;
+  font-size: 11px;
+  font-weight: 750;
+  padding: 4px 14px;
+  border-radius: var(--radius-pill, 9999px);
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  box-shadow: 0 4px 12px rgba(197, 172, 134, 0.4);
+  box-shadow: 0 4px 14px rgba(197, 172, 134, 0.35);
 }
 
 .prem-card-header {
-  margin-bottom: 1.5rem;
+  margin-bottom: 20px;
 }
 
 .prem-plan-title {
-  font-size: 1.4rem;
+  font-size: 22px;
   font-weight: 700;
-  color: #ffffff;
-  margin: 0 0 0.5rem 0;
+  color: #FFFFFF;
+  margin: 0 0 6px 0;
+  letter-spacing: -0.015em;
 }
 
 .prem-plan-sub {
-  font-size: 0.88rem;
-  color: #94a3b8;
+  font-size: 14px;
+  color: var(--text-secondary, #A1A1A6);
   margin: 0;
 }
 
@@ -178,241 +175,191 @@
   display: flex;
   align-items: baseline;
   gap: 6px;
-  margin-bottom: 0.5rem;
+  margin-bottom: 6px;
 }
 
 .prem-currency {
-  font-size: 1.8rem;
+  font-size: 24px;
   font-weight: 700;
-  color: #C5AC86;
+  color: var(--brand-gold, #C5AC86);
 }
 
 .prem-amount {
-  font-size: 3.5rem;
+  font-size: 50px;
   font-weight: 800;
-  color: #C5AC86;
+  color: #FFFFFF;
   line-height: 1;
+  letter-spacing: -0.03em;
 }
 
 .prem-billing-term {
-  font-size: 0.92rem;
-  color: #94a3b8;
+  font-size: 14px;
+  color: var(--text-secondary, #A1A1A6);
   font-weight: 500;
 }
 
 .prem-one-time-badge {
   display: inline-block;
-  background: rgba(255, 255, 255, 0.06);
-  color: #cbd5e1;
-  font-size: 0.76rem;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-secondary, #A1A1A6);
+  font-size: 11.5px;
   font-weight: 600;
-  padding: 3px 9px;
-  border-radius: 6px;
-  margin-bottom: 1.8rem;
+  padding: 3px 10px;
+  border-radius: var(--radius-pill, 9999px);
+  margin-bottom: 24px;
+  width: fit-content;
 }
 
 .prem-features-list {
   list-style: none;
   padding: 0;
-  margin: 0 0 2rem 0;
+  margin: 0 0 32px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
   flex: 1;
 }
 
-.prem-features-list li {
+.prem-feature-item {
   display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  font-size: 0.92rem;
-  color: #cbd5e1;
-  margin-bottom: 0.85rem;
-  line-height: 1.4;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  color: var(--text-primary, #F5F5F7);
 }
 
-.prem-features-list li svg {
+.prem-check-icon {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: rgba(48, 209, 88, 0.12);
+  color: var(--status-success, #30D158);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
-  margin-top: 2px;
 }
 
 .prem-cta-btn {
   width: 100%;
-  padding: 0.95rem;
-  background: linear-gradient(135deg, #C5AC86 0%, #b2966e 100%);
-  color: #111215;
-  border: none;
-  border-radius: 12px;
-  font-weight: 700;
-  font-size: 1rem;
+  padding: 13px 24px;
+  border-radius: var(--radius-pill, 9999px);
+  font-family: var(--font-family-sans);
+  font-size: 15px;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.25s;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
+  transition: all var(--duration-fast, 160ms) var(--ease-apple);
 }
 
-.prem-cta-btn:hover:not(:disabled) {
-  background: linear-gradient(135deg, #dfc6a2 0%, #C5AC86 100%);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(197, 172, 134, 0.35);
+.prem-cta-btn.gold {
+  background: #F5F5F7;
+  color: #0A0C10;
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
 }
 
-.prem-cta-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+.prem-cta-btn.gold:hover {
+  background: #FFFFFF;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px rgba(255, 255, 255, 0.22);
 }
 
-/* Feature Comparison Table */
-.prem-comparison-section {
-  background: rgba(15, 19, 26, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 20px;
-  padding: 2.5rem 2rem;
-  margin-bottom: 4rem;
+.prem-cta-btn.secondary {
+  background: rgba(255, 255, 255, 0.05);
+  color: #F5F5F7;
+  border: 1px solid rgba(255, 255, 255, 0.10);
 }
 
-.prem-section-title {
-  font-size: 1.75rem;
+.prem-cta-btn.secondary:hover {
+  background: rgba(255, 255, 255, 0.10);
+  border-color: rgba(255, 255, 255, 0.20);
+  color: #FFFFFF;
+}
+
+/* ─── COMPARISON & FAQ ─── */
+.prem-comparison-section,
+.prem-faq-section {
+  margin-top: 80px;
+}
+
+.prem-section-heading {
+  text-align: center;
+  font-size: 28px;
   font-weight: 700;
-  color: #ffffff;
-  margin: 0 0 0.5rem 0;
-  text-align: center;
+  color: #FFFFFF;
+  margin: 0 0 36px 0;
+  letter-spacing: -0.02em;
 }
 
-.prem-section-sub {
-  font-size: 0.95rem;
-  color: #94a3b8;
-  text-align: center;
-  margin: 0 0 2rem 0;
+.prem-comparison-table-wrap {
+  border-radius: var(--radius-xl, 24px);
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(14, 17, 24, 0.65);
+  backdrop-filter: blur(20px);
 }
 
 .prem-table {
   width: 100%;
-  min-width: 500px;
   border-collapse: collapse;
 }
 
 .prem-table th,
 .prem-table td {
-  padding: 1rem 1.2rem;
+  padding: 16px 20px;
   text-align: left;
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  font-size: 14px;
 }
 
 .prem-table th {
-  font-size: 0.95rem;
-  font-weight: 700;
-  color: #ffffff;
+  background: rgba(255, 255, 255, 0.03);
+  font-weight: 600;
+  color: #FFFFFF;
 }
 
-.prem-table td {
-  font-size: 0.9rem;
-  color: #cbd5e1;
-}
-
-.prem-table td:nth-child(2),
-.prem-table th:nth-child(2),
-.prem-table td:nth-child(3),
-.prem-table th:nth-child(3) {
-  text-align: center;
-}
-
-.prem-table th:nth-child(3) {
-  color: #C5AC86;
-}
-
-/* FAQs */
-.prem-faq-section {
+.prem-faq-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
   max-width: 800px;
-  margin: 0 auto 3rem;
+  margin: 0 auto;
 }
 
 .prem-faq-item {
-  background: rgba(17, 21, 28, 0.7);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 14px;
-  margin-bottom: 12px;
+  border-radius: var(--radius-md, 16px);
   overflow: hidden;
-  transition: all 0.2s;
+  background: rgba(14, 17, 24, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(16px);
+  transition: all 0.2s ease;
 }
 
-.prem-faq-item:hover {
-  border-color: rgba(197, 172, 134, 0.3);
-}
-
-.prem-faq-question {
-  padding: 1.2rem 1.4rem;
-  font-size: 1.02rem;
-  font-weight: 600;
-  color: #ffffff;
+.prem-faq-q {
+  padding: 18px 22px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   cursor: pointer;
+  font-weight: 600;
+  font-size: 15px;
+  color: #FFFFFF;
 }
 
-.prem-faq-answer {
-  padding: 0 1.4rem 1.2rem;
-  font-size: 0.9rem;
-  color: #94a3b8;
+.prem-faq-a {
+  padding: 0 22px 18px;
+  font-size: 14px;
   line-height: 1.6;
+  color: var(--text-secondary, #A1A1A6);
 }
 
-/* Trust footer */
-.prem-trust-footer {
-  text-align: center;
-  color: #64748b;
-  font-size: 0.85rem;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: 20px;
-}
-
-@media (max-width: 768px) {
-  .prem-page {
-    padding: 3rem 1.25rem 4rem;
-  }
-  .prem-heading {
-    font-size: clamp(2rem, 6vw, 2.6rem);
-  }
+/* ─── RESPONSIVE ─── */
+@media (max-width: 800px) {
   .prem-pricing-grid {
     grid-template-columns: 1fr;
-    gap: 20px;
-  }
-  .prem-comparison-section {
-    padding: 1.5rem 1rem;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-}
-
-@media (max-width: 480px) {
-  .prem-page {
-    padding: 2rem 0.85rem 3.5rem;
-  }
-  .prem-heading {
-    font-size: 1.85rem;
-  }
-  .prem-description {
-    font-size: 0.95rem;
-  }
-  .prem-plan-card {
-    padding: 1.8rem 1.25rem;
-    border-radius: 18px;
-  }
-  .prem-amount {
-    font-size: 2.8rem;
-  }
-  .prem-currency {
-    font-size: 1.5rem;
-  }
-  .prem-faq-question {
-    padding: 1rem 1.1rem;
-    font-size: 0.95rem;
-  }
-  .prem-faq-answer {
-    padding: 0 1.1rem 1rem;
-    font-size: 0.85rem;
   }
 }

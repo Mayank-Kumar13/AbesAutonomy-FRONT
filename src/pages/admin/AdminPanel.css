@@ -1,9 +1,9 @@
 .admin-wrapper {
   min-height: 100vh;
   padding: 6rem 2rem 3rem;
-  background-color: #0b0d10;
-  color: #e2e8f0;
-  font-family: system-ui, -apple-system, sans-serif;
+  background-color: var(--bg-canvas, #060709);
+  color: var(--text-primary, #F5F5F7);
+  font-family: var(--font-family-sans);
 }
 
 .admin-loading {
@@ -32,41 +32,45 @@
 }
 
 .admin-card {
-  background: #121418;
-  border: 1px solid #2d3748;
-  border-radius: 10px;
+  background: rgba(14, 17, 24, 0.72);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-md, 16px);
   padding: 1.25rem;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.12);
 }
 
 .admin-card-label {
   font-size: 0.8rem;
-  color: #a0aec0;
+  color: var(--text-secondary, #A1A1A6);
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  font-weight: 600;
 }
 
 .admin-card-value {
   font-size: 1.8rem;
-  font-weight: 600;
-  color: #c89b63;
+  font-weight: 700;
+  color: #FFFFFF;
   display: flex;
   align-items: center;
   gap: 0.5rem;
 }
 
 .admin-card.live .admin-card-value {
-  color: #4ade80;
+  color: var(--status-success, #30D158);
 }
 
 .live-dot {
-  width: 10px;
-  height: 10px;
+  width: 9px;
+  height: 9px;
   border-radius: 50%;
-  background: #4ade80;
-  box-shadow: 0 0 8px rgba(74, 222, 128, 0.8);
+  background: var(--status-success, #30D158);
+  box-shadow: 0 0 10px rgba(48, 209, 88, 0.8);
   display: inline-block;
   animation: pulse-dot 1.5s infinite;
 }
@@ -80,24 +84,32 @@
 .admin-tabs {
   display: flex;
   gap: 0.5rem;
-  border-bottom: 1px solid #2d3748;
-  margin-bottom: 1.25rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-pill, 9999px);
+  padding: 4px;
+  margin-bottom: 1.5rem;
+  width: fit-content;
+  flex-wrap: wrap;
 }
 
 .admin-tab-btn {
   background: transparent;
   border: none;
-  color: #718096;
-  padding: 0.6rem 1rem;
-  font-size: 0.9rem;
+  color: var(--text-secondary, #A1A1A6);
+  padding: 0.6rem 1.2rem;
+  font-size: 0.88rem;
+  font-weight: 550;
+  border-radius: var(--radius-pill, 9999px);
   cursor: pointer;
-  border-bottom: 2px solid transparent;
-  transition: all 0.2s;
+  transition: all var(--duration-fast, 160ms) var(--ease-apple);
 }
 
 .admin-tab-btn.active {
-  color: #c89b63;
-  border-bottom-color: #c89b63;
+  color: #0A0C10;
+  background: #F5F5F7;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  font-weight: 600;
 }
 
 .admin-table-wrap {

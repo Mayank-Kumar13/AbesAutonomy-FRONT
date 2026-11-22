@@ -47,7 +47,7 @@ const IntroOverlay = () => {
         }, 1800); // 1.8s intro hold to allow typing animation
         return () => clearTimeout(timer);
     } else if (stage === "move") {
-        const target = document.querySelector(".navbar .logo-section");
+        const target = document.querySelector(".capsule-brand") || document.querySelector(".navbar .logo-section");
         let destX = 60; // fallback margin left
         let destY = 18; // fallback top padding
         let targetScale = 1;

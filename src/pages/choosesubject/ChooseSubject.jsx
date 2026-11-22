@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './ChooseSubject.css';
 import Unicard from "../../component/universal_card/Unicard";
 import Credit_Card from "../../component/credit_card/Credit_Card";
-import {Link, useLocation, useNavigate} from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   LineChart, 
   BrainCircuit, 
@@ -14,22 +14,24 @@ import {
   Zap,      
   Cpu,      
   Leaf,     
-  BookOpen, 
+  BookOpen,
+  ChevronRight,
+  Sparkles,
+  Inbox
 } from 'lucide-react';
-import { subjectsApi } from '../../services/api';
 
 // Icon mapping for fallback or direct mapping
 const SUBJECT_ICONS = {
-  DSA: <LineChart size={35} strokeWidth={1.5} />,
-  MATHS: <span style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontWeight: 'bold', fontSize: '28px', lineHeight: '1' }}>f(x)</span>,
-  PHYSICS: <Atom size={35} strokeWidth={1.5} />,
-  EVS: <Leaf size={35} strokeWidth={1.5} />,
-  AI: <BrainCircuit size={35} strokeWidth={1.5} />,
-  ELECTRICAL: <Zap size={35} strokeWidth={1.5} />,
-  'SOFT SKILL': <Code size={35} strokeWidth={1.5} />,
-  DT: <Monitor size={35} strokeWidth={1.5} />,
-  MECHANICS: <Cog size={35} strokeWidth={1.5} />,
-  ELECTRONICS: <Cpu size={35} strokeWidth={1.5} />,
+  DSA: <LineChart size={30} strokeWidth={1.5} />,
+  MATHS: <span style={{ fontFamily: 'var(--font-family-serif)', fontStyle: 'italic', fontWeight: 'bold', fontSize: '24px', lineHeight: '1' }}>f(x)</span>,
+  PHYSICS: <Atom size={30} strokeWidth={1.5} />,
+  EVS: <Leaf size={30} strokeWidth={1.5} />,
+  AI: <BrainCircuit size={30} strokeWidth={1.5} />,
+  ELECTRICAL: <Zap size={30} strokeWidth={1.5} />,
+  'SOFT SKILL': <Code size={30} strokeWidth={1.5} />,
+  DT: <Monitor size={30} strokeWidth={1.5} />,
+  MECHANICS: <Cog size={30} strokeWidth={1.5} />,
+  ELECTRONICS: <Cpu size={30} strokeWidth={1.5} />,
 };
 
 const HANDWRITTEN_CREDIT = {
@@ -97,79 +99,120 @@ const ChooseSubject = () => {
     };
   }, [activeGroup, selectedYear, resourceType]);
 
-  // Map DB subjects to frontend format
   const displayedSubjects = subjects.map(subj => {
     const subjectName = subj.subject || subj.name || "Unknown";
-    const iconName = subj.icon || 'BookOpen';
-    // Fallback to our existing mapping if available, otherwise use default BookOpen
-    let mappedIcon = SUBJECT_ICONS[subjectName.toUpperCase()] || <BookOpen size={35} strokeWidth={1.5} />;
+    let mappedIcon = SUBJECT_ICONS[subjectName.toUpperCase()] || <BookOpen size={30} strokeWidth={1.5} />;
     
     return {
       heading: subjectName,
-      para: subj.description || `${subjectName} Study Materials (${subj.count || 0} files)`,
+      para: subj.description || `${subjectName} Academic Materials (${subj.count || 0} files)`,
       icon: mappedIcon,
     };
   });
 
   return (
     <div className="choose-subject-wrapper">
+      <div className="choose-ambient-light" aria-hidden="true" />
+
       <div className="choose-subject-container">
-        <div className="header-section">
-          <div style={{ color: '#d4a373', marginBottom: '16px', fontSize: '13px', fontWeight: '600', letterSpacing: '1px', display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-            <span style={{ cursor: 'pointer', transition: 'color 0.2s' }} onMouseEnter={(e) => e.target.style.color = '#fff'} onMouseLeave={(e) => e.target.style.color = '#d4a373'} onClick={() => navigate('/resources')}>RESOURCES</span>
-            <span>/</span>
-            <span style={{ color: '#fff' }}>{resourceTitle.toUpperCase()}</span>
+        {/* Navigation Breadcrumb */}
+        <nav className="choose-breadcrumb" aria-label="Breadcrumb">
+          <Link to="/resources" className="breadcrumb-link">RESOURCES</Link>
+          <ChevronRight size={14} className="breadcrumb-sep" />
+          <span className="breadcrumb-current">{resourceTitle.toUpperCase()}</span>
+        </nav>
+
+        {/* Page Header */}
+        <header className="choose-header">
+          <div className="choose-title-block">
+            <h1 className="choose-title">Choose Subject</h1>
+            <p className="choose-subtitle">
+              Select your academic discipline to access verified unit notes, syllabi, and study resources.
+            </p>
           </div>
-          <div className="title-container">
-            <h1 className="page-title">CHOOSE SUBJECT</h1>
-            <p className="page-subtitle">Select a subject to explore all related resources, notes, previous papers and more.</p>
-          </div>
-          
-          <div className="filter-controls-container">
+
+          {/* Interactive Filter Pills */}
+          <div className="choose-filters-row">
             {/* Year Selector */}
-            <div className="semester-container">
-              <span className="semester-label">YEAR</span>
-              <div className="semester-buttons">
-                <button className={`sem-btn ${selectedYear === 1 ? 'active' : ''}`} onClick={() => { setSelectedYear(1); setActiveGroup('electrical'); }}>YEAR 1</button>
-                <button className={`sem-btn ${selectedYear === 2 ? 'active' : ''}`} onClick={() => { setSelectedYear(2); setActiveGroup('cse'); }}>YEAR 2</button>
+            <div className="filter-group">
+              <span className="filter-group-label">YEAR</span>
+              <div className="filter-pills-wrap">
+                <button 
+                  type="button"
+                  className={`filter-pill ${selectedYear === 1 ? 'active' : ''}`} 
+                  onClick={() => { setSelectedYear(1); setActiveGroup('electrical'); }}
+                >
+                  Year 1
+                </button>
+                <button 
+                  type="button"
+                  className={`filter-pill ${selectedYear === 2 ? 'active' : ''}`} 
+                  onClick={() => { setSelectedYear(2); setActiveGroup('cse'); }}
+                >
+                  Year 2
+                </button>
               </div>
             </div>
 
-            {/* Group Selector - Year 1 */}
-            {selectedYear === 1 && (
-              <div className="semester-container">
-                <span className="semester-label">GROUP</span>
-                <div className="semester-buttons">
-                  <button className={`sem-btn ${activeGroup === 'electrical' ? 'active' : ''}`} onClick={() => setActiveGroup('electrical')}>Electrical</button>
-                  <button className={`sem-btn ${activeGroup === 'electronics' ? 'active' : ''}`} onClick={() => setActiveGroup('electronics')}>Electronics</button>
-                </div>
+            {/* Branch / Group Selector */}
+            <div className="filter-group">
+              <span className="filter-group-label">
+                {selectedYear === 1 ? 'GROUP' : 'BRANCH'}
+              </span>
+              <div className="filter-pills-wrap">
+                {selectedYear === 1 ? (
+                  <>
+                    <button 
+                      type="button"
+                      className={`filter-pill ${activeGroup === 'electrical' ? 'active' : ''}`} 
+                      onClick={() => setActiveGroup('electrical')}
+                    >
+                      Electrical
+                    </button>
+                    <button 
+                      type="button"
+                      className={`filter-pill ${activeGroup === 'electronics' ? 'active' : ''}`} 
+                      onClick={() => setActiveGroup('electronics')}
+                    >
+                      Electronics
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    {['cse', 'ds', 'aiml', 'ece', 'elce'].map((branch) => (
+                      <button
+                        key={branch}
+                        type="button"
+                        className={`filter-pill ${activeGroup === branch ? 'active' : ''}`}
+                        onClick={() => setActiveGroup(branch)}
+                      >
+                        {branch.toUpperCase()}
+                      </button>
+                    ))}
+                  </>
+                )}
               </div>
-            )}
-
-            {/* Group Selector - Year 2 */}
-            {selectedYear === 2 && (
-              <div className="semester-container">
-                <span className="semester-label">BRANCH</span>
-                <div className="semester-buttons">
-                  <button className={`sem-btn ${activeGroup === 'cse' ? 'active' : ''}`} onClick={() => setActiveGroup('cse')}>CSE</button>
-                  <button className={`sem-btn ${activeGroup === 'ds' ? 'active' : ''}`} onClick={() => setActiveGroup('ds')}>DS</button>
-                  <button className={`sem-btn ${activeGroup === 'aiml' ? 'active' : ''}`} onClick={() => setActiveGroup('aiml')}>AIML</button>
-                  <button className={`sem-btn ${activeGroup === 'ece' ? 'active' : ''}`} onClick={() => setActiveGroup('ece')}>ECE</button>
-                  <button className={`sem-btn ${activeGroup === 'elce' ? 'active' : ''}`} onClick={() => setActiveGroup('elce')}>ELCE</button>
-                </div>
-              </div>
-            )}
+            </div>
           </div>
-        </div>
+        </header>
 
+        {/* Subject Cards Section */}
         {loading ? (
-          <div style={{ textAlign: 'center', padding: '60px 0', color: '#9ca3af' }}>
-            <p>Loading subjects...</p>
+          <div className="subject-grid">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <div key={i} className="subject-skeleton-card skeleton-shimmer" />
+            ))}
           </div>
         ) : displayedSubjects.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '60px 0', color: '#9ca3af' }}>
-            <p>No subjects available for Year {selectedYear} {activeGroup} yet.</p>
-            <p>Please check back later.</p>
+          <div className="choose-empty-state glass-clear">
+            <div className="empty-icon-bubble">
+              <Inbox size={32} />
+            </div>
+            <h3>No Subjects Available</h3>
+            <p>
+              No notes uploaded for Year {selectedYear} ({activeGroup.toUpperCase()}) under {resourceTitle}.
+              Please select another branch or check back soon.
+            </p>
           </div>
         ) : (
           <div className="subject-grid">
@@ -184,27 +227,35 @@ const ChooseSubject = () => {
                   resourceTitle: resourceTitle,
                   branch: activeGroup,
                 }}
-                style={{ textDecoration: 'none', color: 'inherit' }}
+                className="subject-card-link"
                 key={index}
               >
                 <Unicard 
                   heading={subject.heading} 
                   para={subject.para} 
                   icon={subject.icon}
-                  btnn={<div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>Explore <ArrowRight size={16} /></div>}
+                  btnn={
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      Explore <ArrowRight size={14} />
+                    </span>
+                  }
                 />
               </Link>
             ))}
           </div>
         )}
 
-        {/* ─── Credit Card — Only for Handwritten Notes ─── */}
+        {/* Notes Contributed By Topper Section (Handwritten Notes Only) */}
         {isHandwritten && (
-          <div className="handwritten-credit-section">
+          <section className="handwritten-credit-glass glass-frosted" aria-label="Contributor Acknowledgement">
             <div className="handwritten-credit-header">
+              <div className="credit-tag-pill">
+                <Sparkles size={12} />
+                <span>TOPPER ACKNOWLEDGEMENT</span>
+              </div>
               <h2 className="handwritten-credit-title">Notes Contributed By</h2>
               <p className="handwritten-credit-subtitle">
-                Special thanks to the student who made these handwritten notes available for everyone.
+                Gratitude to academic toppers whose meticulously maintained notes assist hundreds of fellow ABES students.
               </p>
             </div>
             <div className="handwritten-credit-card-wrapper">
@@ -218,7 +269,7 @@ const ChooseSubject = () => {
                 instagram={HANDWRITTEN_CREDIT.instagram}
               />
             </div>
-          </div>
+          </section>
         )}
       </div>
     </div>
