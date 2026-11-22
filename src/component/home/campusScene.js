@@ -14,6 +14,7 @@ export function createCampusScene(canvas) {
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'low-power' });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
   renderer.setClearColor(0x000000, 0);
+  renderer.localClippingEnabled = true;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 0.92;
   renderer.shadowMap.enabled = true;
@@ -221,6 +222,11 @@ export function createCampusScene(canvas) {
   }
 
   const title = new THREE.Group();
+  // The atrium has real openings. Clip only the lettering below the roofline
+  // so it cannot show through those openings while rising behind the campus.
+  const titleRoofline = new THREE.Plane(new THREE.Vector3(0, 1, 0), -15.5);
+  materials.silver.clippingPlanes = [titleRoofline];
+  materials.silverSide.clippingPlanes = [titleRoofline];
   const font = new FontLoader().parse(brandFont);
   for (const [word, width, y] of [['ABES', 21, 18.1], ['AUTONOMY', 49, 11.8]]) {
     const geometry = new TextGeometry(word, { font, size: 6.6, depth: 1.3, curveSegments: 6, bevelEnabled: true, bevelThickness: 0.09, bevelSize: 0.055, bevelSegments: 2 });
@@ -307,7 +313,7 @@ export function createCampusScene(canvas) {
       title.scale.setScalar(titleScale);
       // Clear the rear block and entrance domes before the zoom begins. Pan
       // upward with the reveal so ABES keeps headroom beneath the navigation.
-      const titleLift = 6.2;
+      const titleLift = 4.5;
       title.position.y = 17 * (1 - titleScale) - 15 * (1 - rise) + titleLift * rise;
       const x = reducedMotion ? 0 : pointer.x * (1 - zoom) * 0.85;
       const y = reducedMotion ? 0 : -pointer.y * (1 - zoom) * 0.28;

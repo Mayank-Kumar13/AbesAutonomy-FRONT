@@ -138,6 +138,7 @@
   color: #c5d7e6;
   text-shadow: 0 4px 20px rgba(0, 0, 0, 0.8);
   transform: translateY(var(--title-rise));
+  clip-path: inset(0 0 var(--title-clip, 100%) 0);
 }
 
 .campus-vignette {
