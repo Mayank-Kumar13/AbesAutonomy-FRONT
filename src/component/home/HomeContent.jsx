@@ -19,7 +19,9 @@ export default function HomeContent() {
     if (!notes) return;
     notes.inert = false;
     notes.style.opacity = 1;
-    window.scrollTo({ top: notes.getBoundingClientRect().top + window.scrollY, behavior: 'smooth' });
+    // An accessibility skip must move focus immediately, without the scroll
+    // timeline making its destination inert again halfway through an animation.
+    window.scrollTo({ top: notes.getBoundingClientRect().top + window.scrollY, behavior: 'instant' });
     const titleEl = notes.querySelector('h2');
     if (titleEl) titleEl.focus({ preventScroll: true });
   };
@@ -40,29 +42,37 @@ export default function HomeContent() {
     let start = 0;
     let distance = 1;
 
-    const render = () => {
+    let previousTime = 0;
+    const render = (time = performance.now()) => {
       frame = 0;
       if (disposed || document.hidden) return;
       progress = Math.max(0, Math.min(1, (window.scrollY - start) / distance));
       const state = getJourneyState(progress, motion.matches);
-      currentPointer.x += (pointer.x - currentPointer.x) * 0.09;
-      currentPointer.y += (pointer.y - currentPointer.y) * 0.09;
+      const delta = previousTime ? Math.min(time - previousTime, 64) : 16;
+      previousTime = time;
+      const damping = motion.matches ? 1 : 1 - Math.exp(-delta / 110);
+      currentPointer.x += (pointer.x - currentPointer.x) * damping;
+      currentPointer.y += (pointer.y - currentPointer.y) * damping;
       stage.style.setProperty('--title-rise', `${(1 - state.rise) * 110}%`);
-      stage.style.setProperty('--scene-opacity', `${state.opacity}`);
-      stage.style.setProperty('--scene-scale', `${state.scale}`);
+      stage.style.setProperty('--scene-opacity', `${1 - state.fade}`);
+      stage.style.setProperty('--scene-scale', `${1 + state.zoom * 1.8}`);
       stage.style.setProperty('--cue-opacity', `${Math.max(0, 1 - progress * 4.2)}`);
       stage.style.setProperty('--journey-progress', `${progress}`);
+      stage.inert = !motion.matches && state.fade >= 1;
 
       if (notes) {
-        notes.style.opacity = `${Math.max(0, (progress - 0.72) / 0.28)}`;
-        notes.inert = progress < 0.94;
+        notes.style.opacity = motion.matches ? '1' : `${state.fade}`;
+        notes.inert = !motion.matches && state.fade < 0.5;
       }
 
-      scene?.update({
-        progress,
-        pointer: currentPointer,
-        state,
-      });
+      scene?.render(state, currentPointer, motion.matches);
+      // Finish easing after the last pointer event; stop once settled.
+      if (!motion.matches && state.fade < 1 &&
+          (Math.abs(pointer.x - currentPointer.x) > 0.001 || Math.abs(pointer.y - currentPointer.y) > 0.001)) {
+        frame = window.requestAnimationFrame(render);
+      } else {
+        previousTime = 0;
+      }
     };
 
     const schedule = () => {
@@ -73,14 +83,15 @@ export default function HomeContent() {
       const journeyRect = journey.getBoundingClientRect();
       start = journeyRect.top + window.scrollY;
       distance = Math.max(1, journey.offsetHeight - stage.offsetHeight);
+      scene?.resize(stage.clientWidth, stage.clientHeight);
       schedule();
     };
 
     const onPointer = (event) => {
-      if (!finePointer.matches) return;
+      if (motion.matches || !finePointer.matches || progress > 0.8) return;
       const rect = stage.getBoundingClientRect();
       pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-      pointer.y = -(((event.clientY - rect.top) / rect.height) * 2 - 1);
+      pointer.y = ((event.clientY - rect.top) / rect.height) * 2 - 1;
       schedule();
     };
 
@@ -92,13 +103,20 @@ export default function HomeContent() {
 
     const onContextLost = (event) => {
       event.preventDefault();
+      scene?.dispose();
+      scene = undefined;
       setSceneReady(false);
-    };
-
-    const onMotionChange = () => {
       measure();
     };
 
+    const onMotionChange = () => {
+      resetPointer();
+      measure();
+    };
+
+    const resizeObserver = new ResizeObserver(measure);
+    resizeObserver.observe(journey);
+    resizeObserver.observe(stage);
     measure();
     window.addEventListener('scroll', schedule, { passive: true });
     window.addEventListener('resize', measure, { passive: true });
@@ -113,17 +131,24 @@ export default function HomeContent() {
       .then(({ createCampusScene }) => {
         if (disposed) return;
         scene = createCampusScene(canvas);
-        setSceneReady(true);
         measure();
+        window.cancelAnimationFrame(frame);
+        render();
+        setSceneReady(true);
       })
       .catch((error) => {
         console.warn('3D campus scene skipped, using fallback stage.', error);
-        setSceneReady(false);
+        if (!disposed) {
+          scene?.dispose();
+          scene = undefined;
+          setSceneReady(false);
+        }
       });
 
     return () => {
       disposed = true;
       if (frame) window.cancelAnimationFrame(frame);
+      resizeObserver.disconnect();
       window.removeEventListener('scroll', schedule);
       window.removeEventListener('resize', measure);
       window.removeEventListener('pageshow', measure);
@@ -138,6 +163,7 @@ export default function HomeContent() {
 
   return (
     <div className="autonomy-home">
+      <a className="home-explore-link" href="#all-notes" onClick={skipToNotes}>Explore notes</a>
       <HomeNavigation onSkipNotes={skipToNotes} />
       <main>
         {/* 3D Campus Experience Stage */}

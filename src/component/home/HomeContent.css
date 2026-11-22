@@ -7,6 +7,7 @@
 .autonomy-home {
   --home-bg: #060709;
   --home-ink: #F5F5F7;
+  --stage-height: max(100svh, 420px);
   color: var(--home-ink);
   background: var(--home-bg);
   font-family: var(--font-family-sans, -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif);
@@ -40,8 +41,25 @@
 }
 
 /* ─── 3D CAMPUS JOURNEY STAGE ─── */
+.home-explore-link {
+  position: absolute;
+  z-index: 3;
+  top: 108px;
+  right: 5%;
+  padding: 10px 18px;
+  border: 1px solid rgba(223, 202, 170, 0.25);
+  border-radius: 999px;
+  background: rgba(6, 7, 9, 0.65);
+  backdrop-filter: blur(12px);
+  font-size: 14px;
+}
+
+.home-explore-link:hover {
+  background: rgba(197, 172, 134, 0.18);
+}
+
 .campus-journey {
-  height: 310svh;
+  height: calc(var(--stage-height) + 180svh);
   position: relative;
 }
 
@@ -52,8 +70,7 @@
   --cue-opacity: 1;
   position: sticky;
   top: 0;
-  height: 100svh;
-  min-height: 520px;
+  height: var(--stage-height);
   overflow: hidden;
   background: #060709;
 }
@@ -79,7 +96,7 @@
   height: 100%;
   display: block;
   opacity: 0;
-  transition: opacity 0.4s ease;
+  pointer-events: none;
 }
 
 .is-3d-ready .campus-canvas {
@@ -96,6 +113,15 @@
 
 .is-3d-ready .campus-fallback {
   visibility: hidden;
+}
+
+.campus-fallback-building {
+  position: absolute;
+  bottom: 10%;
+  left: 50%;
+  width: max(100%, 760px);
+  max-width: none;
+  transform: translateX(-50%);
 }
 
 .campus-fallback-title {
@@ -129,10 +155,10 @@
   bottom: 40px;
   display: flex;
   justify-content: space-between;
-  font-size: 11px;
+  font-size: 12px;
   letter-spacing: 0.22em;
   opacity: var(--cue-opacity);
-  color: var(--text-tertiary, #6E6E73);
+  color: #b7bdc7;
   font-weight: 500;
   text-transform: uppercase;
 }
@@ -146,7 +172,7 @@
   flex-direction: column;
   align-items: center;
   gap: 10px;
-  font-size: 10.5px;
+  font-size: 12px;
   letter-spacing: 0.24em;
   opacity: var(--cue-opacity);
   color: var(--text-secondary, #A1A1A6);
@@ -157,7 +183,11 @@
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  transition: all var(--duration-fast, 160ms) ease;
+  transition: background 160ms ease, border-color 160ms ease;
+}
+
+.campus-scroll-cue:focus-visible {
+  opacity: 1;
 }
 
 .campus-scroll-cue svg {
@@ -193,7 +223,7 @@
 /* ─── LIQUID GLASS SHOWCASE SECTION ─── */
 .home-notes {
   min-height: 100svh;
-  margin-top: -100svh;
+  margin-top: calc(-1 * var(--stage-height));
   position: relative;
   overflow: hidden;
   display: flex;
@@ -269,7 +299,7 @@
 .notes-description {
   max-width: 680px;
   margin: 0 auto 52px;
-  font-size: clamp(15px, 1.6vw, 18px);
+  font-size: clamp(16px, 1.6vw, 18px);
   line-height: 1.6;
   color: var(--text-secondary, #A1A1A6);
   font-weight: 400;
@@ -320,7 +350,7 @@
 
 .home-glass-card p {
   margin: 0;
-  font-size: 14px;
+  font-size: 16px;
   line-height: 1.55;
   color: var(--text-secondary, #A1A1A6);
 }
@@ -396,17 +426,16 @@
   }
 
   .campus-journey {
-    height: 250svh;
+    height: calc(var(--stage-height) + 140svh);
   }
 }
 
 @media (max-width: 540px) {
-  .campus-stage {
-    min-height: 480px;
-  }
-
   .campus-caption {
-    font-size: 9px;
+    bottom: 118px;
+    justify-content: center;
+    font-size: 12px;
+    letter-spacing: 0.12em;
   }
 
   .campus-caption span:last-child {
@@ -418,7 +447,7 @@
   }
 
   .notes-description {
-    font-size: 14.5px;
+    font-size: 16px;
     margin-bottom: 36px;
   }
 
@@ -445,8 +474,7 @@
     scroll-behavior: auto;
   }
   .campus-journey {
-    height: 100svh;
-    min-height: 520px;
+    height: var(--stage-height);
   }
   .campus-stage {
     position: relative;
@@ -456,5 +484,11 @@
   }
   .home-notes {
     margin-top: 0;
+  }
+  .autonomy-home *,
+  .autonomy-home *::before,
+  .autonomy-home *::after {
+    animation: none !important;
+    transition: none !important;
   }
 }
