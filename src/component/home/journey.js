@@ -10,7 +10,7 @@ export function getJourneyState(progress, reducedMotion = false) {
   if (reducedMotion) return { rise: 1, zoom: 0, fade: 0 };
   return {
     rise: smoothstep(0.015, 0.36, progress),
-    zoom: smoothstep(0.49, 0.93, progress),
+    zoom: smoothstep(0.56, 0.93, progress),
     fade: smoothstep(0.77, 0.97, progress),
   };
 }

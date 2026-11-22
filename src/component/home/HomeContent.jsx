@@ -53,7 +53,7 @@ export default function HomeContent() {
       const damping = motion.matches ? 1 : 1 - Math.exp(-delta / 110);
       currentPointer.x += (pointer.x - currentPointer.x) * damping;
       currentPointer.y += (pointer.y - currentPointer.y) * damping;
-      stage.style.setProperty('--title-rise', `${(1 - state.rise) * 110}%`);
+      stage.style.setProperty('--title-rise', `${(1 - state.rise) * 110 - state.rise * 20}%`);
       stage.style.setProperty('--scene-opacity', `${1 - state.fade}`);
       stage.style.setProperty('--scene-scale', `${1 + state.zoom * 1.8}`);
       stage.style.setProperty('--cue-opacity', `${Math.max(0, 1 - progress * 4.2)}`);

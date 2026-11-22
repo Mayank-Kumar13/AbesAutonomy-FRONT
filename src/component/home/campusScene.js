@@ -305,11 +305,14 @@ export function createCampusScene(canvas) {
       const baseDistance = narrow ? 77 : Math.max(49, 33 / aspect);
       const titleScale = Math.min(1, baseDistance * Math.tan(THREE.MathUtils.degToRad(20)) * aspect * 1.8 / 49);
       title.scale.setScalar(titleScale);
-      title.position.y = 17 * (1 - titleScale) - 15 * (1 - rise);
+      // Clear the rear block and entrance domes before the zoom begins. Pan
+      // upward with the reveal so ABES keeps headroom beneath the navigation.
+      const titleLift = 6.2;
+      title.position.y = 17 * (1 - titleScale) - 15 * (1 - rise) + titleLift * rise;
       const x = reducedMotion ? 0 : pointer.x * (1 - zoom) * 0.85;
       const y = reducedMotion ? 0 : -pointer.y * (1 - zoom) * 0.28;
-      camera.position.set(x, THREE.MathUtils.lerp(narrow ? 16 : 15, 17.5, zoom) + y, THREE.MathUtils.lerp(baseDistance, -1.8, zoom));
-      camera.lookAt(0, THREE.MathUtils.lerp(narrow ? 13 : 12, 17.5, zoom), -6);
+      camera.position.set(x, THREE.MathUtils.lerp((narrow ? 16 : 15) + rise * 2.5, 17.5 + titleLift, zoom) + y, THREE.MathUtils.lerp(baseDistance + rise * 3, -1.8, zoom));
+      camera.lookAt(0, THREE.MathUtils.lerp((narrow ? 13 : 12) + rise * 3, 17.5 + titleLift, zoom), -6);
       renderer.render(scene, camera);
       scheduleClouds();
     },
