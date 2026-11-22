@@ -7,6 +7,7 @@ import ReviewModal from "../component/home/ReviewModal";
 import Navbar from "../component/navbar/Navbar";
 import { downloadNoteFile } from "../utils/downloadHelper";
 import PremiumUpgradeModal from "../component/premium/PremiumUpgradeModal";
+import PdfChatPanel from "../component/PdfChatPanel";
 export default function PdfPreview() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -410,6 +411,9 @@ export default function PdfPreview() {
       ) : (
         <Pdfviewer file={viewerFileUrl} backendUrl={noteId ? `${API_BASE}/notes/${noteId}/pdf` : ''} isImageFlag={isImage} isDarkMode={isDarkMode} />
       )}
+
+      {/* AI assistant: answers questions about THIS pdf only */}
+      {noteId && !isImage && !accessDenied && (<PdfChatPanel noteId={noteId} title={title} />)}
 
       {/* "Still Reading?" Anti-AFK Modal */}
       {showStillReadingPrompt && (

@@ -584,6 +584,18 @@ export const aiApi = {
       body: JSON.stringify(payload),
     });
   },
+
+  // Chat about the PDF that is open in the viewer. retries=0: request() would otherwise
+  // auto-retry 429s, which for AI means burning the user's daily allowance / shared quota.
+  async pdfChatStatus(noteId) {
+    return request(`/ai/pdf-chat/${encodeURIComponent(noteId)}/status`, {}, 0);
+  },
+  async pdfChat({ noteId, message, history }) {
+    return request('/ai/pdf-chat', {
+      method: 'POST',
+      body: JSON.stringify({ noteId, message, history }),
+    }, 0);
+  },
 };
 
 // ─────────────────────────────────────────────────────
