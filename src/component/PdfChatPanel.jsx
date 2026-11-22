@@ -341,7 +341,7 @@ export default function PdfChatPanel({ noteId, title }) {
 
       <style>{`
         .pdfchat-launcher {
-          position: fixed; right: 16px; bottom: 20px; z-index: 9000;
+          position: fixed; right: 30px; bottom: 110px; z-index: 9000; /* sits above the notification bell (bottom-right, z 9999) */
           display: flex; align-items: center; gap: 8px;
           padding: 11px 18px; border: none; border-radius: 999px; cursor: pointer;
           background: linear-gradient(135deg, #d9a441 0%, #b8860b 100%); color: #0b0d10;
@@ -351,7 +351,7 @@ export default function PdfChatPanel({ noteId, title }) {
         }
         .pdfchat-launcher:hover { transform: translateY(-2px); }
         .pdfchat-panel {
-          position: fixed; right: 16px; bottom: 16px; z-index: 9000;
+          position: fixed; right: 16px; bottom: 16px; z-index: 10001; /* above the notification bell */
           width: 400px; max-width: calc(100vw - 32px);
           height: min(620px, calc(100vh - 120px));
           display: flex; flex-direction: column; overflow: hidden;
@@ -435,7 +435,7 @@ export default function PdfChatPanel({ noteId, title }) {
         .pdfchat-dots i:nth-child(3) { animation-delay: .3s; }
         @keyframes pdfchat-bounce { 0%, 80%, 100% { transform: scale(.6); opacity: .5; } 40% { transform: scale(1); opacity: 1; } }
         @media (max-width: 640px) {
-          .pdfchat-launcher { right: 12px; bottom: 14px; padding: 10px 16px; }
+          .pdfchat-launcher { right: 16px; bottom: 90px; padding: 10px 16px; }
           .pdfchat-panel {
             left: 0; right: 0; bottom: 0; width: 100%; max-width: 100%;
             height: 82vh; height: 82dvh; border-radius: 16px 16px 0 0;
