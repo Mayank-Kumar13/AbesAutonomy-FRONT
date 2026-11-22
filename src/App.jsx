@@ -45,6 +45,7 @@ const App = () => {
   const path = location.pathname.toLowerCase();
   const isAuthPage = path === '/login' || path === '/forgot-password' || path === '/reset-password' || path.startsWith('/auth/');
   const hideNavAndFooter = isAuthPage || path === '/pdfpreview';
+  const hideFooter = hideNavAndFooter || path === '/credits';
   const isHomePage = path === '/';
 
   return (
@@ -84,7 +85,7 @@ const App = () => {
           <Route path="/admin" element={<AdminRoute><AdminPanel /></AdminRoute>} />
         </Routes>
       </Suspense>
-      {!hideNavAndFooter && !isHomePage && <Footer />}
+      {!hideFooter && !isHomePage && <Footer />}
     </GlobalStatusGuard>
   )
 }
