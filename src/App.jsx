@@ -21,6 +21,7 @@ import PrivacyPolicy from './pages/InfoPage/PrivacyPolicy';
 import Terms from './pages/InfoPage/Terms';
 import Contact from './pages/InfoPage/Contact';
 import Contribute from './pages/InfoPage/Contribute';
+import UnderConstruction from './pages/UnderConstruction/UnderConstruction';
 import ForgotPassword from './pages/forgotPassword/ForgotPassword';
 import ResetPassword from './pages/forgotPassword/ResetPassword';
 import OAuthCallback from './pages/oauth/OAuthCallback';
@@ -79,6 +80,7 @@ const App = () => {
           <Route path="/terms" element={<Terms />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/contribute" element={<Contribute />} />
+          <Route path="/under-construction" element={<UnderConstruction />} />
           <Route path="/admin" element={<AdminRoute><AdminPanel /></AdminRoute>} />
         </Routes>
       </Suspense>

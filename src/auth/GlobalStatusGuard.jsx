@@ -20,7 +20,11 @@ const GlobalStatusGuard = ({ children }) => {
     );
   }
 
-  const isUnderConstruction = websiteStatus === 'UNDER_CONSTRUCTION';
+  // In local development, allow designing and previewing the full application
+  // without being locked out by the production backend's UNDER_CONSTRUCTION status.
+  const isDev = import.meta.env.DEV;
+  const forceConstruction = import.meta.env.VITE_ENFORCE_UNDER_CONSTRUCTION === 'true';
+  const isUnderConstruction = websiteStatus === 'UNDER_CONSTRUCTION' && (!isDev || forceConstruction);
   const isAdmin = user?.role === 'admin';
 
   // If the site is under construction and the user is NOT an admin
