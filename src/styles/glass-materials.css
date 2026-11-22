@@ -91,6 +91,22 @@
 
 .glass-btn-primary * {
   color: #08090C !important;
+  -webkit-text-fill-color: #08090C !important;
+}
+
+/* ─── BULLETPROOF TEXT CONTRAST GUARD FOR WHITE PILL BUTTONS ─── */
+:is(.glass-btn-primary, .home-cta-btn, .nav-signin-pill) {
+  color: #08090C !important;
+  -webkit-text-fill-color: #08090C !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+:is(.glass-btn-primary, .home-cta-btn, .nav-signin-pill) :is(span, svg, strong, em, div) {
+  color: #08090C !important;
+  -webkit-text-fill-color: #08090C !important;
+  opacity: 1 !important;
+  visibility: visible !important;
 }
 
 .glass-btn-primary:hover {

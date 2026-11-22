@@ -1,0 +1,138 @@
+/**
+ * ABES AUTONOMY — THREE.JS LANYARD 3D COMPONENT STYLES
+ * Physically simulated 3D hanging identity badge lanyard with Apple Liquid Glass stage.
+ */
+
+.lanyard-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 540px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: grab;
+}
+
+.lanyard-container.is-dragging {
+  cursor: grabbing;
+}
+
+.lanyard-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+  outline: none;
+  pointer-events: auto;
+}
+
+/* ─── HINT OVERLAY & FLIP PILL ─── */
+.lanyard-hint-badge {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px;
+  background: rgba(12, 15, 22, 0.78);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-pill, 9999px);
+  color: var(--text-secondary, #A1A1A6);
+  font-family: var(--font-family-sans);
+  font-size: 12.5px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  box-shadow: 
+    0 4px 16px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  z-index: 10;
+}
+
+.lanyard-hint-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--brand-gold, #C5AC86);
+  box-shadow: 0 0 8px rgba(197, 172, 134, 0.8);
+  animation: lanyardPulse 2s infinite ease-in-out;
+}
+
+@keyframes lanyardPulse {
+  0%, 100% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.4); opacity: 1; }
+}
+
+/* ─── FALLBACK CARD FOR BROKEN / DISABLED WEBGL ─── */
+.lanyard-fallback-card {
+  position: relative;
+  width: 290px;
+  height: 420px;
+  background: rgba(14, 18, 26, 0.92);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 20px;
+  box-shadow: 
+    0 24px 60px rgba(0, 0, 0, 0.8),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 20px;
+  text-align: center;
+  z-index: 5;
+}
+
+.lanyard-fallback-portrait {
+  width: 190px;
+  height: 190px;
+  border-radius: 16px;
+  object-fit: cover;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  margin-bottom: 20px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+}
+
+.lanyard-fallback-name {
+  font-size: 22px;
+  font-weight: 700;
+  color: #FFFFFF;
+  margin: 0 0 6px 0;
+}
+
+.lanyard-fallback-role {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--brand-gold, #C5AC86);
+  margin: 0;
+}
+
+/* ─── RESPONSIVE SAFEGUARDS ─── */
+@media (max-width: 768px) {
+  .lanyard-container {
+    min-height: 460px;
+  }
+  .lanyard-hint-badge {
+    bottom: 16px;
+    padding: 6px 14px;
+    font-size: 11.5px;
+  }
+}
+
+@media (max-width: 480px) {
+  .lanyard-container {
+    min-height: 400px;
+  }
+}

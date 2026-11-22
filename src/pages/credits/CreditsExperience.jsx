@@ -1,7 +1,22 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import gsap from 'gsap';
-import { ArrowLeft, ArrowRight, Sparkles, ChevronLeft, ChevronRight } from 'lucide-react';
-import ContributorCard3D from './ContributorCard3D';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import { 
+  ArrowLeft, 
+  ArrowRight, 
+  Sparkles, 
+  ChevronLeft, 
+  ChevronRight, 
+  RotateCw, 
+  ExternalLink,
+  ShieldCheck,
+  Award
+} from 'lucide-react';
+import { FaGithub, FaLinkedinIn, FaInstagram } from 'react-icons/fa';
+import Lanyard from './Lanyard';
+import { 
+  createFrontBadgeCanvas, 
+  createBackBadgeCanvas, 
+  createStrapCanvas 
+} from './badgeTextureGenerator';
 import CreditsParticleScene from './CreditsParticleScene';
 import './CreditsExperience.css';
 
@@ -99,7 +114,7 @@ const DEFAULT_MEMBERS = [
 
 export default function CreditsExperience({ liveSections = [] }) {
   // Aggregate all members from live backend sections if provided, else use defaults
-  const members = React.useMemo(() => {
+  const members = useMemo(() => {
     if (Array.isArray(liveSections) && liveSections.length > 0) {
       const flattened = [];
       liveSections.forEach((sec) => {
@@ -120,389 +135,274 @@ export default function CreditsExperience({ liveSections = [] }) {
   }, [liveSections]);
 
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [isFlipped, setIsFlipped] = useState(false);
+  const [loadedImages, setLoadedImages] = useState({});
+  const [canvasTextures, setCanvasTextures] = useState({});
 
-  const stageRef = useRef(null);
-  const cardElementsRef = useRef([]);
-  const lastScrollTime = useRef(0);
-  const touchStartX = useRef(0);
-  const touchStartY = useRef(0);
+  const activeMember = members[currentIndex] || members[0];
 
-  // Preload and decode all contributor portraits eagerly
+  // Pre-generate procedural strap texture canvas
+  const strapCanvas = useMemo(() => {
+    return createStrapCanvas({ width: 1024, height: 128 });
+  }, []);
+
+  // Preload contributor photos into Image elements
   useEffect(() => {
     members.forEach((member) => {
-      if (member.photoUrl) {
+      if (member.photoUrl && !loadedImages[member._id]) {
         const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => {
+          setLoadedImages((prev) => ({ ...prev, [member._id]: img }));
+        };
+        img.onerror = () => {
+          console.warn(`Could not load portrait for ${member.name}, using fallback canvas`);
+          // Set null image so generator renders monogram placeholder
+          setLoadedImages((prev) => ({ ...prev, [member._id]: null }));
+        };
         img.src = member.photoUrl;
       }
     });
-  }, [members]);
+  }, [members, loadedImages]);
 
-  // Set initial 3D positions for all cards
-  const setupCards = useCallback(() => {
-    cardElementsRef.current.forEach((cardEl, idx) => {
-      if (!cardEl) return;
-      if (idx === currentIndex) {
-        gsap.set(cardEl, {
-          xPercent: 0,
-          yPercent: 0,
-          rotateY: 0,
-          rotateX: 0,
-          rotateZ: 0,
-          scale: 1,
-          opacity: 1,
-          zIndex: 20,
-          visibility: 'visible',
-        });
-      } else if (idx < currentIndex) {
-        gsap.set(cardEl, {
-          xPercent: -150,
-          yPercent: 0,
-          rotateY: -48,
-          rotateX: 8,
-          rotateZ: -4,
-          scale: 0.75,
-          opacity: 0,
-          zIndex: 10,
-          visibility: 'hidden',
-        });
-      } else {
-        gsap.set(cardEl, {
-          xPercent: 150,
-          yPercent: 0,
-          rotateY: 48,
-          rotateX: 8,
-          rotateZ: 4,
-          scale: 0.75,
-          opacity: 0,
-          zIndex: 10,
-          visibility: 'hidden',
-        });
-      }
-    });
-  }, [currentIndex]);
-
+  // Generate and cache front/back canvas textures for each member
   useEffect(() => {
-    setupCards();
-  }, [setupCards, members]);
+    const member = activeMember;
+    if (!member) return;
 
-  // Master transition function between cards
-  const goToCard = useCallback(
-    (newIndex, direction = 'next') => {
-      if (isTransitioning || newIndex === currentIndex) return;
-      if (newIndex < 0 || newIndex >= members.length) return;
+    const img = loadedImages[member._id];
+    const front = createFrontBadgeCanvas(member, img);
+    const back = createBackBadgeCanvas(member);
 
-      setIsTransitioning(true);
-      const currentCard = cardElementsRef.current[currentIndex];
-      const nextCard = cardElementsRef.current[newIndex];
+    setCanvasTextures((prev) => ({
+      ...prev,
+      [member._id]: { front, back },
+    }));
+  }, [activeMember, loadedImages]);
 
-      const tl = gsap.timeline({
-        defaults: { ease: 'power3.out' },
-        onComplete: () => {
-          setCurrentIndex(newIndex);
-          setIsTransitioning(false);
-        },
-      });
+  // Navigation handlers
+  const handlePrev = useCallback(() => {
+    setIsFlipped(false);
+    setCurrentIndex((prev) => (prev > 0 ? prev - 1 : members.length - 1));
+  }, [members.length]);
 
-      if (direction === 'next') {
-        // Current Card EXITS towards the LEFT with natural 3D rotation
-        if (currentCard) {
-          tl.to(
-            currentCard,
-            {
-              xPercent: -150,
-              rotateY: -48,
-              rotateX: 8,
-              rotateZ: -4,
-              scale: 0.74,
-              opacity: 0,
-              duration: 0.85,
-            },
-            0
-          );
-        }
+  const handleNext = useCallback(() => {
+    setIsFlipped(false);
+    setCurrentIndex((prev) => (prev < members.length - 1 ? prev + 1 : 0));
+  }, [members.length]);
 
-        // Next Card ENTERS from the RIGHT with 3D rotation, settling into center
-        if (nextCard) {
-          gsap.set(nextCard, {
-            visibility: 'visible',
-            xPercent: 150,
-            rotateY: 52,
-            rotateX: 10,
-            rotateZ: 4,
-            scale: 0.75,
-            opacity: 0,
-            zIndex: 25,
-          });
+  const handleFlipToggle = useCallback(() => {
+    setIsFlipped((prev) => !prev);
+  }, []);
 
-          tl.to(
-            nextCard,
-            {
-              xPercent: 0,
-              rotateY: 0,
-              rotateX: 0,
-              rotateZ: 0,
-              scale: 1,
-              opacity: 1,
-              duration: 0.95,
-              ease: 'power3.out',
-            },
-            0.12
-          );
-        }
-      } else {
-        // Going backward: Current Card EXITS towards the RIGHT
-        if (currentCard) {
-          tl.to(
-            currentCard,
-            {
-              xPercent: 150,
-              rotateY: 48,
-              rotateX: 8,
-              rotateZ: 4,
-              scale: 0.74,
-              opacity: 0,
-              duration: 0.85,
-            },
-            0
-          );
-        }
-
-        // Previous Card ENTERS from the LEFT
-        if (nextCard) {
-          gsap.set(nextCard, {
-            visibility: 'visible',
-            xPercent: -150,
-            rotateY: -52,
-            rotateX: 10,
-            rotateZ: -4,
-            scale: 0.75,
-            opacity: 0,
-            zIndex: 25,
-          });
-
-          tl.to(
-            nextCard,
-            {
-              xPercent: 0,
-              rotateY: 0,
-              rotateX: 0,
-              rotateZ: 0,
-              scale: 1,
-              opacity: 1,
-              duration: 0.95,
-              ease: 'power3.out',
-            },
-            0.12
-          );
-        }
-      }
-    },
-    [currentIndex, isTransitioning, members.length]
-  );
-
-  const nextCard = useCallback(() => {
-    if (currentIndex < members.length - 1) {
-      goToCard(currentIndex + 1, 'next');
-    }
-  }, [currentIndex, goToCard, members.length]);
-
-  const prevCard = useCallback(() => {
-    if (currentIndex > 0) {
-      goToCard(currentIndex - 1, 'prev');
-    }
-  }, [currentIndex, goToCard]);
-
-  // Scroll wheel interaction with cooldown
-  useEffect(() => {
-    const handleWheel = (e) => {
-      const now = Date.now();
-      if (now - lastScrollTime.current < 850) return;
-
-      if (e.deltaY > 28) {
-        if (currentIndex < members.length - 1) {
-          lastScrollTime.current = now;
-          nextCard();
-        }
-      } else if (e.deltaY < -28) {
-        if (currentIndex > 0) {
-          lastScrollTime.current = now;
-          prevCard();
-        }
-      }
-    };
-
-    const stage = stageRef.current;
-    if (stage) {
-      stage.addEventListener('wheel', handleWheel, { passive: true });
-    }
-    return () => {
-      if (stage) stage.removeEventListener('wheel', handleWheel);
-    };
-  }, [currentIndex, members.length, nextCard, prevCard]);
-
-  // Keyboard navigation (ArrowLeft & ArrowRight)
+  // Keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
-        nextCard();
-      } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
-        prevCard();
-      }
+      if (e.key === 'ArrowLeft') handlePrev();
+      if (e.key === 'ArrowRight') handleNext();
+      if (e.key === ' ' || e.key === 'Enter') handleFlipToggle();
     };
-
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [nextCard, prevCard]);
+  }, [handlePrev, handleNext, handleFlipToggle]);
 
-  // Touch swipe gesture handling
-  const handleTouchStart = (e) => {
-    touchStartX.current = e.touches[0].clientX;
-    touchStartY.current = e.touches[0].clientY;
-  };
-
-  const handleTouchEnd = (e) => {
-    const deltaX = e.changedTouches[0].clientX - touchStartX.current;
-    const deltaY = e.changedTouches[0].clientY - touchStartY.current;
-
-    // Detect intentional horizontal swipe (more horizontal than vertical, > 35px)
-    if (Math.abs(deltaX) > 35 && Math.abs(deltaX) > Math.abs(deltaY)) {
-      if (deltaX < 0) {
-        nextCard();
-      } else {
-        prevCard();
-      }
-    }
-  };
-
-  // Subtle interactive 3D tilt tracking for the centered active card
-  const handlePointerMove = (e) => {
-    const activeEl = cardElementsRef.current[currentIndex];
-    if (!activeEl || isTransitioning) return;
-
-    const rect = activeEl.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    const centerX = rect.width / 2;
-    const centerY = rect.height / 2;
-
-    const tiltX = -((y - centerY) / centerY) * 6; // Max 6 deg
-    const tiltY = ((x - centerX) / centerX) * 8; // Max 8 deg
-
-    gsap.to(activeEl, {
-      rotateX: tiltX,
-      rotateY: tiltY,
-      duration: 0.35,
-      ease: 'power2.out',
-      transformPerspective: 1200,
-    });
-  };
-
-  const handlePointerLeave = () => {
-    const activeEl = cardElementsRef.current[currentIndex];
-    if (!activeEl) return;
-    gsap.to(activeEl, {
-      rotateX: 0,
-      rotateY: 0,
-      duration: 0.6,
-      ease: 'power3.out',
-    });
-  };
-
-  // Format index (e.g. 01 / 08)
-  const currentFormatted = String(currentIndex + 1).padStart(2, '0');
-  const totalFormatted = String(members.length).padStart(2, '0');
+  // Active texture sources for Three.js Lanyard
+  const activeFront = canvasTextures[activeMember?._id]?.front || null;
+  const activeBack = canvasTextures[activeMember?._id]?.back || null;
 
   return (
-    <div
-      ref={stageRef}
-      className="credits-stage-container"
-      onTouchStart={handleTouchStart}
-      onTouchEnd={handleTouchEnd}
-    >
-      {/* ─── 3D AMBIENT PARTICLE BACKGROUND ─── */}
+    <div className="credits-root">
+      {/* Dynamic 3D Celestial Background Particles */}
       <CreditsParticleScene />
 
-      {/* ─── RADIAL LIGHTING & DEPTH VIGNETTE ─── */}
-      <div className="credits-depth-overlay" aria-hidden="true" />
+      {/* Atmospheric Radial Gradients */}
+      <div className="credits-ambient-mesh" aria-hidden="true">
+        <div className="credits-orb credits-orb-gold" />
+        <div className="credits-orb credits-orb-cyan" />
+      </div>
 
-      {/* ─── FLOATING TOP HEADER ─── */}
-      <header className="credits-top-header">
-        <div className="credits-badge-pill anim-fade-in">
-          <Sparkles size={12} className="credits-gold-icon" />
-          <span>THE CRAFTSMEN OF ABES AUTONOMY</span>
+      <main className="credits-layout-container">
+        {/* Section Header */}
+        <header className="credits-page-header">
+          <div className="credits-badge-pill">
+            <Sparkles size={12} className="credits-badge-sparkle" />
+            <span>CORE CONTRIBUTORS &amp; ARCHITECTS</span>
+          </div>
+          <h1 className="credits-main-title">
+            The Minds Behind <span className="gold-text-glow">ABES Autonomy</span>
+          </h1>
+          <p className="credits-main-subtitle">
+            An engineering collective passionate about making academic preparation organized, accessible, and exceptional.
+          </p>
+        </header>
+
+        {/* 3D Lanyard Identity Badge Stage & Companion Profile Showcase */}
+        <div className="credits-showcase-wrapper">
+          <div className="credits-stage-column">
+            <div className="credits-lanyard-stage">
+              <Lanyard
+                key={activeMember?._id}
+                frontImage={activeFront || activeMember?.photoUrl}
+                backImage={activeBack}
+                strapImage={strapCanvas}
+                imageFit="cover"
+                cardColor="#FFFFFF"
+                orientation="portrait"
+                finish="glossy"
+                cornerRadius={0.3}
+                size={0.75}
+                anchor="center"
+                strapLength={0.5}
+                strapColor="#111111"
+                strapWidth={0.65}
+                metal="silver"
+                gravity={1}
+                damping={0.6}
+                elasticity={0.55}
+                breeze={0.35}
+                interactive={true}
+                intro={true}
+                isFlipped={isFlipped}
+                onFlip={(flipped) => setIsFlipped(flipped)}
+              />
+            </div>
+
+            {/* Liquid Glass Navigation Bar & Flip Trigger */}
+            <nav className="credits-nav-capsule" aria-label="Contributor Navigation">
+              <button
+                type="button"
+                className="credits-nav-btn"
+                onClick={handlePrev}
+                aria-label="Previous Contributor"
+                title="Previous (Left Arrow)"
+              >
+                <ChevronLeft size={18} />
+              </button>
+
+              <div className="credits-nav-counter">
+                <span className="counter-current">
+                  {String(currentIndex + 1).padStart(2, '0')}
+                </span>
+                <span className="counter-divider">/</span>
+                <span className="counter-total">
+                  {String(members.length).padStart(2, '0')}
+                </span>
+              </div>
+
+              <button
+                type="button"
+                className="credits-nav-btn"
+                onClick={handleNext}
+                aria-label="Next Contributor"
+                title="Next (Right Arrow)"
+              >
+                <ChevronRight size={18} />
+              </button>
+
+              <div className="nav-capsule-divider" />
+
+              <button
+                type="button"
+                className={`credits-flip-btn ${isFlipped ? 'is-active' : ''}`}
+                onClick={handleFlipToggle}
+                aria-label="Flip Badge to reverse side"
+                title="Flip Badge (Spacebar)"
+              >
+                <RotateCw size={14} className={isFlipped ? 'icon-rotated' : ''} />
+                <span>{isFlipped ? 'Show Front' : 'Flip Badge'}</span>
+              </button>
+            </nav>
+
+            {/* Dots Scrubber Bar */}
+            <div className="credits-dots-bar" role="tablist" aria-label="Choose Contributor">
+              {members.map((m, idx) => (
+                <button
+                  key={m._id}
+                  type="button"
+                  role="tab"
+                  aria-selected={idx === currentIndex}
+                  aria-label={`Go to ${m.name}`}
+                  className={`credits-dot ${idx === currentIndex ? 'active' : ''}`}
+                  onClick={() => {
+                    setIsFlipped(false);
+                    setCurrentIndex(idx);
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* Frosted Liquid Glass Contributor Companion Info Panel */}
+          <article className="credits-info-panel glass-frosted">
+            <div className="info-panel-header">
+              <div className="info-identity">
+                <h2 className="info-name">{activeMember.name}</h2>
+                <div className="info-role-badge">
+                  <Award size={13} className="role-icon" />
+                  <span>{activeMember.role}</span>
+                </div>
+              </div>
+
+              {/* Social Link Action Buttons */}
+              <div className="info-socials">
+                {activeMember.github && (
+                  <a
+                    href={activeMember.github}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="info-social-pill"
+                    aria-label={`${activeMember.name}'s GitHub Profile`}
+                    title="GitHub"
+                  >
+                    <FaGithub size={15} />
+                    <span>GitHub</span>
+                  </a>
+                )}
+                {activeMember.linkedin && (
+                  <a
+                    href={activeMember.linkedin}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="info-social-pill"
+                    aria-label={`${activeMember.name}'s LinkedIn Profile`}
+                    title="LinkedIn"
+                  >
+                    <FaLinkedinIn size={15} />
+                    <span>LinkedIn</span>
+                  </a>
+                )}
+                {activeMember.instagram && (
+                  <a
+                    href={activeMember.instagram}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="info-social-pill"
+                    aria-label={`${activeMember.name}'s Instagram Profile`}
+                    title="Instagram"
+                  >
+                    <FaInstagram size={15} />
+                    <span>Instagram</span>
+                  </a>
+                )}
+              </div>
+            </div>
+
+            <p className="info-quote">
+              &ldquo;{activeMember.description}&rdquo;
+            </p>
+
+            <div className="info-meta-footer">
+              <span className="info-meta-item">
+                <ShieldCheck size={14} className="meta-icon" />
+                Verified Student Developer • ABES Engineering College
+              </span>
+              <span className="info-meta-item meta-year">
+                Batch 2024–2028
+              </span>
+            </div>
+          </article>
         </div>
-        <h1 className="credits-headline">Architects & Contributors</h1>
-        <p className="credits-subheadline">
-          The engineering minds and academic achievers shaping the digital campus ecosystem.
-        </p>
-      </header>
-
-      {/* ─── 3D PRESENTATION ARENA ─── */}
-      <main className="credits-3d-arena" aria-live="polite">
-        {members.map((member, idx) => (
-          <ContributorCard3D
-            key={member._id || idx}
-            member={member}
-            isActive={idx === currentIndex}
-            cardRef={(el) => (cardElementsRef.current[idx] = el)}
-            onPointerMove={idx === currentIndex ? handlePointerMove : undefined}
-            onPointerLeave={idx === currentIndex ? handlePointerLeave : undefined}
-          />
-        ))}
       </main>
-
-      {/* ─── CINEMATIC PROGRESS & CONTROLS FOOTER ─── */}
-      <footer className="credits-bottom-bar">
-        {/* Counter Display: 01 / 08 */}
-        <div className="credits-counter-box">
-          <span className="counter-current">{currentFormatted}</span>
-          <span className="counter-divider">/</span>
-          <span className="counter-total">{totalFormatted}</span>
-        </div>
-
-        {/* Multi-segment Progress Scrubber */}
-        <div className="credits-scrubber" role="progressbar" aria-valuenow={currentIndex + 1} aria-valuemax={members.length}>
-          {members.map((_, idx) => (
-            <button
-              key={idx}
-              type="button"
-              className={`scrubber-segment ${idx === currentIndex ? 'is-active' : ''} ${idx < currentIndex ? 'is-passed' : ''}`}
-              onClick={() => goToCard(idx, idx > currentIndex ? 'next' : 'prev')}
-              aria-label={`Jump to contributor ${idx + 1}`}
-            />
-          ))}
-        </div>
-
-        {/* Previous & Next Floating Navigation Buttons */}
-        <div className="credits-nav-buttons">
-          <button
-            type="button"
-            className="credits-nav-btn glass-clear"
-            onClick={prevCard}
-            disabled={currentIndex === 0 || isTransitioning}
-            aria-label="Previous Contributor"
-            title="Previous (Left Arrow)"
-          >
-            <ChevronLeft size={18} />
-          </button>
-          <button
-            type="button"
-            className="credits-nav-btn glass-clear"
-            onClick={nextCard}
-            disabled={currentIndex === members.length - 1 || isTransitioning}
-            aria-label="Next Contributor"
-            title="Next (Right Arrow)"
-          >
-            <ChevronRight size={18} />
-          </button>
-        </div>
-
-        {/* Interaction Hint */}
-        <div className="credits-hint-pill" aria-hidden="true">
-          <span>SCROLL OR SWIPE TO EXPLORE</span>
-        </div>
-      </footer>
     </div>
   );
 }

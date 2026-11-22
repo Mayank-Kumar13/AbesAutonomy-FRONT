@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="128" viewBox="0 0 512 128">
+  <defs>
+    <linearGradient id="strapBg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#181B24" />
+      <stop offset="50%" stop-color="#0E1017" />
+      <stop offset="100%" stop-color="#181B24" />
+    </linearGradient>
+    <linearGradient id="goldText" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#C5AC86" />
+      <stop offset="50%" stop-color="#DFCAAA" />
+      <stop offset="100%" stop-color="#C5AC86" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Base Strap Background -->
+  <rect width="512" height="128" fill="url(#strapBg)" />
+  
+  <!-- Top and Bottom Edge Stitching -->
+  <line x1="0" y1="10" x2="512" y2="10" stroke="#C5AC86" stroke-width="2" stroke-dasharray="6,4" opacity="0.75"/>
+  <line x1="0" y1="118" x2="512" y2="118" stroke="#C5AC86" stroke-width="2" stroke-dasharray="6,4" opacity="0.75"/>
+  
+  <!-- Subtle center highlight track -->
+  <line x1="0" y1="64" x2="512" y2="64" stroke="rgba(255,255,255,0.06)" stroke-width="2"/>
+  
+  <!-- Repeating ABES Autonomy Brand Typography -->
+  <g fill="url(#goldText)" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', sans-serif" font-weight="700">
+    <polygon points="26,64 32,50 46,58 38,72 46,86 32,78 26,92 20,78 6,86 14,72 6,58 20,50" fill="#DFCAAA" transform="translate(10, 0) scale(0.65) translate(0, 30)"/>
+    <text x="56" y="73" font-size="22" letter-spacing="4">ABES AUTONOMY</text>
+    <circle cx="340" cy="64" r="4" fill="#C5AC86" opacity="0.9" />
+    <text x="360" y="73" font-size="18" fill="rgba(255,255,255,0.85)" letter-spacing="3">ACADEMIC HUB</text>
+  </g>
+</svg>

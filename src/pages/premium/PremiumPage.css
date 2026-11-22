@@ -284,6 +284,8 @@
 .prem-comparison-section,
 .prem-faq-section {
   margin-top: 96px;
+  scroll-margin-top: 110px;
+  padding-top: 20px;
 }
 
 .prem-section-header {
