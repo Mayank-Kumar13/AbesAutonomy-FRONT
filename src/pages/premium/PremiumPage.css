@@ -108,10 +108,10 @@
 }
 
 .prem-plan-card {
-  background: rgba(14, 17, 24, 0.72);
+  background: rgba(13, 16, 24, 0.78);
   backdrop-filter: blur(28px) saturate(180%);
   -webkit-backdrop-filter: blur(28px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.09);
+  border: 1px solid rgba(255, 255, 255, 0.10);
   border-radius: var(--radius-xl, 26px);
   padding: 38px 32px;
   position: relative;
@@ -119,13 +119,25 @@
   flex-direction: column;
   box-shadow: 
     0 20px 48px -12px rgba(0, 0, 0, 0.7),
-    inset 0 1px 0 rgba(255, 255, 255, 0.14);
+    inset 0 1px 0 rgba(255, 255, 255, 0.20);
+  overflow: hidden;
   transition: all var(--duration-normal, 260ms) var(--ease-apple);
+}
+
+.prem-plan-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+  pointer-events: none;
 }
 
 .prem-plan-card:hover {
   transform: translateY(-4px);
-  border-color: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.20);
   box-shadow: 0 24px 60px -10px rgba(0, 0, 0, 0.8), 0 0 24px rgba(255, 255, 255, 0.04);
 }
 
@@ -280,6 +292,11 @@
   box-shadow: 0 8px 24px rgba(255, 255, 255, 0.22);
 }
 
+.prem-cta-btn.gold:active {
+  transform: translateY(0.5px) scale(0.96);
+  transition-duration: 0.05s;
+}
+
 .prem-cta-btn.secondary {
   background: rgba(255, 255, 255, 0.05);
   color: #F5F5F7;
@@ -290,6 +307,11 @@
   background: rgba(255, 255, 255, 0.10);
   border-color: rgba(255, 255, 255, 0.20);
   color: #FFFFFF;
+}
+
+.prem-cta-btn.secondary:active {
+  transform: translateY(0.5px) scale(0.96);
+  transition-duration: 0.05s;
 }
 
 /* ─── COMPARISON & FAQ SECTIONS ─── */

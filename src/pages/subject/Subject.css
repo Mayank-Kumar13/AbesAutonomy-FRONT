@@ -114,6 +114,12 @@
   font-size: 14px;
   padding: 10px 20px;
   white-space: nowrap;
+  transition: all var(--duration-fast, 160ms) var(--ease-apple);
+}
+
+.download-all-btn:active {
+  transform: scale(0.96);
+  transition-duration: 0.05s;
 }
 
 /* ─── LOADING & EMPTY STATES ─── */
@@ -166,6 +172,26 @@
 .unit-glass-panel {
   padding: 28px 26px;
   border-radius: var(--radius-xl, 26px);
+  background: rgba(13, 16, 24, 0.78);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.11);
+  box-shadow: 
+    0 16px 40px -10px rgba(0, 0, 0, 0.7),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22);
+  position: relative;
+  overflow: hidden;
+}
+
+.unit-glass-panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+  pointer-events: none;
 }
 
 .unit-panel-header {
@@ -292,6 +318,12 @@
   padding: 7px 16px;
   font-size: 13px;
   font-weight: 600;
+  transition: all var(--duration-fast, 160ms) var(--ease-apple);
+}
+
+.note-preview-btn:active {
+  transform: scale(0.96);
+  transition-duration: 0.05s;
 }
 
 .glass-icon-btn {
@@ -312,6 +344,12 @@
   background: rgba(255, 255, 255, 0.10);
   border-color: rgba(255, 255, 255, 0.20);
   color: #FFFFFF;
+  transform: translateY(-1px);
+}
+
+.glass-icon-btn:active {
+  transform: scale(0.92);
+  transition-duration: 0.05s;
 }
 
 /* ─── RESPONSIVE ─── */

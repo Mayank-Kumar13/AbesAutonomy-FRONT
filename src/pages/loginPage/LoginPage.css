@@ -29,29 +29,47 @@
   pointer-events: none;
 }
 
-/* ─── MODAL CLOSE BUTTON ─── */
+/* ─── WINDOW HEADER WITH MAC DOTS ─── */
+.login-window-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  position: relative;
+  z-index: 20;
+}
+
+.login-window-header .mac-dots {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  cursor: pointer;
+}
+
 .modal-close-btn {
-  position: absolute;
-  top: 16px;
-  right: 16px;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.10);
   color: var(--text-secondary, #A1A1A6);
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: all var(--duration-fast, 160ms) ease;
-  z-index: 20;
+  font-size: 11px;
 }
 
 .modal-close-btn:hover {
   background: rgba(255, 255, 255, 0.14);
   color: #FFFFFF;
   transform: scale(1.06);
+}
+
+.modal-close-btn:active {
+  transform: scale(0.92);
 }
 
 /* ─── LIQUID GLASS AUTH CARD ─── */
@@ -76,8 +94,21 @@
   transition: all var(--duration-normal, 260ms) var(--ease-apple);
 }
 
+/* Top specular ridge */
+.modal-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+  pointer-events: none;
+  z-index: 30;
+}
+
 .modal-content {
-  padding: 1.85rem 1.85rem 2rem;
+  padding: 1.5rem 1.85rem 1.85rem;
   color: #FFFFFF;
   font-family: var(--font-family-sans);
 }
@@ -126,6 +157,11 @@
   text-align: center;
 }
 
+.tab-btn:active {
+  transform: scale(0.96);
+  transition-duration: 0.05s;
+}
+
 .tab-btn.active {
   color: #08090C !important;
   -webkit-text-fill-color: #08090C !important;
@@ -153,26 +189,27 @@
 .input-group input {
   width: 100%;
   background: rgba(255, 255, 255, 0.038);
-  border: 1px solid rgba(255, 255, 255, 0.095);
-  border-radius: 12px;
-  padding: 0.68rem 0.95rem;
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 14px;
+  padding: 0.72rem 0.95rem;
   color: #FFFFFF;
   font-family: var(--font-family-sans);
   font-size: 0.92rem;
   outline: none;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.4);
   transition: all var(--duration-fast, 160ms) ease;
 }
 
 .input-group input::placeholder {
-  color: rgba(255, 255, 255, 0.25);
+  color: rgba(255, 255, 255, 0.28);
 }
 
 .input-group input:focus {
-  border-color: rgba(255, 255, 255, 0.30);
+  border-color: rgba(255, 255, 255, 0.35);
   background: rgba(255, 255, 255, 0.065);
-  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.06);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.10), inset 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .password-wrapper {
@@ -192,6 +229,7 @@
   align-items: center;
   justify-content: center;
   padding: 4px;
+  transition: color var(--duration-fast, 160ms) ease;
 }
 
 .eye-btn:hover {
@@ -222,7 +260,7 @@
 
 .submit-btn:hover:not(:disabled) {
   background: #FFFFFF;
-  transform: translateY(-0.5px);
+  transform: translateY(-1px);
   box-shadow: 
     0 0 0 1px rgba(0, 0, 0, 0.3),
     0 6px 18px rgba(255, 255, 255, 0.25),
@@ -230,7 +268,8 @@
 }
 
 .submit-btn:active:not(:disabled) {
-  transform: translateY(0.5px);
+  transform: translateY(0.5px) scale(0.96);
+  transition-duration: 0.05s;
 }
 
 .submit-btn:disabled {
@@ -312,8 +351,9 @@
 }
 
 .oauth-btn:active {
-  transform: translateY(0.5px);
+  transform: translateY(0.5px) scale(0.96);
   background: rgba(255, 255, 255, 0.03);
+  transition-duration: 0.05s;
 }
 
 .oauth-icon {

@@ -137,6 +137,12 @@
   color: #FFFFFF;
   background: rgba(255, 255, 255, 0.08);
   border-color: rgba(255, 255, 255, 0.16);
+  transform: translateY(-1px);
+}
+
+.filter-pill:active {
+  transform: scale(0.96);
+  transition-duration: 0.05s;
 }
 
 .filter-pill.active {

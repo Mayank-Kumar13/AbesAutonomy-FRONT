@@ -163,7 +163,7 @@ const ProfileCard = ({
         raf = requestAnimationFrame(frame);
       } else {
         x.p = x.target;
-        y.target = y.target;
+        y.p = y.target;
         light.p = light.target;
         write();
         raf = 0;

@@ -98,6 +98,10 @@
   width: 100%;
   padding: 32px 28px;
   border-radius: var(--radius-xl, 26px);
+  background: rgba(13, 16, 24, 0.78);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.11);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -105,6 +109,10 @@
   position: relative;
   overflow: hidden;
   cursor: pointer;
+  box-shadow: 
+    0 16px 40px -10px rgba(0, 0, 0, 0.7),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22);
+  transition: all var(--duration-normal, 260ms) var(--ease-apple);
 }
 
 .resource-glass-card::before {
@@ -114,8 +122,18 @@
   left: 0;
   right: 0;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
-  opacity: 0.6;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+  opacity: 0.8;
+  pointer-events: none;
+}
+
+.resource-glass-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(255, 255, 255, 0.22);
+  box-shadow: 
+    0 24px 60px -10px rgba(0, 0, 0, 0.8),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    0 0 28px rgba(255, 255, 255, 0.04);
 }
 
 .card-top-row {

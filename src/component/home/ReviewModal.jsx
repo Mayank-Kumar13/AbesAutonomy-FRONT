@@ -61,9 +61,16 @@ const ReviewModal = ({ isOpen, onClose, onSuccess }) => {
   return (
     <div className="review-modal-overlay" onClick={onClose} role="dialog" aria-modal="true" aria-label="Write a review">
       <div className="review-modal" onClick={(e) => e.stopPropagation()}>
-        <button className="review-modal-close" onClick={onClose} aria-label="Close">
-          <X size={20} />
-        </button>
+        <div className="review-window-header">
+          <div className="mac-dots" aria-hidden="true">
+            <span className="mac-dot red" onClick={onClose} title="Close" />
+            <span className="mac-dot amber" />
+            <span className="mac-dot green" />
+          </div>
+          <button className="review-modal-close" onClick={onClose} aria-label="Close">
+            <X size={16} />
+          </button>
+        </div>
 
         <h2 className="review-modal-title">Write a Review</h2>
         <p className="review-modal-subtitle">Share your experience with ABES Autonomy</p>

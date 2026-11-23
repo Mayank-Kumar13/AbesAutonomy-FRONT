@@ -16,12 +16,12 @@
 }
 
 .review-modal {
-  background: rgba(14, 17, 24, 0.90);
-  backdrop-filter: blur(36px) saturate(180%);
-  -webkit-backdrop-filter: blur(36px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.11);
+  background: rgba(13, 16, 24, 0.90);
+  backdrop-filter: blur(40px) saturate(190%);
+  -webkit-backdrop-filter: blur(40px) saturate(190%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: var(--radius-xl, 26px);
-  padding: 36px 32px;
+  padding: 0 32px 32px;
   width: 100%;
   max-width: 480px;
   max-height: 90vh;
@@ -30,20 +30,44 @@
   position: relative;
   box-shadow: 
     0 28px 70px -10px rgba(0, 0, 0, 0.85),
-    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
   font-family: var(--font-family-sans);
   color: #FFFFFF;
 }
 
-.review-modal-close {
+.review-modal::before {
+  content: '';
   position: absolute;
-  top: 18px;
-  right: 18px;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+  pointer-events: none;
+}
+
+.review-window-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 0 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  margin-bottom: 20px;
+}
+
+.review-window-header .mac-dots {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  cursor: pointer;
+}
+
+.review-modal-close {
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 50%;
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -53,8 +77,13 @@
 }
 
 .review-modal-close:hover {
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.14);
   color: #FFFFFF;
+  transform: scale(1.06);
+}
+
+.review-modal-close:active {
+  transform: scale(0.92);
 }
 
 .review-modal-title {

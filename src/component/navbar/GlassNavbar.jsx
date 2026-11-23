@@ -1,20 +1,15 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { Link, NavLink, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../auth/AuthContext";
-import { HiOutlineUserCircle } from "react-icons/hi2";
 import { 
   Menu, 
   X, 
   ChevronDown, 
   Crown, 
-  Sparkles, 
   User, 
   ShieldCheck, 
   LogOut, 
-  LogIn,
-  Layers,
-  Award,
-  BookOpen
+  LogIn
 } from "lucide-react";
 import "./GlassNavbar.css";
 
@@ -234,6 +229,14 @@ export default function GlassNavbar({ variant = "standard", onSkipNotes }) {
                 {/* Frosted Glass User Dropdown Menu */}
                 {userDropdownOpen && (
                   <div className="glass-dropdown-menu anim-scale-in" role="menu">
+                    <div className="dropdown-mac-header">
+                      <div className="mac-dots">
+                        <span className="mac-dot red" />
+                        <span className="mac-dot amber" />
+                        <span className="mac-dot green" />
+                      </div>
+                      <span className="dropdown-label">ACCOUNT</span>
+                    </div>
                     <div className="dropdown-header">
                       <p className="dropdown-user-name">{user?.name}</p>
                       <p className="dropdown-user-email">{user?.email}</p>
@@ -314,6 +317,11 @@ export default function GlassNavbar({ variant = "standard", onSkipNotes }) {
         aria-hidden={!mobileMenuOpen}
       >
         <div className="mobile-sheet-header">
+          <div className="mac-dots">
+            <span className="mac-dot red" />
+            <span className="mac-dot amber" />
+            <span className="mac-dot green" />
+          </div>
           <div className="brand-text">
             <span className="brand-title">ABES</span>
             <span className="brand-sub">AUTONOMY</span>

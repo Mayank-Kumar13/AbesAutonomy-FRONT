@@ -8,6 +8,10 @@
   width: 100%;
   min-height: 250px;
   padding: 28px 24px;
+  background: rgba(13, 16, 24, 0.78);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.11);
   border-radius: var(--radius-lg, 22px);
   display: flex;
   flex-direction: column;
@@ -16,6 +20,21 @@
   text-align: left;
   cursor: pointer;
   box-sizing: border-box;
+  box-shadow: 
+    0 16px 40px -10px rgba(0, 0, 0, 0.7),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22);
+  transition: transform var(--duration-normal, 260ms) var(--ease-apple),
+              border-color var(--duration-normal, 260ms) var(--ease-apple),
+              box-shadow var(--duration-normal, 260ms) var(--ease-apple);
+}
+
+.unicard-root.card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(255, 255, 255, 0.22);
+  box-shadow: 
+    0 24px 60px -10px rgba(0, 0, 0, 0.8),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    0 0 28px rgba(255, 255, 255, 0.04);
 }
 
 .unicard-specular {
@@ -24,7 +43,7 @@
   left: 0;
   right: 0;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.22), transparent);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
 }
 
 .unicard-icon-wrap.logo {
@@ -99,4 +118,9 @@
   background: #F5F5F7;
   border-color: rgba(255, 255, 255, 0.9);
   box-shadow: 0 4px 14px rgba(255, 255, 255, 0.2);
+}
+
+.unicard-btn.btnn:active {
+  transform: scale(0.95);
+  transition-duration: 0.05s;
 }

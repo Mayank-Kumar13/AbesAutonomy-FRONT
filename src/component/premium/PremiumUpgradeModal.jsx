@@ -69,9 +69,16 @@ export default function PremiumUpgradeModal({
   return (
     <div className="pum-backdrop" onClick={onClose}>
       <div className="pum-card" onClick={(e) => e.stopPropagation()}>
-        <button className="pum-close-btn" onClick={onClose} aria-label="Close modal">
-          <X size={16} />
-        </button>
+        <div className="pum-window-header">
+          <div className="mac-dots" aria-hidden="true">
+            <span className="mac-dot red" onClick={onClose} title="Close" />
+            <span className="mac-dot amber" />
+            <span className="mac-dot green" />
+          </div>
+          <button className="pum-close-btn" onClick={onClose} aria-label="Close modal">
+            <X size={16} />
+          </button>
+        </div>
 
         <div className="pum-badge">
           <Crown size={14} />

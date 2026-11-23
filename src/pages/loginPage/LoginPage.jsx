@@ -158,7 +158,23 @@ function App() {
     return (
       <div className="modal-overlay">
         <div className="modal-container">
-          <div className="modal-content" style={{ textAlign: 'center', padding: '3rem 2rem' }}>
+          <div className="login-window-header">
+            <div className="mac-dots" aria-hidden="true">
+              <span className="mac-dot red" onClick={() => navigate('/')} title="Close" />
+              <span className="mac-dot amber" />
+              <span className="mac-dot green" />
+            </div>
+            <button 
+              type="button" 
+              className="modal-close-btn" 
+              onClick={() => navigate('/')} 
+              aria-label="Back to website"
+              title="Back to website"
+            >
+              ✕
+            </button>
+          </div>
+          <div className="modal-content" style={{ textAlign: 'center', padding: '2.5rem 2rem 3rem' }}>
             <div
               style={{
                 width: '68px',
@@ -224,15 +240,22 @@ function App() {
     return (
       <div className="modal-overlay">
         <div className="modal-container">
-          <button 
-            type="button" 
-            className="modal-close-btn" 
-            onClick={() => navigate('/')} 
-            aria-label="Back to website"
-            title="Back to website"
-          >
-            ✕
-          </button>
+          <div className="login-window-header">
+            <div className="mac-dots" aria-hidden="true">
+              <span className="mac-dot red" onClick={() => navigate('/')} title="Close" />
+              <span className="mac-dot amber" />
+              <span className="mac-dot green" />
+            </div>
+            <button 
+              type="button" 
+              className="modal-close-btn" 
+              onClick={() => navigate('/')} 
+              aria-label="Back to website"
+              title="Back to website"
+            >
+              ✕
+            </button>
+          </div>
           <div className="modal-content">
 
             <h2 className="modal-title">VERIFY YOUR<br />IDENTITY</h2>
@@ -302,15 +325,22 @@ function App() {
   return (
     <div className="modal-overlay">
       <div className="modal-container">
-        <button 
-          type="button" 
-          className="modal-close-btn" 
-          onClick={() => navigate('/')} 
-          aria-label="Back to website"
-          title="Back to website"
-        >
-          ✕
-        </button>
+        <div className="login-window-header">
+          <div className="mac-dots" aria-hidden="true">
+            <span className="mac-dot red" onClick={() => navigate('/')} title="Close" />
+            <span className="mac-dot amber" />
+            <span className="mac-dot green" />
+          </div>
+          <button 
+            type="button" 
+            className="modal-close-btn" 
+            onClick={() => navigate('/')} 
+            aria-label="Back to website"
+            title="Back to website"
+          >
+            ✕
+          </button>
+        </div>
         <div className="modal-content">
           
           <div className="modal-crest-wrap" aria-hidden="true">
