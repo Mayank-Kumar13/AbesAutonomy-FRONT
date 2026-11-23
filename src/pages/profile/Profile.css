@@ -40,7 +40,7 @@
 }
 
 /* ─── FROSTED GLASS PROFILE CARD ─── */
-.profile-card {
+.profile-page > .profile-card {
   max-width: 900px;
   margin: 0 auto;
   background: rgba(13, 16, 24, 0.78);
@@ -57,7 +57,7 @@
   overflow: hidden;
 }
 
-.profile-card::before {
+.profile-page > .profile-card::before {
   content: '';
   position: absolute;
   top: 0;
@@ -224,7 +224,7 @@
   .form-grid {
     grid-template-columns: 1fr;
   }
-  .profile-card {
+  .profile-page > .profile-card {
     padding: 24px 18px;
   }
 }
