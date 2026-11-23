@@ -365,16 +365,26 @@
   justify-content: center;
 }
 
-.home-cta-btn {
+.home-cta-btn,
+.home-cta-btn:visited,
+.home-cta-btn:hover,
+.home-cta-btn:active {
   padding: 13px 30px;
   font-size: 15.5px;
   font-weight: 600;
   color: #08090C !important;
+  -webkit-text-fill-color: #08090C !important;
+  text-decoration: none !important;
 }
 
 .home-cta-btn span,
-.home-cta-btn svg {
+.home-cta-btn svg,
+.home-cta-btn path {
   color: #08090C !important;
+  -webkit-text-fill-color: #08090C !important;
+  stroke: #08090C !important;
+  opacity: 1 !important;
+  visibility: visible !important;
 }
 
 .home-sec-btn {

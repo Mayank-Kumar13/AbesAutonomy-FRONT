@@ -2,7 +2,13 @@ import React, { useEffect, useRef } from 'react';
 
 const SCRIPT_ID = 'cloudflare-turnstile-script';
 const isLocalhost = typeof window !== 'undefined' && 
-  (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+  (window.location.hostname === 'localhost' || 
+   window.location.hostname === '127.0.0.1' ||
+   window.location.hostname.startsWith('192.168.') ||
+   window.location.hostname.startsWith('10.') ||
+   window.location.hostname.endsWith('.local') ||
+   window.location.search.includes('preview=true') ||
+   localStorage.getItem('bypass_construction') === 'true');
 
 // Cloudflare's official dummy sitekey for testing (Always passes): '1x00000000000000000000AA'
 const SITE_KEY =

@@ -239,9 +239,13 @@ export default function HomeContent() {
 
             {/* Action Buttons */}
             <div className="notes-action-row">
-              <Link to="/resources" className="glass-btn-primary home-cta-btn">
-                <span>Explore Academic Resources</span>
-                <ArrowUpRight size={17} />
+              <Link 
+                to="/resources" 
+                className="glass-btn-primary home-cta-btn"
+                style={{ color: '#08090C', textDecoration: 'none' }}
+              >
+                <span style={{ color: '#08090C', WebkitTextFillColor: '#08090C' }}>Explore Academic Resources</span>
+                <ArrowUpRight size={17} style={{ color: '#08090C', stroke: '#08090C' }} />
               </Link>
               <Link to="/mvp-projects" className="glass-btn-secondary home-sec-btn">
                 <span>View MVP Projects</span>

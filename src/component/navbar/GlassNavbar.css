@@ -36,7 +36,14 @@
   z-index: 1000;
   padding: 0 20px;
   pointer-events: none; /* Let clicks pass through outside the capsule */
-  transition: transform var(--duration-smooth, 400ms) var(--ease-apple, cubic-bezier(0.16, 1, 0.3, 1));
+  transition: transform var(--duration-smooth, 400ms) var(--ease-apple, cubic-bezier(0.16, 1, 0.3, 1)),
+              opacity var(--duration-fast, 160ms) ease;
+}
+
+.glass-nav-wrapper.is-hidden {
+  transform: translateY(-130%);
+  opacity: 0;
+  pointer-events: none;
 }
 
 /* ─── DYNAMIC ISLAND CAPSULE ─── */
@@ -208,13 +215,17 @@
 }
 
 /* Sign In Pill */
-.nav-signin-pill {
+.nav-signin-pill,
+.nav-signin-pill:visited,
+.nav-signin-pill:hover,
+.nav-signin-pill:active {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   padding: 6px 16px;
   background: linear-gradient(180deg, #FFFFFF 0%, #ECECF0 100%);
   color: #08090C !important;
+  -webkit-text-fill-color: #08090C !important;
   font-family: var(--font-family-sans);
   font-size: 13.5px;
   font-weight: 600;
@@ -232,8 +243,13 @@
 }
 
 .nav-signin-pill span,
-.nav-signin-pill svg {
+.nav-signin-pill svg,
+.nav-signin-pill path {
   color: #08090C !important;
+  -webkit-text-fill-color: #08090C !important;
+  stroke: #08090C !important;
+  opacity: 1 !important;
+  visibility: visible !important;
 }
 
 .nav-signin-pill:hover {

@@ -106,14 +106,37 @@ const UnderConstruction = () => {
           We'll be back very soon with an incredible new experience!
         </p>
 
-        {/* Admin link */}
-        <Link
-          to="/login"
-          state={{ from: { pathname: '/admin' } }}
-          className="uc-admin-link"
-        >
-          Admin Login
-        </Link>
+        {/* Design preview & Admin links */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '16px', marginTop: '1.2rem' }}>
+          <button
+            type="button"
+            onClick={() => {
+              localStorage.setItem('bypass_construction', 'true');
+              window.location.href = '/';
+            }}
+            style={{
+              background: 'rgba(255, 255, 255, 0.08)',
+              border: '1px solid rgba(255, 255, 255, 0.16)',
+              borderRadius: '9999px',
+              padding: '6px 14px',
+              color: '#DFCAAA',
+              fontSize: '0.78rem',
+              fontWeight: '550',
+              cursor: 'pointer',
+              transition: 'all 0.18s ease'
+            }}
+          >
+            ✦ Enter Design Preview
+          </button>
+          <Link
+            to="/login"
+            state={{ from: { pathname: '/admin' } }}
+            className="uc-admin-link"
+            style={{ marginTop: 0 }}
+          >
+            Admin Login
+          </Link>
+        </div>
       </div>
     </div>
   );

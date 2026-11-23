@@ -34,19 +34,30 @@ export default function GlassNavbar({ variant = "standard", onSkipNotes }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [navHidden, setNavHidden] = useState(false);
   const [spotlightPos, setSpotlightPos] = useState({ x: 0, y: 0, opacity: 0 });
 
   const capsuleRef = useRef(null);
   const userMenuRef = useRef(null);
+  const lastScrollY = useRef(0);
 
-  // Track scroll position for homepage or sticky treatment
+  // Track scroll position and direction: auto-hide when scrolling down to avoid
+  // obstructing content, and smoothly restore when scrolling up or at top.
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
+      const currentY = window.scrollY;
+      setScrolled(currentY > 20);
+
+      if (currentY > 100 && currentY > lastScrollY.current + 8 && !mobileMenuOpen && !userDropdownOpen) {
+        setNavHidden(true);
+      } else if (currentY < lastScrollY.current - 6 || currentY <= 60) {
+        setNavHidden(false);
+      }
+      lastScrollY.current = currentY;
     };
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [mobileMenuOpen, userDropdownOpen]);
 
   // Close menus on route change
   useEffect(() => {
@@ -111,7 +122,7 @@ export default function GlassNavbar({ variant = "standard", onSkipNotes }) {
 
       {/* Floating Dynamic Island Navigation Capsule */}
       <header 
-        className={`glass-nav-wrapper ${scrolled ? "is-scrolled" : ""} ${isHome ? "is-home" : ""}`}
+        className={`glass-nav-wrapper ${scrolled ? "is-scrolled" : ""} ${isHome ? "is-home" : ""} ${navHidden ? "is-hidden" : ""}`}
       >
         <nav 
           ref={capsuleRef}
@@ -267,9 +278,13 @@ export default function GlassNavbar({ variant = "standard", onSkipNotes }) {
                 )}
               </div>
             ) : (
-              <Link to="/login" className="nav-signin-pill">
-                <span>Sign In</span>
-                <LogIn size={14} />
+              <Link 
+                to="/login" 
+                className="nav-signin-pill"
+                style={{ color: '#08090C', textDecoration: 'none' }}
+              >
+                <span style={{ color: '#08090C', WebkitTextFillColor: '#08090C' }}>Sign In</span>
+                <LogIn size={14} style={{ color: '#08090C', stroke: '#08090C' }} />
               </Link>
             )}
 

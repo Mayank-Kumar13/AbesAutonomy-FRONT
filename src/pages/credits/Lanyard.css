@@ -3,6 +3,7 @@
  * Physically simulated 3D hanging identity badge lanyard with Apple Liquid Glass stage.
  */
 
+.lanyard-wrapper,
 .lanyard-container {
   position: relative;
   width: 100%;
@@ -18,7 +19,9 @@
   cursor: grab;
 }
 
-.lanyard-container.is-dragging {
+.lanyard-wrapper:active,
+.lanyard-container.is-dragging,
+.lanyard-canvas.is-dragging {
   cursor: grabbing;
 }
 

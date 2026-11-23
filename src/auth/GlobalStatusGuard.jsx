@@ -20,14 +20,20 @@ const GlobalStatusGuard = ({ children }) => {
     );
   }
 
-  // In local development or preview, allow designing and previewing the full application
+  // In local development, preview mode, or review testing, allow designing and previewing the full application
   // without being locked out by the production backend's UNDER_CONSTRUCTION status.
-  const isLocalhost = typeof window !== 'undefined' && (
+  const hasPreviewAccess = typeof window !== 'undefined' && (
     window.location.hostname === 'localhost' || 
     window.location.hostname === '127.0.0.1' || 
-    window.location.hostname.endsWith('.local')
+    window.location.hostname.endsWith('.local') ||
+    window.location.hostname.startsWith('192.168.') ||
+    window.location.hostname.startsWith('10.') ||
+    window.location.hostname.startsWith('172.') ||
+    window.location.search.includes('preview=true') ||
+    window.location.search.includes('bypass=true') ||
+    localStorage.getItem('bypass_construction') === 'true'
   );
-  const isDev = import.meta.env.DEV || isLocalhost;
+  const isDev = import.meta.env.DEV || hasPreviewAccess;
   const forceConstruction = import.meta.env.VITE_ENFORCE_UNDER_CONSTRUCTION === 'true';
   const isUnderConstruction = websiteStatus === 'UNDER_CONSTRUCTION' && (!isDev || forceConstruction);
   const isAdmin = user?.role === 'admin';

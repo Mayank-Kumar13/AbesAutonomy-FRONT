@@ -317,9 +317,12 @@
 }
 
 .oauth-icon {
-  width: 17px;
-  height: 17px;
+  width: 18px;
+  height: 18px;
+  max-width: 18px;
+  max-height: 18px;
   flex-shrink: 0;
+  display: inline-block;
 }
 
 /* ─── FOOTER LINKS & TEXT ─── */

@@ -1,11 +1,79 @@
 /**
  * ABES AUTONOMY — 3D IDENTITY BADGE TEXTURE GENERATOR
- * Generates high-resolution front and back ID card textures and lanyard ribbon textures
- * via HTML5 Canvas for Three.js materials.
+ * Generates high-resolution front (photograph-only) and back (complete profile)
+ * textures and lanyard ribbon textures via HTML5 Canvas for Three.js WebGL materials.
  */
 
+// Canonical UV hit regions for interactive social buttons on the 3D card back
+export const SOCIAL_HIT_REGIONS = {
+  github: {
+    uMin: 0.088,
+    uMax: 0.485,
+    vMin: 0.225,
+    vMax: 0.288,
+  },
+  linkedin: {
+    uMin: 0.515,
+    uMax: 0.912,
+    vMin: 0.225,
+    vMax: 0.288,
+  },
+  instagram: {
+    uMin: 0.220,
+    uMax: 0.780,
+    vMin: 0.150,
+    vMax: 0.213,
+  },
+};
+
 /**
- * Creates a procedural strap texture canvas with repeat pattern
+ * Checks if a UV intersection point from Three.js raycasting falls within a social button
+ * @param {{ x: number, y: number }} uv - UV coordinates (0-1) from raycast intersection
+ * @param {object} contributor - Active contributor data object
+ * @returns {{ type: string, url: string } | null}
+ */
+export function getSocialHitFromUV(uv, contributor) {
+  if (!uv || !contributor) return null;
+  const { x: u, y: v } = uv;
+
+  // GitHub
+  if (
+    contributor.github &&
+    u >= SOCIAL_HIT_REGIONS.github.uMin &&
+    u <= SOCIAL_HIT_REGIONS.github.uMax &&
+    v >= SOCIAL_HIT_REGIONS.github.vMin &&
+    v <= SOCIAL_HIT_REGIONS.github.vMax
+  ) {
+    return { type: 'github', url: contributor.github, label: 'GitHub' };
+  }
+
+  // LinkedIn
+  if (
+    contributor.linkedin &&
+    u >= SOCIAL_HIT_REGIONS.linkedin.uMin &&
+    u <= SOCIAL_HIT_REGIONS.linkedin.uMax &&
+    v >= SOCIAL_HIT_REGIONS.linkedin.vMin &&
+    v <= SOCIAL_HIT_REGIONS.linkedin.vMax
+  ) {
+    return { type: 'linkedin', url: contributor.linkedin, label: 'LinkedIn' };
+  }
+
+  // Instagram
+  if (
+    contributor.instagram &&
+    u >= SOCIAL_HIT_REGIONS.instagram.uMin &&
+    u <= SOCIAL_HIT_REGIONS.instagram.uMax &&
+    v >= SOCIAL_HIT_REGIONS.instagram.vMin &&
+    v <= SOCIAL_HIT_REGIONS.instagram.vMax
+  ) {
+    return { type: 'instagram', url: contributor.instagram, label: 'Instagram' };
+  }
+
+  return null;
+}
+
+/**
+ * Creates procedural woven strap ribbon canvas with gold stitching and repeating brand typography
  */
 export function createStrapCanvas({ width = 1024, height = 128 } = {}) {
   const canvas = document.createElement('canvas');
@@ -16,15 +84,15 @@ export function createStrapCanvas({ width = 1024, height = 128 } = {}) {
 
   // Background gradient
   const bgGrad = ctx.createLinearGradient(0, 0, 0, height);
-  bgGrad.addColorStop(0, '#1A1D27');
-  bgGrad.addColorStop(0.3, '#10131B');
-  bgGrad.addColorStop(0.7, '#0B0D13');
-  bgGrad.addColorStop(1, '#1A1D27');
+  bgGrad.addColorStop(0, '#1E222D');
+  bgGrad.addColorStop(0.3, '#12151E');
+  bgGrad.addColorStop(0.7, '#0C0E14');
+  bgGrad.addColorStop(1, '#1E222D');
   ctx.fillStyle = bgGrad;
   ctx.fillRect(0, 0, width, height);
 
-  // Micro weave pattern
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.035)';
+  // Micro-weave texture
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.04)';
   ctx.lineWidth = 1;
   const step = 6;
   for (let x = 0; x < width; x += step) {
@@ -40,7 +108,7 @@ export function createStrapCanvas({ width = 1024, height = 128 } = {}) {
   }
 
   // Top & bottom edge gold stitching
-  ctx.strokeStyle = 'rgba(197, 172, 134, 0.75)';
+  ctx.strokeStyle = 'rgba(197, 172, 134, 0.85)';
   ctx.lineWidth = 2.5;
   ctx.setLineDash([8, 6]);
   ctx.beginPath();
@@ -52,12 +120,12 @@ export function createStrapCanvas({ width = 1024, height = 128 } = {}) {
   ctx.setLineDash([]);
 
   // Central highlight streak
-  const streak = ctx.createLinearGradient(0, height * 0.48, 0, height * 0.52);
+  const streak = ctx.createLinearGradient(0, height * 0.45, 0, height * 0.55);
   streak.addColorStop(0, 'rgba(255, 255, 255, 0)');
-  streak.addColorStop(0.5, 'rgba(255, 255, 255, 0.08)');
+  streak.addColorStop(0.5, 'rgba(255, 255, 255, 0.12)');
   streak.addColorStop(1, 'rgba(255, 255, 255, 0)');
   ctx.fillStyle = streak;
-  ctx.fillRect(0, height * 0.45, width, height * 0.1);
+  ctx.fillRect(0, height * 0.44, width, height * 0.12);
 
   // Repeating brand text
   ctx.font = 'bold 22px -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif';
@@ -78,7 +146,6 @@ export function createStrapCanvas({ width = 1024, height = 128 } = {}) {
 
     // Brand text
     ctx.fillStyle = '#C5AC86';
-    ctx.letterSpacing = '3px';
     ctx.fillText('ABES AUTONOMY', ox + 48, height / 2);
 
     // Separator
@@ -98,426 +165,502 @@ export function createStrapCanvas({ width = 1024, height = 128 } = {}) {
 }
 
 /**
- * Creates high-resolution front ID badge canvas
+ * Creates high-resolution front badge canvas: PHOTOGRAPH ONLY (Zero text, zero labels, full-bleed portrait)
+ * @param {HTMLImageElement|ImageBitmap} img - Preloaded image
+ * @param {object} options - Focal positioning and dimensions
  */
-export function createFrontBadgeCanvas(contributor, loadedImage, { width = 640, height = 960 } = {}) {
+export function createPhotoBadgeCanvas(img, {
+  focalX = 0.5,
+  focalY = 0.35,
+  width = 1024,
+  height = 1516,
+  fallbackName = 'Contributor'
+} = {}) {
   const canvas = document.createElement('canvas');
   canvas.width = width;
   canvas.height = height;
   const ctx = canvas.getContext('2d');
   if (!ctx) return canvas;
 
-  // Background deep obsidian
-  const bg = ctx.createLinearGradient(0, 0, 0, height);
-  bg.addColorStop(0, '#151922');
-  bg.addColorStop(0.35, '#0E1118');
-  bg.addColorStop(0.85, '#080A0E');
-  bg.addColorStop(1, '#050609');
-  ctx.fillStyle = bg;
-  ctx.fillRect(0, 0, width, height);
+  if (img && (img.naturalWidth || img.width)) {
+    const nw = img.naturalWidth || img.width;
+    const nh = img.naturalHeight || img.height;
 
-  // Top punch slot hole (where lanyard clasp attaches)
-  ctx.fillStyle = '#020305';
-  ctx.beginPath();
-  const slotW = 110;
-  const slotH = 16;
-  const slotX = (width - slotW) / 2;
-  const slotY = 32;
-  ctx.roundRect(slotX, slotY, slotW, slotH, 8);
-  ctx.fill();
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.18)';
-  ctx.lineWidth = 1.5;
-  ctx.stroke();
+    const imgRatio = nw / nh;
+    const canvasRatio = width / height;
 
-  // Subtle metallic outer border inset
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
-  ctx.lineWidth = 2;
-  ctx.strokeRect(18, 18, width - 36, height - 36);
-
-  // Top header banner
-  ctx.fillStyle = '#0B0E14';
-  ctx.fillRect(20, 68, width - 40, 78);
-  ctx.strokeStyle = 'rgba(197, 172, 134, 0.25)';
-  ctx.lineWidth = 1;
-  ctx.strokeRect(20, 68, width - 40, 78);
-
-  // Gold shield crest icon
-  drawShieldCrest(ctx, 48, 107, 24);
-
-  // Header Title
-  ctx.font = 'bold 20px -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif';
-  ctx.fillStyle = '#FFFFFF';
-  ctx.textAlign = 'left';
-  ctx.textBaseline = 'middle';
-  ctx.fillText('ABES AUTONOMY', 90, 96);
-
-  ctx.font = '700 10.5px -apple-system, BlinkMacSystemFont, sans-serif';
-  ctx.fillStyle = '#C5AC86';
-  ctx.fillText('OFFICIAL CONTRIBUTOR PASS • 2025–2026', 90, 120);
-
-  // Contributor Portrait Area
-  const photoW = 440;
-  const photoH = 440;
-  const photoX = (width - photoW) / 2;
-  const photoY = 170;
-
-  // Portrait background / placeholder
-  ctx.fillStyle = '#0B0E14';
-  ctx.beginPath();
-  ctx.roundRect(photoX, photoY, photoW, photoH, 20);
-  ctx.fill();
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
-  ctx.lineWidth = 2;
-  ctx.stroke();
-
-  if (loadedImage) {
-    ctx.save();
-    ctx.beginPath();
-    ctx.roundRect(photoX, photoY, photoW, photoH, 20);
-    ctx.clip();
-
-    // Calculate aspect ratio cover
-    const imgAspect = loadedImage.width / loadedImage.height;
-    const boxAspect = photoW / photoH;
-    let sx = 0, sy = 0, sWidth = loadedImage.width, sHeight = loadedImage.height;
-
-    if (imgAspect > boxAspect) {
-      sWidth = loadedImage.height * boxAspect;
-      sx = (loadedImage.width - sWidth) / 2;
+    let sW, sH, sX, sY;
+    if (imgRatio > canvasRatio) {
+      sH = nh;
+      sW = sH * canvasRatio;
+      sX = (nw - sW) * focalX;
+      sY = 0;
     } else {
-      sHeight = loadedImage.width / boxAspect;
-      sy = (loadedImage.height - sHeight) / 2;
+      sW = nw;
+      sH = sW / canvasRatio;
+      sX = 0;
+      sY = (nh - sH) * focalY;
     }
 
-    ctx.drawImage(loadedImage, sx, sy, sWidth, sHeight, photoX, photoY, photoW, photoH);
+    sX = Math.max(0, Math.min(nw - sW, sX));
+    sY = Math.max(0, Math.min(nh - sH, sY));
 
-    // Subtle inner vignette
-    const vig = ctx.createLinearGradient(0, photoY + photoH - 90, 0, photoY + photoH);
-    vig.addColorStop(0, 'rgba(0, 0, 0, 0)');
-    vig.addColorStop(1, 'rgba(11, 14, 20, 0.7)');
-    ctx.fillStyle = vig;
-    ctx.fillRect(photoX, photoY + photoH - 90, photoW, 90);
+    // Draw full-bleed photograph
+    ctx.drawImage(img, sX, sY, sW, sH, 0, 0, width, height);
 
-    ctx.restore();
+    // Subtle edge highlight so acrylic card perimeter looks physically grounded
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.16)';
+    ctx.lineWidth = 3;
+    ctx.strokeRect(1.5, 1.5, width - 3, height - 3);
+
+    // Very subtle glossy bottom vignette for physical depth
+    const bottomVignette = ctx.createLinearGradient(0, height * 0.85, 0, height);
+    bottomVignette.addColorStop(0, 'rgba(0, 0, 0, 0)');
+    bottomVignette.addColorStop(1, 'rgba(0, 0, 0, 0.28)');
+    ctx.fillStyle = bottomVignette;
+    ctx.fillRect(0, height * 0.85, width, height * 0.15);
+
   } else {
-    // Placeholder monogram
-    ctx.font = 'bold 72px -apple-system, BlinkMacSystemFont, sans-serif';
-    ctx.fillStyle = '#C5AC86';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    const initials = (contributor?.name || 'ABES')
+    // Elegant obsidian fallback with monogram initials if photo is still loading
+    const bg = ctx.createRadialGradient(width / 2, height * 0.45, 60, width / 2, height / 2, width);
+    bg.addColorStop(0, '#1E2330');
+    bg.addColorStop(0.6, '#0E1118');
+    bg.addColorStop(1, '#06080C');
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, width, height);
+
+    // Clean subtle monogram
+    const initials = (fallbackName || 'ABES')
       .split(' ')
       .map(n => n[0])
       .slice(0, 2)
       .join('');
-    ctx.fillText(initials, width / 2, photoY + photoH / 2);
+
+    ctx.font = 'bold 96px -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif';
+    ctx.fillStyle = '#DFCAAA';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(initials, width / 2, height / 2);
+
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.14)';
+    ctx.lineWidth = 4;
+    ctx.strokeRect(2, 2, width - 4, height - 4);
   }
 
-  // Hologram Security Chip Icon (Gold embossed chip)
-  drawChip(ctx, photoX + photoW - 55, photoY + 22, 36, 28);
+  return canvas;
+}
 
-  // Identity Details Area
-  const infoY = 640;
+/**
+ * Creates high-resolution back ID badge canvas with full contributor profile & clickable social buttons
+ */
+export function createBackBadgeCanvas(contributor, { width = 1024, height = 1516 } = {}) {
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return canvas;
 
-  // Name
-  ctx.font = 'bold 34px -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif';
+  // Deep obsidian carbon background
+  const bg = ctx.createLinearGradient(0, 0, width, height);
+  bg.addColorStop(0, '#090B10');
+  bg.addColorStop(0.5, '#0E1118');
+  bg.addColorStop(1, '#05070A');
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, width, height);
+
+  // Subtle radial ambient glow behind crest
+  const glow = ctx.createRadialGradient(width / 2, 260, 20, width / 2, 260, 360);
+  glow.addColorStop(0, 'rgba(197, 172, 134, 0.14)');
+  glow.addColorStop(0.6, 'rgba(197, 172, 134, 0.03)');
+  glow.addColorStop(1, 'transparent');
+  ctx.fillStyle = glow;
+  ctx.fillRect(0, 60, width, 400);
+
+  // Micro carbon pattern
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.012)';
+  for (let x = 0; x < width; x += 16) {
+    for (let y = 0; y < height; y += 16) {
+      if ((x + y) % 32 === 0) {
+        ctx.fillRect(x, y, 8, 8);
+      }
+    }
+  }
+
+  // Outer border with subtle corner inset
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.14)';
+  ctx.lineWidth = 3;
+  ctx.strokeRect(24, 24, width - 48, height - 48);
+
+  // Top Punch Slot Simulation
+  ctx.fillStyle = '#020305';
+  ctx.beginPath();
+  const slotW = 160;
+  const slotH = 22;
+  const slotX = (width - slotW) / 2;
+  const slotY = 44;
+  ctx.roundRect(slotX, slotY, slotW, slotH, 11);
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.22)';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  // 1. BRAND HEADER: Large Gold Crest & Title
+  drawLargeGoldCrest(ctx, width / 2, 210, 84);
+
+  ctx.font = 'bold 36px -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif';
   ctx.fillStyle = '#FFFFFF';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'top';
-  ctx.fillText(contributor?.name || 'Contributor', width / 2, infoY);
+  ctx.fillText('ABES AUTONOMY', width / 2, 310);
 
-  // Role Pill
+  ctx.font = '700 15px -apple-system, BlinkMacSystemFont, sans-serif';
+  ctx.fillStyle = '#C5AC86';
+  ctx.fillText('CONTRIBUTOR IDENTITY // 2024–2028', width / 2, 358);
+
+  // Divider Line
+  ctx.strokeStyle = 'rgba(197, 172, 134, 0.35)';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(140, 395);
+  ctx.lineTo(width - 140, 395);
+  ctx.stroke();
+
+  // Central Gold Diamond on Divider
+  ctx.fillStyle = '#DFCAAA';
+  ctx.beginPath();
+  ctx.moveTo(width / 2, 388);
+  ctx.lineTo(width / 2 + 7, 395);
+  ctx.lineTo(width / 2, 402);
+  ctx.lineTo(width / 2 - 7, 395);
+  ctx.closePath();
+  ctx.fill();
+
+  // 2. CONTRIBUTOR FULL NAME
+  const nameY = 430;
+  ctx.font = 'bold 50px -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif';
+  ctx.fillStyle = '#FFFFFF';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'top';
+  ctx.fillText(contributor?.name || 'Contributor', width / 2, nameY);
+
+  // 3. ROLE / DESIGNATION PILL
   const roleText = (contributor?.role || 'Core Team').toUpperCase();
-  ctx.font = '700 14px -apple-system, BlinkMacSystemFont, sans-serif';
+  ctx.font = '700 16px -apple-system, BlinkMacSystemFont, sans-serif';
   const roleMetrics = ctx.measureText(roleText);
-  const pillW = Math.max(roleMetrics.width + 36, 160);
-  const pillH = 32;
+  const pillW = Math.max(roleMetrics.width + 48, 220);
+  const pillH = 42;
   const pillX = (width - pillW) / 2;
-  const pillY = infoY + 48;
+  const pillY = nameY + 68;
 
   ctx.fillStyle = 'rgba(197, 172, 134, 0.14)';
   ctx.beginPath();
-  ctx.roundRect(pillX, pillY, pillW, pillH, 16);
+  ctx.roundRect(pillX, pillY, pillW, pillH, 21);
   ctx.fill();
-  ctx.strokeStyle = 'rgba(197, 172, 134, 0.4)';
-  ctx.lineWidth = 1;
+  ctx.strokeStyle = 'rgba(197, 172, 134, 0.45)';
+  ctx.lineWidth = 1.5;
   ctx.stroke();
 
   ctx.fillStyle = '#DFCAAA';
   ctx.textBaseline = 'middle';
   ctx.fillText(roleText, width / 2, pillY + pillH / 2);
 
-  // Academic Affiliation
-  ctx.font = '500 15px -apple-system, BlinkMacSystemFont, sans-serif';
+  // Department
+  ctx.font = '500 17px -apple-system, BlinkMacSystemFont, sans-serif';
   ctx.fillStyle = 'rgba(255, 255, 255, 0.65)';
   ctx.textBaseline = 'top';
-  ctx.fillText('ABES Engineering College • Computer Science', width / 2, pillY + 44);
+  ctx.fillText('ABES Engineering College • Verified Contributor', width / 2, pillY + 54);
 
-  // Bottom Card Barcode & ID Strip
-  const stripY = 780;
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.03)';
-  ctx.fillRect(40, stripY, width - 80, 110);
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
-  ctx.lineWidth = 1;
-  ctx.strokeRect(40, stripY, width - 80, 110);
+  // 4. BIOGRAPHY / QUOTE STATEMENT
+  const quoteY = 620;
+  const quote = contributor?.description || 'Crafting accessible digital engineering resources.';
+  
+  // Frosted Quote Card Box
+  const qBoxW = width - 160;
+  const qBoxH = 170;
+  const qBoxX = 80;
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.035)';
+  ctx.beginPath();
+  ctx.roundRect(qBoxX, quoteY, qBoxW, qBoxH, 20);
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.09)';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
 
-  // Realistic Barcode
-  drawBarcode(ctx, 70, stripY + 20, width - 140, 48, contributor?._id || 'ABES-01');
+  // Ambient Quote Mark Icon
+  ctx.font = 'bold 72px "Georgia", serif';
+  ctx.fillStyle = 'rgba(197, 172, 134, 0.22)';
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'top';
+  ctx.fillText('“', qBoxX + 24, quoteY + 12);
 
-  // Badge ID & Security Code
-  ctx.font = '600 12px "SF Mono", monospace, sans-serif';
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+  // Quote Text
+  ctx.font = 'italic 24px "Georgia", serif';
+  ctx.fillStyle = 'rgba(245, 245, 247, 0.92)';
   ctx.textAlign = 'center';
-  ctx.fillText(`AUTH-ID: ABES-2026-${(contributor?._id || '01').replace(/^m-/, '').padStart(3, '0')} // VERIFIED SECURE`, width / 2, stripY + 84);
+  ctx.textBaseline = 'middle';
+  wrapText(ctx, `“${quote}”`, width / 2, quoteY + qBoxH / 2 + 8, qBoxW - 60, 36);
 
-  // Bottom subtle watermark
-  ctx.font = '600 11px -apple-system, BlinkMacSystemFont, sans-serif';
-  ctx.fillStyle = 'rgba(197, 172, 134, 0.45)';
-  ctx.fillText('★ ACADEMIC RESOURCE ARCHITECTURE ★', width / 2, height - 32);
+  // 5. SECONDARY DIVIDER
+  const divY2 = 830;
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(120, divY2);
+  ctx.lineTo(width - 120, divY2);
+  ctx.stroke();
+
+  // Social Links Header
+  ctx.font = '700 14px -apple-system, BlinkMacSystemFont, sans-serif';
+  ctx.fillStyle = '#C5AC86';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('VERIFIED PROFILES & LINKS', width / 2, divY2 + 28);
+
+  // 6. INTERACTIVE SOCIAL LINK BUTTONS (MATCHING SOCIAL_HIT_REGIONS)
+  // Button 1: GitHub (Row 1 Left: x=100..490, y=1080..1168)
+  drawSocialButton(
+    ctx,
+    100,
+    1080,
+    390,
+    88,
+    'GitHub',
+    contributor?.github,
+    'github'
+  );
+
+  // Button 2: LinkedIn (Row 1 Right: x=534..924, y=1080..1168)
+  drawSocialButton(
+    ctx,
+    534,
+    1080,
+    390,
+    88,
+    'LinkedIn',
+    contributor?.linkedin,
+    'linkedin'
+  );
+
+  // Button 3: Instagram (Row 2 Center: x=232..792, y=1195..1283)
+  drawSocialButton(
+    ctx,
+    232,
+    1195,
+    560,
+    88,
+    'Instagram',
+    contributor?.instagram,
+    'instagram'
+  );
+
+  // 7. BOTTOM VERIFICATION FOOTER
+  const footerY = 1350;
+  ctx.font = '600 14px "SF Mono", monospace, sans-serif';
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.55)';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'top';
+  const badgeId = (contributor?._id || '01').replace(/^m-/, '').padStart(3, '0');
+  ctx.fillText(`AUTH-ID: ABES-2026-${badgeId} // VERIFIED CORE TEAM`, width / 2, footerY);
+
+  ctx.font = '500 13px -apple-system, BlinkMacSystemFont, sans-serif';
+  ctx.fillStyle = 'rgba(197, 172, 134, 0.65)';
+  ctx.fillText('★ OFFICIAL ABES AUTONOMY ACADEMIC PLATFORM ★', width / 2, footerY + 28);
+
+  ctx.font = '500 12px -apple-system, BlinkMacSystemFont, sans-serif';
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.35)';
+  ctx.fillText('Tap links to visit verified profiles • Tap card to return', width / 2, footerY + 54);
 
   return canvas;
 }
 
 /**
- * Creates high-resolution back ID badge canvas
+ * Draws a glass social button on the canvas
  */
-export function createBackBadgeCanvas(contributor, { width = 640, height = 960 } = {}) {
-  const canvas = document.createElement('canvas');
-  canvas.width = width;
-  canvas.height = height;
-  const ctx = canvas.getContext('2d');
-  if (!ctx) return canvas;
+function drawSocialButton(ctx, x, y, w, h, label, url, type) {
+  const isAvailable = Boolean(url);
 
-  // Deep obsidian background with carbon weave gradient
-  const bg = ctx.createLinearGradient(0, 0, width, height);
-  bg.addColorStop(0, '#090B0F');
-  bg.addColorStop(0.5, '#0E1117');
-  bg.addColorStop(1, '#05070A');
-  ctx.fillStyle = bg;
-  ctx.fillRect(0, 0, width, height);
+  // Button pill background
+  ctx.save();
+  ctx.beginPath();
+  ctx.roundRect(x, y, w, h, h / 2);
 
-  // Micro carbon pattern
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.012)';
-  for (let x = 0; x < width; x += 12) {
-    for (let y = 0; y < height; y += 12) {
-      if ((x + y) % 24 === 0) {
-        ctx.fillRect(x, y, 6, 6);
-      }
-    }
+  if (isAvailable) {
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.06)';
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.18)';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // Top specular highlight
+    ctx.beginPath();
+    ctx.roundRect(x + 2, y + 2, w - 4, h / 2 - 2, [h / 2, h / 2, 0, 0]);
+    const topGleam = ctx.createLinearGradient(0, y, 0, y + h / 2);
+    topGleam.addColorStop(0, 'rgba(255, 255, 255, 0.12)');
+    topGleam.addColorStop(1, 'rgba(255, 255, 255, 0)');
+    ctx.fillStyle = topGleam;
+    ctx.fill();
+  } else {
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.02)';
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.06)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
   }
 
-  // Top punch slot
-  ctx.fillStyle = '#020305';
-  ctx.beginPath();
-  const slotW = 110;
-  const slotH = 16;
-  const slotX = (width - slotW) / 2;
-  const slotY = 32;
-  ctx.roundRect(slotX, slotY, slotW, slotH, 8);
-  ctx.fill();
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.18)';
-  ctx.lineWidth = 1.5;
-  ctx.stroke();
+  // Draw Icon
+  const iconX = x + 36;
+  const iconY = y + h / 2;
+  drawSocialGlyph(ctx, iconX, iconY, type, isAvailable);
 
-  // Magnetic strip simulation (like physical cards)
-  ctx.fillStyle = '#111319';
-  ctx.fillRect(20, 70, width - 40, 72);
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.06)';
-  ctx.lineWidth = 1;
-  ctx.strokeRect(20, 70, width - 40, 72);
-
-  // Magnetic stripe fine texture
-  ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
-  ctx.fillRect(20, 85, width - 40, 42);
-
-  // Outer border
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
-  ctx.lineWidth = 2;
-  ctx.strokeRect(18, 18, width - 36, height - 36);
-
-  // Big Central Gold Crest
-  drawLargeGoldCrest(ctx, width / 2, 280, 68);
-
-  // Title
-  ctx.font = 'bold 28px -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif';
-  ctx.fillStyle = '#FFFFFF';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'top';
-  ctx.fillText('ABES AUTONOMY', width / 2, 380);
-
-  ctx.font = '700 13px -apple-system, BlinkMacSystemFont, sans-serif';
-  ctx.fillStyle = '#C5AC86';
-  ctx.fillText('ACADEMIC PREPARATION PLATFORM', width / 2, 420);
-
-  // Divider line
-  ctx.strokeStyle = 'rgba(197, 172, 134, 0.25)';
-  ctx.lineWidth = 1.5;
-  ctx.beginPath();
-  ctx.moveTo(120, 450);
-  ctx.lineTo(width - 120, 450);
-  ctx.stroke();
-
-  // Contributor statement / quote
-  const quote = contributor?.description || 'Crafting accessible digital engineering resources.';
-  ctx.font = 'italic 18px "Georgia", serif';
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
-  ctx.textAlign = 'center';
-  wrapText(ctx, `"${quote}"`, width / 2, 480, 480, 28);
-
-  // Contributor Profile Details Box
-  const boxY = 620;
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.03)';
-  ctx.beginPath();
-  ctx.roundRect(50, boxY, width - 100, 180, 16);
-  ctx.fill();
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.09)';
-  ctx.lineWidth = 1;
-  ctx.stroke();
-
-  // Key-value pairs inside box
-  ctx.font = '600 12px -apple-system, BlinkMacSystemFont, sans-serif';
-  ctx.fillStyle = '#C5AC86';
+  // Draw Text
+  ctx.font = '600 20px -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif';
+  ctx.fillStyle = isAvailable ? '#FFFFFF' : 'rgba(255, 255, 255, 0.3)';
   ctx.textAlign = 'left';
-  ctx.fillText('DESIGNATION', 80, boxY + 28);
-  ctx.fillText('DEPARTMENT', 80, boxY + 76);
-  ctx.fillText('STATUS', 80, boxY + 124);
+  ctx.textBaseline = 'middle';
+  ctx.fillText(label, iconX + 28, iconY);
 
-  ctx.font = '600 15px -apple-system, BlinkMacSystemFont, sans-serif';
-  ctx.fillStyle = '#FFFFFF';
-  ctx.fillText(contributor?.role || 'Contributor', 80, boxY + 48);
-  ctx.fillText('ABES Engineering College', 80, boxY + 96);
-  ctx.fillText('Active Architecture Contributor', 80, boxY + 144);
-
-  // Bottom Notice
-  ctx.font = '500 11px -apple-system, BlinkMacSystemFont, sans-serif';
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
-  ctx.textAlign = 'center';
-  ctx.fillText('Property of ABES Autonomy • www.abes.work', width / 2, height - 60);
-  ctx.fillText('Handcrafted with Three.js & Apple Liquid Glass', width / 2, height - 42);
-
-  return canvas;
-}
-
-/* Helper functions for canvas graphics */
-
-function drawShieldCrest(ctx, cx, cy, size) {
-  ctx.save();
-  ctx.translate(cx, cy);
-  ctx.strokeStyle = '#DFCAAA';
-  ctx.lineWidth = 2.5;
-  ctx.fillStyle = 'rgba(197, 172, 134, 0.15)';
-
-  ctx.beginPath();
-  ctx.moveTo(-size * 0.7, -size * 0.8);
-  ctx.lineTo(size * 0.7, -size * 0.8);
-  ctx.lineTo(size * 0.7, 0);
-  ctx.quadraticCurveTo(size * 0.7, size * 0.9, 0, size * 1.1);
-  ctx.quadraticCurveTo(-size * 0.7, size * 0.9, -size * 0.7, 0);
-  ctx.closePath();
-  ctx.fill();
-  ctx.stroke();
+  // Draw Arrow indicator
+  if (isAvailable) {
+    ctx.font = '600 18px -apple-system, BlinkMacSystemFont, sans-serif';
+    ctx.fillStyle = '#DFCAAA';
+    ctx.textAlign = 'right';
+    ctx.fillText('↗', x + w - 32, iconY);
+  }
 
   ctx.restore();
 }
 
+/**
+ * Draws simple vector glyphs for social platforms
+ */
+function drawSocialGlyph(ctx, cx, cy, type, active) {
+  ctx.save();
+  ctx.fillStyle = active ? '#FFFFFF' : 'rgba(255, 255, 255, 0.3)';
+  ctx.strokeStyle = active ? '#FFFFFF' : 'rgba(255, 255, 255, 0.3)';
+  ctx.lineWidth = 2.5;
+
+  if (type === 'github') {
+    // Circle with cat ears representation
+    ctx.beginPath();
+    ctx.arc(cx, cy, 14, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(cx, cy, 6, 0, Math.PI * 2);
+    ctx.fill();
+  } else if (type === 'linkedin') {
+    // Square with 'in' symbol
+    ctx.beginPath();
+    ctx.roundRect(cx - 14, cy - 14, 28, 28, 6);
+    ctx.stroke();
+    ctx.font = 'bold 15px -apple-system, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('in', cx, cy);
+  } else if (type === 'instagram') {
+    // Rounded camera rect with center lens
+    ctx.beginPath();
+    ctx.roundRect(cx - 14, cy - 14, 28, 28, 8);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(cx, cy, 7, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(cx + 8, cy - 8, 2, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.restore();
+}
+
+/**
+ * Draws the ABES Autonomy Gold Crest
+ */
 function drawLargeGoldCrest(ctx, cx, cy, radius) {
   ctx.save();
-  ctx.translate(cx, cy);
+  const grad = ctx.createLinearGradient(cx - radius, cy - radius, cx + radius, cy + radius);
+  grad.addColorStop(0, '#FFFFFF');
+  grad.addColorStop(0.3, '#DFCAAA');
+  grad.addColorStop(1, '#C5AC86');
 
-  // Outer glowing ring
-  ctx.strokeStyle = 'rgba(197, 172, 134, 0.25)';
-  ctx.lineWidth = 3;
+  // Shield Path
   ctx.beginPath();
-  ctx.arc(0, 0, radius, 0, Math.PI * 2);
-  ctx.stroke();
+  const w = radius * 1.5;
+  const h = radius * 1.9;
+  const left = cx - w / 2;
+  const right = cx + w / 2;
+  const top = cy - h / 2;
+  const bottom = cy + h / 2;
 
-  // Inner shield
-  const s = radius * 0.65;
-  ctx.fillStyle = 'rgba(197, 172, 134, 0.12)';
-  ctx.strokeStyle = '#DFCAAA';
-  ctx.lineWidth = 2.5;
-
-  ctx.beginPath();
-  ctx.moveTo(-s, -s);
-  ctx.lineTo(s, -s);
-  ctx.lineTo(s, s * 0.2);
-  ctx.quadraticCurveTo(s, s * 1.2, 0, s * 1.5);
-  ctx.quadraticCurveTo(-s, s * 1.2, -s, s * 0.2);
+  ctx.moveTo(left, top);
+  ctx.lineTo(right, top);
+  ctx.lineTo(right, cy + h * 0.1);
+  ctx.bezierCurveTo(right, bottom - 10, cx, bottom, cx, bottom);
+  ctx.bezierCurveTo(cx, bottom, left, bottom - 10, left, cy + h * 0.1);
   ctx.closePath();
+
+  ctx.fillStyle = 'rgba(12, 14, 18, 0.9)';
   ctx.fill();
+  ctx.strokeStyle = grad;
+  ctx.lineWidth = 4;
   ctx.stroke();
 
-  // Gold monogram 'ABES'
-  ctx.font = 'bold 22px -apple-system, BlinkMacSystemFont, sans-serif';
-  ctx.fillStyle = '#DFCAAA';
+  // Shield Inner Border
+  ctx.beginPath();
+  const inScale = 0.85;
+  const inW = w * inScale;
+  const inH = h * inScale;
+  const inL = cx - inW / 2;
+  const inR = cx + inW / 2;
+  const inT = cy - inH / 2;
+  const inB = cy + inH / 2;
+
+  ctx.moveTo(inL, inT);
+  ctx.lineTo(inR, inT);
+  ctx.lineTo(inR, cy + inH * 0.1);
+  ctx.bezierCurveTo(inR, inB - 8, cx, inB, cx, inB);
+  ctx.bezierCurveTo(cx, inB, inL, inB - 8, inL, cy + inH * 0.1);
+  ctx.closePath();
+  ctx.strokeStyle = 'rgba(197, 172, 134, 0.4)';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  // Word ABES inside shield
+  ctx.font = '800 24px -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif';
+  ctx.fillStyle = grad;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText('ABES', 0, 0);
+  ctx.fillText('ABES', cx, cy - 8);
 
-  ctx.restore();
-}
-
-function drawChip(ctx, x, y, w, h) {
-  ctx.save();
-  const grad = ctx.createLinearGradient(x, y, x + w, y + h);
-  grad.addColorStop(0, '#E5C07B');
-  grad.addColorStop(0.5, '#D19A66');
-  grad.addColorStop(1, '#986801');
+  // Star Emblem
+  ctx.beginPath();
+  ctx.arc(cx, cy + 22, 6, 0, Math.PI * 2);
   ctx.fillStyle = grad;
-  ctx.beginPath();
-  ctx.roundRect(x, y, w, h, 4);
   ctx.fill();
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
-  ctx.lineWidth = 1;
-  ctx.stroke();
 
-  // Internal chip contact lines
-  ctx.strokeStyle = 'rgba(50, 30, 0, 0.6)';
-  ctx.lineWidth = 1;
-  ctx.beginPath();
-  ctx.moveTo(x + w * 0.35, y);
-  ctx.lineTo(x + w * 0.35, y + h);
-  ctx.moveTo(x + w * 0.65, y);
-  ctx.lineTo(x + w * 0.65, y + h);
-  ctx.moveTo(x, y + h * 0.5);
-  ctx.lineTo(x + w, y + h * 0.5);
-  ctx.stroke();
   ctx.restore();
 }
 
-function drawBarcode(ctx, x, y, width, height, seed = '') {
-  ctx.save();
-  ctx.fillStyle = '#E5E5EA';
-  let curX = x;
-  let hash = 0;
-  for (let i = 0; i < seed.length; i++) hash = (hash * 31 + seed.charCodeAt(i)) >>> 0;
-
-  while (curX < x + width) {
-    hash = (hash * 1664525 + 1013904223) >>> 0;
-    const barW = (hash % 3) + 1.5;
-    const gapW = ((hash >> 4) % 3) + 1.5;
-    if (curX + barW > x + width) break;
-    ctx.fillRect(curX, y, barW, height);
-    curX += barW + gapW;
-  }
-  ctx.restore();
-}
-
+/**
+ * Multi-line canvas text wrapping utility
+ */
 function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
   const words = text.split(' ');
-  let line = '';
-  let curY = y;
+  const lines = [];
+  let currentLine = words[0];
 
-  for (let n = 0; n < words.length; n++) {
-    const testLine = line + words[n] + ' ';
-    const metrics = ctx.measureText(testLine);
-    if (metrics.width > maxWidth && n > 0) {
-      ctx.fillText(line.trim(), x, curY);
-      line = words[n] + ' ';
-      curY += lineHeight;
+  for (let i = 1; i < words.length; i++) {
+    const word = words[i];
+    const width = ctx.measureText(currentLine + ' ' + word).width;
+    if (width < maxWidth) {
+      currentLine += ' ' + word;
     } else {
-      line = testLine;
+      lines.push(currentLine);
+      currentLine = word;
     }
   }
-  ctx.fillText(line.trim(), x, curY);
+  lines.push(currentLine);
+
+  const startY = y - ((lines.length - 1) * lineHeight) / 2;
+  for (let k = 0; k < lines.length; k++) {
+    ctx.fillText(lines[k], x, startY + k * lineHeight);
+  }
 }

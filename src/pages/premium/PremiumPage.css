@@ -295,9 +295,9 @@
 /* ─── COMPARISON & FAQ SECTIONS ─── */
 .prem-comparison-section,
 .prem-faq-section {
-  margin-top: 110px;
-  scroll-margin-top: 140px;
-  padding-top: 36px;
+  margin-top: 120px;
+  scroll-margin-top: 130px;
+  padding-top: 32px;
 }
 
 .prem-section-header {
@@ -415,25 +415,26 @@
 .prem-faq-item {
   border-radius: var(--radius-lg, 20px);
   overflow: hidden;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: rgba(14, 17, 24, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
   box-shadow: 
-    0 0 0 1px rgba(0, 0, 0, 0.4),
-    0 4px 16px rgba(0, 0, 0, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    0 0 0 1px rgba(0, 0, 0, 0.6),
+    0 8px 24px -4px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
   transition: all var(--duration-normal, 260ms) var(--ease-apple);
 }
 
 .prem-faq-item:hover,
 .prem-faq-item.is-open {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.15);
+  background: rgba(20, 25, 36, 0.92);
+  border-color: rgba(223, 202, 170, 0.35);
   box-shadow: 
-    0 0 0 1px rgba(0, 0, 0, 0.5),
-    0 8px 24px rgba(0, 0, 0, 0.45),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    0 0 0 1px rgba(0, 0, 0, 0.7),
+    0 12px 32px rgba(0, 0, 0, 0.6),
+    0 0 24px rgba(197, 172, 134, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.28);
 }
 
 .prem-faq-question {
