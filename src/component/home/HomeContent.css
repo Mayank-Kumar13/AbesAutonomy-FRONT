@@ -243,11 +243,38 @@
 
 .home-notes h2 {
   margin: 0;
-  font-size: clamp(36px, 6vw, 76px);
-  line-height: 1.08;
-  letter-spacing: -0.04em;
-  font-weight: 600;
-  text-wrap: balance;
+  color: #f5f0e7;
+}
+
+.notes-heading-lead {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.1em;
+  margin-bottom: 14px;
+  font-size: clamp(12px, 1.2vw, 16px);
+  font-weight: 550;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.notes-heading-lead::before,
+.notes-heading-lead::after {
+  content: "";
+  width: 2.25em;
+  height: 1px;
+  background: #a68b61;
+}
+
+.notes-heading-line {
+  display: block;
+  font: 400 clamp(44px, 8.8vw, 112px)/1.05 Georgia, serif;
+  letter-spacing: -0.055em;
+}
+
+.notes-heading-line em {
+  color: var(--brand-gold-light, #dfcaaa);
+  font-style: italic;
 }
 
 .home-cta-btn {

@@ -192,7 +192,10 @@ export default function HomeContent() {
         </section>
 
         <section className="home-notes" id="all-notes" ref={notesRef} aria-labelledby="notes-title">
-          <h2 id="notes-title" tabIndex={-1}>Get your all notes here</h2>
+          <h2 id="notes-title" tabIndex={-1}>
+            <span className="notes-heading-lead">Get your</span>{' '}
+            <span className="notes-heading-line"><em>all notes</em> here</span>
+          </h2>
           <Link to="/resources" className="glass-btn-primary home-cta-btn">
             Explore Notes <ArrowUpRight size={17} aria-hidden="true" />
           </Link>
