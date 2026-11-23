@@ -1,26 +1,22 @@
 import React, { useState, useEffect } from "react";
 import "./Subject.css";
-import { useLocation, useNavigate, Link } from "react-router-dom";
+import { useLocation, Link } from "react-router-dom";
 import { 
   FileText, 
   Download, 
-  ArrowRight, 
   ChevronRight, 
   BookOpen, 
-  Eye, 
-  CheckCircle2, 
   AlertCircle,
   Inbox,
-  Sparkles,
   Loader2
 } from "lucide-react";
 import { notesApi } from "../../services/api";
 import { downloadNoteFile } from "../../utils/downloadHelper";
+import ResourceCover from "../../component/ui/ResourceCover";
 import PremiumUpgradeModal from "../../component/premium/PremiumUpgradeModal";
 
 const Subject = () => {
   const location = useLocation();
-  const navigate = useNavigate();
 
   const {
     heading = "SUBJECT",
@@ -68,19 +64,6 @@ const Subject = () => {
 
     return () => controller.abort();
   }, [heading, year, resourceType, branch]);
-
-  const handlePreview = (note) => {
-    const isImg = note.pdfUrl ? /\.(png|jpe?g|webp)$/i.test(note.pdfUrl.split('?')[0]) : false;
-    navigate("/pdfpreview", {
-      state: {
-        pdfUrl: note.pdfUrl,
-        title: note.title,
-        noteId: note._id,
-        subject: note.subject,
-        isImage: isImg
-      },
-    });
-  };
 
   const handleDownloadSingle = async (e, note) => {
     e.stopPropagation();
@@ -225,7 +208,7 @@ const Subject = () => {
         ) : (
           <div className="subject-units-flow">
             {Object.entries(groupedNotes).map(([unitName, unitNotes]) => (
-              <section key={unitName} className="unit-glass-panel glass-frosted" aria-label={unitName}>
+              <section key={unitName} className="unit-cover-section" aria-label={unitName}>
                 <div className="unit-panel-header">
                   <div className="unit-title-wrap">
                     <BookOpen size={18} className="unit-icon" />
@@ -234,55 +217,21 @@ const Subject = () => {
                   <span className="unit-notes-count">{unitNotes.length} file{unitNotes.length > 1 ? 's' : ''}</span>
                 </div>
 
-                <div className="unit-notes-list">
-                  {unitNotes.map((note) => (
-                    <article 
-                      key={note._id} 
-                      className="note-row-item glass-clear"
-                      onClick={() => handlePreview(note)}
-                    >
-                      <div className="note-left-col">
-                        <div className="note-file-bubble">
-                          <FileText size={20} />
-                        </div>
-                        <div className="note-meta-block">
-                          <h3 className="note-title">{note.title}</h3>
-                          <div className="note-specs-row">
-                            <span className="note-spec-badge">{note.resourceType || resourceType}</span>
-                            {note.unit && <span className="note-spec-badge">Unit {note.unit}</span>}
-                            {note.viewsCount > 0 && <span className="note-views-text">{note.viewsCount} reads</span>}
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="note-right-actions">
-                        <button
-                          type="button"
-                          className="glass-btn-primary note-preview-btn"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handlePreview(note);
-                          }}
-                        >
-                          <Eye size={14} />
-                          <span>Preview</span>
+                <div className="resource-shelf__grid">
+                  {unitNotes.map(note => (
+                    <ResourceCover key={note._id} type={note.resourceType || resourceType}
+                      heading="h3" title={note.title} icon={<FileText size={30} strokeWidth={1.25} />}
+                      detail={[unitName, note.viewsCount > 0 && `${note.viewsCount} reads`].filter(Boolean).join(' · ')}
+                      to="/pdfpreview" state={{
+                        pdfUrl: note.pdfUrl, title: note.title, noteId: note._id, subject: note.subject,
+                        isImage: /\.(png|jpe?g|webp)$/i.test((note.pdfUrl || '').split('?')[0]),
+                      }}
+                      action={
+                        <button type="button" aria-label={`Download ${note.title}`}
+                          disabled={downloadingId === note._id} onClick={(e) => handleDownloadSingle(e, note)}>
+                          {downloadingId === note._id ? <Loader2 size={16} className="animate-spin" /> : <Download size={16} />}
                         </button>
-
-                        <button
-                          type="button"
-                          className="glass-icon-btn note-dl-btn"
-                          aria-label={`Download ${note.title}`}
-                          onClick={(e) => handleDownloadSingle(e, note)}
-                          disabled={downloadingId === note._id}
-                        >
-                          {downloadingId === note._id ? (
-                            <Loader2 size={16} className="animate-spin" />
-                          ) : (
-                            <Download size={16} />
-                          )}
-                        </button>
-                      </div>
-                    </article>
+                      } />
                   ))}
                 </div>
               </section>

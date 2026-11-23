@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './ChooseSubject.css';
-import Unicard from "../../component/universal_card/Unicard";
+import ResourceCover from "../../component/ui/ResourceCover";
 import Credit_Card from "../../component/credit_card/Credit_Card";
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
@@ -9,7 +9,6 @@ import {
   Cog, 
   Monitor, 
   Code, 
-  ArrowRight,
   Atom,     
   Zap,      
   Cpu,      
@@ -106,6 +105,7 @@ const ChooseSubject = () => {
     return {
       heading: subjectName,
       para: subj.description || `${subjectName} Academic Materials (${subj.count || 0} files)`,
+      count: subj.count,
       icon: mappedIcon,
     };
   });
@@ -215,32 +215,12 @@ const ChooseSubject = () => {
             </p>
           </div>
         ) : (
-          <div className="subject-grid">
-            {displayedSubjects.map((subject, index) => (
-              <Link
-                to="/subject"
-                state={{
-                  heading: subject.heading,
-                  para: subject.para,
-                  year: selectedYear,
-                  resourceType: resourceType,
-                  resourceTitle: resourceTitle,
-                  branch: activeGroup,
-                }}
-                className="subject-card-link"
-                key={index}
-              >
-                <Unicard 
-                  heading={subject.heading} 
-                  para={subject.para} 
-                  icon={subject.icon}
-                  btnn={
-                    <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      Explore <ArrowRight size={14} />
-                    </span>
-                  }
-                />
-              </Link>
+          <div className="resource-shelf__grid">
+            {displayedSubjects.map((subject) => (
+              <ResourceCover key={subject.heading} type={resourceType} title={subject.heading}
+                detail={subject.count == null ? subject.para : `${subject.count} file${subject.count === 1 ? '' : 's'}`}
+                icon={subject.icon} to="/subject"
+                state={{ heading: subject.heading, para: subject.para, year: selectedYear, resourceType, resourceTitle, branch: activeGroup }} />
             ))}
           </div>
         )}
