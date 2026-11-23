@@ -56,6 +56,12 @@ export async function downloadNoteFile({ noteId, pdfUrl, title }, index = 0) {
 
   // Strategy 1: Try backend watermarked download endpoint
   if (noteId) {
+    if (!token) {
+      const err = new Error('PDF downloads are exclusive to Premium subscribers. Please log in with a Premium account to download.');
+      err.status = 403;
+      err.data = { code: 'PREMIUM_DOWNLOAD_REQUIRED' };
+      throw err;
+    }
     try {
       const downloadUrl = `${apiBase}/notes/${noteId}/download`;
       const response = await fetch(downloadUrl, { headers, credentials: "include" });
@@ -85,6 +91,9 @@ export async function downloadNoteFile({ noteId, pdfUrl, title }, index = 0) {
         console.warn(`Backend download failed with status ${response.status}. Falling back to direct CDN...`);
       }
     } catch (err) {
+      if (err.status === 403 || err.data?.code?.includes('PREMIUM')) {
+        throw err; // STRICT SECURITY: Never fall back to CDN if backend blocked download
+      }
       console.warn("Backend download request error. Falling back to direct CDN...", err);
     }
   }

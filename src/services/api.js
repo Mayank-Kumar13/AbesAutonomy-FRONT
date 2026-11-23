@@ -101,6 +101,20 @@ async function request(url, options = {}, retries = 3, backoff = 1000) {
   }
 
   if (!response.ok) {
+    if (response.status === 401) {
+      if (
+        data?.code === 'CONCURRENT_SESSION_LOGOUT' ||
+        (typeof data?.message === 'string' && data.message.includes('another device'))
+      ) {
+        clearAuth();
+        window.dispatchEvent(
+          new CustomEvent('concurrent_session_logout', {
+            detail: data?.message || 'Your account has been logged in on another device. You have been logged out on this device.',
+          })
+        );
+      }
+    }
+
     if (response.status === 429 && retries > 0) {
       console.warn(`Rate limited (429). Retrying in ${backoff}ms...`);
       await new Promise(resolve => setTimeout(resolve, backoff));

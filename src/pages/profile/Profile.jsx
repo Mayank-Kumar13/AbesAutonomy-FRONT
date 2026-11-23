@@ -151,7 +151,7 @@ export default function Profile() {
               <span className="prof-badge-pill free">FREE MEMBER</span>
               <h3 className="prof-membership-title">Free Student Account</h3>
               <p className="prof-membership-desc">
-                Free Document Accesses Used: <strong>{subData?.freePdfAccessCount || 0} / 5</strong> ({subData?.freePdfRemaining ?? 5} remaining)
+                Free Document Accesses Used: <strong>{subData?.freePdfAccessCount || 0} / 3</strong> ({subData?.freePdfRemaining ?? 3} remaining)
                 <br />
                 <span style={{ color: '#4ade80', fontSize: '0.82rem' }}>★ PYQ section remains 100% Free Forever</span>
               </p>

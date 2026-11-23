@@ -420,7 +420,7 @@ export default function PremiumManagement() {
                         <div style={{ fontSize: '0.75rem', color: '#4ade80' }}>({u.daysRemaining}d left)</div>
                       )}
                     </td>
-                    <td>{u.freePdfAccessCount || 0} / 5</td>
+                    <td>{u.freePdfAccessCount || 0} / 3</td>
                     <td>
                       <div style={{ display: 'flex', gap: '6px' }}>
                         <button

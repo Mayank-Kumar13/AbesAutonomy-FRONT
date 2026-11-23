@@ -9,7 +9,7 @@ import './PremiumUpgradeModal.css';
 export default function PremiumUpgradeModal({
   isOpen,
   onClose,
-  message = 'You have used all 5 free document accesses. Upgrade to Premium for unlimited access.',
+  message = 'You have used all 3 free document accesses. Upgrade to Premium for unlimited access.',
   onSuccess,
 }) {
   const { user, setTokenAndLoad } = useAuth();

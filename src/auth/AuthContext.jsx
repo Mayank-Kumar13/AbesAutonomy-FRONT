@@ -47,6 +47,19 @@ export function AuthProvider({ children }) {
     loadProfile();
   }, [loadProfile]);
 
+  // Handle single-device active session invalidation
+  useEffect(() => {
+    const handleConcurrentLogout = (e) => {
+      setUser(null);
+      setToken(null);
+      localStorage.removeItem("token");
+      alert(e.detail || "Your account was logged in on another device. You have been logged out on this device.");
+      window.location.href = '/login';
+    };
+    window.addEventListener('concurrent_session_logout', handleConcurrentLogout);
+    return () => window.removeEventListener('concurrent_session_logout', handleConcurrentLogout);
+  }, []);
+
   // Real-time watch time updater for the frontend
   useEffect(() => {
     if (user) {

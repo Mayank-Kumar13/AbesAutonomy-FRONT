@@ -44,7 +44,7 @@ export default function PdfPreview() {
         .then((res) => {
           if (res?.data && !res.data.allowed) {
             setAccessDenied(true);
-            setAccessDeniedMessage(res.data.message || 'You have used all 5 free document accesses. Upgrade to Premium for unlimited access.');
+            setAccessDeniedMessage(res.data.message || 'You have used all 3 free document accesses. Upgrade to Premium for unlimited access.');
             setShowPremiumModal(true);
           }
         })
@@ -266,6 +266,16 @@ export default function PdfPreview() {
       alert("Cannot download this file.");
       return;
     }
+
+    // STRICT POLICY: PDF Downloads are strictly reserved for Premium members (and Main Super Admin)
+    const isSuperAdmin = user?.email === 'abesautonomy30@gmail.com' || (user?._id && (user._id === '66e13fae7323fe4db20757a3' || user.id === '66e13fae7323fe4db20757a3')) || user?.isSuperAdmin;
+    const isPremiumUser = user?.isPremium === true;
+
+    if (!isSuperAdmin && !isPremiumUser) {
+      setAccessDeniedMessage('PDF downloads are exclusive to Premium subscribers. Upgrade to ABES Autonomy Premium to download and save documents offline.');
+      setShowPremiumModal(true);
+      return;
+    }
     
     setIsDownloading(true);
     try {
@@ -276,8 +286,8 @@ export default function PdfPreview() {
       });
     } catch (error) {
       console.error("PDF download error:", error);
-      if (error.status === 403 || error.data?.code === 'PREMIUM_REQUIRED' || error.message?.includes('Premium') || error.message?.includes('free')) {
-        setAccessDeniedMessage(error.message || 'You have used all 5 free document accesses. Upgrade to Premium for unlimited downloads.');
+      if (error.status === 403 || error.data?.code === 'PREMIUM_DOWNLOAD_REQUIRED' || error.data?.code === 'PREMIUM_REQUIRED' || error.message?.includes('Premium') || error.message?.includes('free')) {
+        setAccessDeniedMessage(error.message || 'PDF downloads are exclusive to Premium subscribers. Upgrade to Premium for unlimited downloads.');
         setShowPremiumModal(true);
       } else {
         alert("Failed to download PDF.");
@@ -372,7 +382,7 @@ export default function PdfPreview() {
               </div>
               <h2>Document Access Locked</h2>
               <p>
-                {accessDeniedMessage || 'You have used all 5 free document accesses. Upgrade to ABES Autonomy Premium for unlimited access to all study materials.'}
+                {accessDeniedMessage || 'You have used all 3 free document accesses. Upgrade to ABES Autonomy Premium for unlimited access to all study materials.'}
               </p>
               <div className="access-btn-row">
                 <button
