@@ -1,21 +1,20 @@
 import React, { useState, useLayoutEffect, useEffect, useRef } from "react";
 import "./IntroOverlay.css";
 
-const IntroOverlay = () => {
+const IntroOverlay = ({ locationKey }) => {
+  const entryKey = useRef(locationKey);
   const [stage, setStage] = useState("init"); // 'init' -> 'hold' -> 'move' -> 'fade' -> 'done'
   const [style, setStyle] = useState({ opacity: 0 }); // hide initially to prevent flash
   const containerRef = useRef(null);
 
   useLayoutEffect(() => {
     const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const hasPlayed = sessionStorage.getItem("introPlayed");
 
-    if (prefersReducedMotion || hasPlayed) {
+    if (prefersReducedMotion) {
       setStage("done");
       return;
     }
     
-    sessionStorage.setItem("introPlayed", "true");
 
     if (containerRef.current) {
         const rect = containerRef.current.getBoundingClientRect();
@@ -39,6 +38,10 @@ const IntroOverlay = () => {
         setStage("hold");
     }
   }, []);
+
+  useLayoutEffect(() => {
+    if (locationKey !== entryKey.current) setStage("done");
+  }, [locationKey]);
 
   useEffect(() => {
     if (stage === "hold") {

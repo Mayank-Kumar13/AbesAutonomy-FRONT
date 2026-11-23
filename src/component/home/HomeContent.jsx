@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowDown, ArrowUpRight, BookOpen, Notebook, Sparkles, ShieldCheck } from 'lucide-react';
 import HomeNavigation from './HomeNavigation';
-import CampusFallback from './CampusFallback';
 import { getJourneyState } from './journey';
 import './HomeContent.css';
 
@@ -35,6 +34,7 @@ export default function HomeContent() {
     const finePointer = window.matchMedia('(pointer: fine)');
     let disposed = false;
     let scene;
+    let hasRenderedScene = false;
     let frame = 0;
     let progress = 0;
     let pointer = { x: 0, y: 0 };
@@ -53,10 +53,7 @@ export default function HomeContent() {
       const damping = motion.matches ? 1 : 1 - Math.exp(-delta / 110);
       currentPointer.x += (pointer.x - currentPointer.x) * damping;
       currentPointer.y += (pointer.y - currentPointer.y) * damping;
-      stage.style.setProperty('--title-rise', `${(1 - state.rise) * 110 - state.rise * 12}%`);
-      stage.style.setProperty('--title-clip', `${(1 - state.rise) * 100}%`);
       stage.style.setProperty('--scene-opacity', `${1 - state.fade}`);
-      stage.style.setProperty('--scene-scale', `${1 + state.zoom * 1.8}`);
       stage.style.setProperty('--cue-opacity', `${Math.max(0, 1 - progress * 4.2)}`);
       stage.style.setProperty('--journey-progress', `${progress}`);
       stage.inert = !motion.matches && state.fade >= 1;
@@ -66,7 +63,13 @@ export default function HomeContent() {
         notes.inert = !motion.matches && state.fade < 0.5;
       }
 
-      scene?.render(state, currentPointer, motion.matches);
+      if (scene) {
+        scene.render(state, currentPointer, motion.matches);
+        if (!hasRenderedScene) {
+          hasRenderedScene = true;
+          setSceneReady(true);
+        }
+      }
       // Finish easing after the last pointer event; stop once settled.
       if (!motion.matches && state.fade < 1 &&
           (Math.abs(pointer.x - currentPointer.x) > 0.001 || Math.abs(pointer.y - currentPointer.y) > 0.001)) {
@@ -135,7 +138,6 @@ export default function HomeContent() {
         measure();
         window.cancelAnimationFrame(frame);
         render();
-        setSceneReady(true);
       })
       .catch((error) => {
         console.warn('3D campus scene skipped, using fallback stage.', error);
@@ -174,7 +176,6 @@ export default function HomeContent() {
             <div className="campus-sky" aria-hidden="true" />
             <div className="campus-fallback" aria-hidden="true">
               <div className="campus-fallback-title"><span>ABES</span><span>AUTONOMY</span></div>
-              <CampusFallback />
             </div>
             <canvas className="campus-canvas" ref={canvasRef} aria-hidden="true" />
             <div className="campus-vignette" aria-hidden="true" />

@@ -1,4 +1,4 @@
-import React, { useEffect, Suspense, lazy } from 'react';
+import React, { useEffect, useState, Suspense, lazy } from 'react';
 import Navbar from './component/navbar/Navbar';
 import IntroOverlay from './component/intro/IntroOverlay';
 import LiveTracker from './component/LiveTracker';
@@ -48,12 +48,15 @@ const App = () => {
   const hideFooter = hideNavAndFooter || path === '/credits';
   const isHomePage = path === '/';
 
+  const [showStartupIntro] = useState(() => !isAuthPage && path !== '/credits');
+
   return (
-    <GlobalStatusGuard>
+    <>
+      {showStartupIntro && <IntroOverlay locationKey={location.key} />}
+      <GlobalStatusGuard>
       {!isAuthPage && <LoginToast />}
       {!isAuthPage && <LiveTracker />}
       {!isAuthPage && <GlobalAnnouncement />}
-      {!isAuthPage && !isHomePage && path !== '/credits' && <IntroOverlay />}
       {!hideNavAndFooter && !isHomePage && <Navbar />}
       <Scroll />
       <Suspense fallback={<div className="flex h-screen items-center justify-center text-white"><div className="animate-spin h-8 w-8 border-4 border-blue-500 rounded-full border-t-transparent"></div></div>}>
@@ -86,7 +89,8 @@ const App = () => {
         </Routes>
       </Suspense>
       {!hideFooter && !isHomePage && <Footer />}
-    </GlobalStatusGuard>
+      </GlobalStatusGuard>
+    </>
   )
 }
 export default App;

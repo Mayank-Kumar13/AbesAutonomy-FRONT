@@ -17,11 +17,10 @@ constructed in code. Pointer movement adds a small camera offset.
 - `HomeContent.css`: homepage-only styling, responsive layouts and motion rules.
 - `HomeNavigation.jsx`: homepage navigation using the existing routes and auth context.
 - `campusScene.js`: geometry, instancing, materials, camera and GPU cleanup.
-- `CampusFallback.jsx`: code-drawn SVG facade when WebGL is unavailable or lost.
 - `journey.js`: pure, reversible scroll timeline.
 - `assets/gentilis-brand.json`: locally bundled, 13 KB font subset for the wordmark.
 - `assets/FONT-LICENSE.txt`: the font's original SIL Open Font License.
-- `src/App.jsx`: omit the shared navigation, timed intro and footer only on `/`.
+- `src/App.jsx`: manage the startup intro independently of navigation.
 - `package.json` and `package-lock.json`: add Three.js; no other package upgrades.
 
 Backend, authentication, resource logic, environment and deployment configuration
@@ -37,7 +36,7 @@ resize and a frame-rate-independent pointer settling loop. Clouds have a separat
 Listeners, animation frames, observers,
 textures, geometries, materials and renderer resources are disposed on unmount.
 
-The fallback renders before the 3D module loads. WebGL failure does not prevent
+A centered wordmark covers the stage until its first rendered 3D frame. WebGL failure does not prevent
 access to notes. Reduced motion displays the completed wordmark without camera
 movement or a long pinned sequence. The navigation has native buttons, Escape
 handling, visible focus, and a skip-to-notes link. Hidden notes are inert until
@@ -47,11 +46,11 @@ they do not temporarily focus a destination that the animation will make inert.
 
 The controller calls the scene's `resize(width, height)` before its first
 `render(state, pointer, reducedMotion)`. Timeline values are `rise`, `zoom`, and
-`fade`; opacity and fallback scale are derived from these values. A ResizeObserver
+`fade`; scene opacity follows the fade. A ResizeObserver
 keeps the drawing buffer and scroll distance aligned with the stage. One shared
 stage-height variable keeps the sticky scene and notes overlap aligned, including
 short landscape viewports. WebGL context loss disposes the scene and reveals the
-positioned SVG fallback.
+static wordmark.
 
 ## Verification
 
