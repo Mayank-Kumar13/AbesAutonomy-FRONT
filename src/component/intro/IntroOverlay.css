@@ -1,14 +1,19 @@
+/* ==========================================================================
+   INTRO OVERLAY - Apple iOS Liquid Glass Aesthetic
+   ========================================================================== */
+
 .intro-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
+  inset: 0;
   width: 100vw;
   height: 100vh;
-  background-color: #0d1117;
-  z-index: 9999;
+  background: radial-gradient(circle at 50% 48%, rgba(18, 22, 30, 0.94) 0%, rgba(6, 8, 12, 0.98) 100%);
+  backdrop-filter: blur(28px) saturate(190%);
+  -webkit-backdrop-filter: blur(28px) saturate(190%);
+  z-index: 99999;
   pointer-events: all;
-  transition: opacity 0.6s cubic-bezier(0.76, 0, 0.24, 1);
   overflow: hidden;
+  transition: opacity 0.42s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .intro-overlay.fade-out {
@@ -16,58 +21,194 @@
   pointer-events: none;
 }
 
+/* ─── MOVING LOGO CONTAINER ─── */
 .intro-logo-container {
   position: absolute;
   top: 0;
   left: 0;
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 18px;
   transform-origin: top left;
   will-change: transform;
-  /* Premium cinematic easing */
-  transition: transform 1.2s cubic-bezier(0.76, 0, 0.24, 1);
+  /* Fluid Apple spring easing */
+  transition: transform 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+  cursor: default;
 }
 
-.intro-logo-container h2.abesname {
-  color: white;
-  font-size: 40px;
-  font-weight: bold;
-  font-family: "montserrat";
-  margin: 0;
-  position: relative;
-  display: inline-block;
-  white-space: nowrap; /* Prevent wrapping on narrow screens */
+/* ─── GLASS CAPSULE POD (CENTER EMBLEM) ─── */
+.intro-capsule-pod {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
   padding-right: 8px;
-  padding-bottom: 5px; /* Prevent bottom descender clipping */
+  position: relative;
+  z-index: 1;
 }
 
-/* The typing text overlays the invisible layout text */
-.intro-overlay:not(.intro-overlay-done) .typewriter-text {
+/* Frosted glass aura in center */
+.intro-capsule-pod::before {
+  content: '';
+  position: absolute;
+  inset: -14px -22px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(24px) saturate(200%);
+  -webkit-backdrop-filter: blur(24px) saturate(200%);
+  border: 1px solid rgba(255, 255, 255, 0.36);
+  box-shadow: 
+    inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.85),
+    inset 0 -1px 0.5px 0 rgba(255, 255, 255, 0.25),
+    inset 3px 0 4px 0 rgba(255, 255, 255, 0.55),
+    inset -3px 0 4px 0 rgba(255, 255, 255, 0.45),
+    0 24px 55px -12px rgba(0, 0, 0, 0.65),
+    0 0 35px rgba(197, 172, 134, 0.22);
+  pointer-events: none;
+  z-index: -1;
+  transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1), transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Top highlight meniscus */
+.intro-capsule-pod::after {
+  content: '';
+  position: absolute;
+  top: -14px;
+  left: -2px;
+  right: -2px;
+  height: 1.5px;
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.6) 20%, #FFFFFF 50%, rgba(255, 255, 255, 0.6) 80%, transparent 100%);
+  pointer-events: none;
+  z-index: 0;
+  transition: opacity 0.5s ease;
+}
+
+/* Smooth dissolve of outer glass capsule when docking into navbar */
+.intro-capsule-pod.is-docking::before,
+.intro-capsule-pod.is-docking::after {
+  opacity: 0;
+  transform: scale(0.92);
+}
+
+/* ─── CREST ─── */
+.intro-crest {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 2px 8px rgba(197, 172, 134, 0.35));
+}
+
+.intro-crest svg {
+  display: block;
+}
+
+/* ─── BRAND TYPOGRAPHY ─── */
+.intro-brand-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1;
+}
+
+.brand-line-1,
+.brand-line-2 {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.brand-line-1 {
+  min-height: 18px;
+}
+
+.brand-line-2 {
+  min-height: 11px;
+  margin-top: 1.5px;
+}
+
+.brand-line-1 .brand-title {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: #FFFFFF;
+  letter-spacing: 0.04em;
+  text-shadow: 0 1px 8px rgba(255, 255, 255, 0.25);
+}
+
+.brand-line-2 .brand-sub {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+  font-size: 8.5px;
+  font-weight: 600;
+  color: #C5AC86;
+  letter-spacing: 0.22em;
+  text-shadow: 0 1px 8px rgba(197, 172, 134, 0.35);
+}
+
+/* Ghost text used solely for rock-solid bounding box layout */
+.intro-ghost-measure {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Active typed letters */
+.intro-visible-text {
   position: absolute;
   top: 0;
   left: 0;
-  bottom: 0; /* Ensures it stretches to include padding-bottom */
-  overflow: hidden;
+  bottom: 0;
+  display: inline-flex;
+  align-items: center;
   white-space: nowrap;
-  border-right: 4px solid #C5AC86;
-  width: 0;
-  animation: 
-    typing 1.04s steps(13, end) forwards,
-    blink 0.8s step-end infinite;
 }
 
-/* Remove cursor when fading out */
-.intro-overlay.fade-out .typewriter-text {
-  border-right-color: transparent;
+/* ─── TYPING CARET ─── */
+.intro-caret {
+  display: inline-block;
+  width: 2px;
+  height: 14px;
+  margin-left: 2px;
+  background-color: #FFFFFF;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.9);
+  border-radius: 1px;
+  animation: introCaretPulse 0.7s infinite alternate;
 }
 
-@keyframes typing {
-  from { width: 0; }
-  to { width: 100%; }
+.intro-caret.intro-caret-gold {
+  height: 9px;
+  background-color: #C5AC86;
+  box-shadow: 0 0 8px rgba(197, 172, 134, 0.9);
 }
 
-@keyframes blink {
-  0%, 100% { border-color: transparent; }
-  50% { border-color: #C5AC86; }
+@keyframes introCaretPulse {
+  0% {
+    opacity: 0.2;
+    transform: scaleY(0.85);
+  }
+  100% {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+}
+
+/* ─── SHIMMER REFLECTION ─── */
+.intro-capsule-pod.intro-shimmer {
+  animation: introSpecularFlash 0.45s ease-out forwards;
+}
+
+@keyframes introSpecularFlash {
+  0% {
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(1.35) drop-shadow(0 0 12px rgba(223, 202, 170, 0.5));
+  }
+  100% {
+    filter: brightness(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .intro-overlay {
+    display: none !important;
+  }
 }
