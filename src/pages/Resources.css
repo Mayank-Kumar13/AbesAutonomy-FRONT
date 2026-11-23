@@ -33,7 +33,6 @@
   letter-spacing: -0.055em;
 }
 
-
 @media (max-width: 540px) {
   .resource-shelf { padding-inline: 16px; }
 }

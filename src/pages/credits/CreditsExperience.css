@@ -253,21 +253,22 @@
   }
 }
 
-/* ─── MINIMAL APPLE LIQUID GLASS NAVIGATION CAPSULE ─── */
+/* ─── MINIMAL APPLE LIQUID GLASS NAVIGATION CAPSULE (ZERO DARKNESS) ─── */
 .credits-nav-capsule {
   display: inline-flex;
   align-items: center;
   gap: 8px;
   padding: 6px 10px;
-  background: rgba(18, 18, 22, 0.72);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.40);
   border-radius: 9999px;
   box-shadow: 
-    0 20px 48px -12px rgba(0, 0, 0, 0.8),
-    0 4px 12px rgba(0, 0, 0, 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.15);
-  -webkit-backdrop-filter: blur(28px) saturate(1.8);
-  backdrop-filter: blur(28px) saturate(1.8);
+    0 20px 48px -12px rgba(0, 0, 0, 0.40),
+    inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.90),
+    inset 0 -1px 0.5px rgba(255, 255, 255, 0.20),
+    0 0 16px rgba(255, 255, 255, 0.12) inset;
+  -webkit-backdrop-filter: blur(28px) saturate(200%) brightness(1.10);
+  backdrop-filter: blur(28px) saturate(200%) brightness(1.10);
   user-select: none;
   max-width: 95vw;
   box-sizing: border-box;
@@ -280,24 +281,25 @@
   width: 38px;
   height: 38px;
   border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.12);
   color: #FFFFFF;
   cursor: pointer;
   transition: all 0.22s ease;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
   flex: none;
 }
 
 .credits-nav-btn:hover {
-  background: rgba(255, 255, 255, 0.16);
-  border-color: rgba(255, 255, 255, 0.22);
-  transform: scale(1.05);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  background: rgba(255, 255, 255, 0.24);
+  border-color: rgba(255, 255, 255, 0.70);
+  transform: scale(1.06);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3), inset 0 1px 0 #FFFFFF;
 }
 
 .credits-nav-btn:active {
   transform: scale(0.94);
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.10);
 }
 
 .credits-section-pills {
@@ -321,7 +323,7 @@
   border-radius: 9999px;
   border: 1px solid transparent;
   background: transparent;
-  color: rgba(255, 255, 255, 0.55);
+  color: rgba(255, 255, 255, 0.65);
   font-family: inherit;
   font-size: 12.5px;
   font-weight: 550;
@@ -342,17 +344,17 @@
 }
 
 .credits-section-pill-tab:hover {
-  color: rgba(255, 255, 255, 0.85);
-  background: rgba(255, 255, 255, 0.06);
+  color: #FFFFFF;
+  background: rgba(255, 255, 255, 0.10);
 }
 
 .credits-section-pill-tab.is-active {
-  background: rgba(255, 255, 255, 0.14);
-  border-color: rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.20);
+  border-color: rgba(255, 255, 255, 0.55);
   color: #FFFFFF;
   box-shadow: 
-    inset 0 1px 0 rgba(255, 255, 255, 0.22),
-    0 2px 10px rgba(0, 0, 0, 0.3);
+    inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.85),
+    0 2px 10px rgba(0, 0, 0, 0.25);
 }
 
 .credits-section-pill-tab.is-active .tab-dot {

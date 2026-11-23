@@ -47,29 +47,29 @@
   top: 108px;
   right: 5%;
   padding: 9px 18px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.40);
   border-radius: var(--radius-pill, 9999px);
-  background: rgba(13, 16, 24, 0.72);
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
-  color: var(--brand-gold-light, #DFCAAA);
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(24px) saturate(200%) brightness(1.10);
+  -webkit-backdrop-filter: blur(24px) saturate(200%) brightness(1.10);
+  color: #FFFFFF;
   font-size: 13.5px;
   font-weight: 550;
   box-shadow: 
-    0 4px 16px rgba(0, 0, 0, 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.22);
+    0 8px 24px rgba(0, 0, 0, 0.35),
+    inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.90);
   transition: all var(--duration-fast, 160ms) var(--ease-apple);
 }
 
 .home-explore-link:hover {
-  background: rgba(20, 24, 34, 0.85);
-  border-color: rgba(223, 202, 170, 0.35);
+  background: rgba(255, 255, 255, 0.22);
+  border-color: #FFFFFF;
   color: #FFFFFF;
   transform: translateY(-1.5px);
   box-shadow: 
-    0 8px 24px rgba(0, 0, 0, 0.5),
-    inset 0 1px 0 rgba(255, 255, 255, 0.35),
-    0 0 20px rgba(197, 172, 134, 0.15);
+    0 12px 32px rgba(0, 0, 0, 0.40),
+    inset 0 1.5px 1px 0 #FFFFFF,
+    0 0 20px rgba(255, 255, 255, 0.25);
 }
 
 .home-explore-link:active {
@@ -252,7 +252,8 @@
   justify-content: center;
   gap: 1.1em;
   margin-bottom: 14px;
-  font-size: clamp(12px, 1.2vw, 16px);
+  color: var(--brand-gold, #c7b38e);
+  font-size: clamp(0.72rem, 1vw, 0.88rem);
   font-weight: 550;
   letter-spacing: 0.2em;
   text-transform: uppercase;

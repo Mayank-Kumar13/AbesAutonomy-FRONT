@@ -72,24 +72,24 @@
   transform: scale(0.92);
 }
 
-/* ─── LIQUID GLASS AUTH CARD ─── */
+/* ─── LIQUID GLASS AUTH CARD (APPLE iOS 27 CRYSTAL GLASS — ZERO DARKNESS) ─── */
 .modal-container {
   position: relative;
   z-index: 10;
   width: 100%;
   max-width: 420px;
   margin: auto 0;
-  background: rgba(13, 16, 24, 0.86);
-  backdrop-filter: blur(40px) saturate(200%) contrast(102%);
-  -webkit-backdrop-filter: blur(40px) saturate(200%) contrast(102%);
-  border: 1px solid rgba(255, 255, 255, 0.13);
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(40px) saturate(200%) brightness(1.10);
+  -webkit-backdrop-filter: blur(40px) saturate(200%) brightness(1.10);
+  border: 1px solid rgba(255, 255, 255, 0.40);
   border-radius: 26px;
   box-shadow: 
-    0 0 0 1px rgba(0, 0, 0, 0.80),
-    0 32px 80px -16px rgba(0, 0, 0, 0.95),
-    0 0 36px rgba(197, 172, 134, 0.08),
-    inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.32),
-    inset 0 -1px 1px 0 rgba(0, 0, 0, 0.45);
+    0 32px 80px -16px rgba(0, 0, 0, 0.55),
+    0 0 36px rgba(255, 255, 255, 0.08),
+    inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.90),
+    inset 0 -1px 0.5px 0 rgba(255, 255, 255, 0.20),
+    0 0 24px 2px rgba(255, 255, 255, 0.12) inset;
   overflow: hidden;
   transition: all var(--duration-normal, 260ms) var(--ease-apple);
 }
@@ -163,10 +163,13 @@
 }
 
 .tab-btn.active {
-  color: #08090C !important;
-  -webkit-text-fill-color: #08090C !important;
-  background: #F5F5F7;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  color: #FFFFFF !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+  background: rgba(255, 255, 255, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.60);
+  box-shadow: 
+    inset 0 1.5px 1px rgba(255, 255, 255, 0.90),
+    0 4px 14px rgba(0, 0, 0, 0.25);
   font-weight: 650;
 }
 
@@ -181,35 +184,35 @@
   display: block;
   font-size: 0.78rem;
   font-weight: 550;
-  color: var(--text-secondary, #A1A1A6);
+  color: rgba(255, 255, 255, 0.82);
   margin-bottom: 0.35rem;
   letter-spacing: 0.01em;
 }
 
 .input-group input {
   width: 100%;
-  background: rgba(255, 255, 255, 0.038);
-  border: 1px solid rgba(255, 255, 255, 0.10);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 14px;
   padding: 0.72rem 0.95rem;
   color: #FFFFFF;
   font-family: var(--font-family-sans);
   font-size: 0.92rem;
   outline: none;
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.15);
   transition: all var(--duration-fast, 160ms) ease;
 }
 
 .input-group input::placeholder {
-  color: rgba(255, 255, 255, 0.28);
+  color: rgba(255, 255, 255, 0.38);
 }
 
 .input-group input:focus {
-  border-color: rgba(255, 255, 255, 0.35);
-  background: rgba(255, 255, 255, 0.065);
-  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.10), inset 0 1px 2px rgba(0, 0, 0, 0.3);
+  border-color: rgba(255, 255, 255, 0.60);
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.25);
 }
 
 .password-wrapper {
@@ -240,10 +243,12 @@
 .submit-btn {
   width: 100%;
   padding: 10px 18px;
-  background: linear-gradient(180deg, #FFFFFF 0%, #ECECF0 100%);
-  color: #08090C !important;
-  -webkit-text-fill-color: #08090C !important;
-  border: 1px solid rgba(255, 255, 255, 0.95);
+  background: rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(20px) saturate(180%) brightness(1.12);
+  -webkit-backdrop-filter: blur(20px) saturate(180%) brightness(1.12);
+  color: #FFFFFF !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+  border: 1px solid rgba(255, 255, 255, 0.65);
   border-radius: var(--radius-pill, 9999px);
   font-family: var(--font-family-sans);
   font-size: 0.92rem;
@@ -251,24 +256,27 @@
   letter-spacing: -0.01em;
   cursor: pointer;
   box-shadow: 
-    0 0 0 1px rgba(0, 0, 0, 0.25),
-    0 4px 14px rgba(0, 0, 0, 0.35),
-    inset 0 1px 0 #FFFFFF;
+    inset 0 1.5px 1px 0 #FFFFFF,
+    inset 0 -1px 0.5px rgba(255, 255, 255, 0.25),
+    0 6px 20px rgba(0, 0, 0, 0.35),
+    0 0 14px rgba(255, 255, 255, 0.15) inset;
   transition: all var(--duration-fast, 160ms) var(--ease-apple);
   margin-top: 0.35rem;
 }
 
 .submit-btn:hover:not(:disabled) {
-  background: #FFFFFF;
+  background: rgba(255, 255, 255, 0.30);
+  border-color: #FFFFFF;
   transform: translateY(-1px);
   box-shadow: 
-    0 0 0 1px rgba(0, 0, 0, 0.3),
-    0 6px 18px rgba(255, 255, 255, 0.25),
-    inset 0 1px 0 #FFFFFF;
+    inset 0 1.5px 1px 0 #FFFFFF,
+    0 0 24px rgba(255, 255, 255, 0.40),
+    0 8px 24px rgba(0, 0, 0, 0.45);
 }
 
 .submit-btn:active:not(:disabled) {
   transform: translateY(0.5px) scale(0.96);
+  background: rgba(255, 255, 255, 0.20);
   transition-duration: 0.05s;
 }
 
@@ -321,10 +329,10 @@
   justify-content: center;
   gap: 8px;
   padding: 9px 14px;
-  background: rgba(255, 255, 255, 0.045);
-  border: 1px solid rgba(255, 255, 255, 0.11);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.35);
   border-radius: var(--radius-pill, 9999px);
-  color: #F5F5F7;
+  color: #FFFFFF;
   font-family: var(--font-family-sans);
   font-size: 0.85rem;
   font-weight: 550;
@@ -332,37 +340,38 @@
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   box-shadow: 
-    0 0 0 1px rgba(0, 0, 0, 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.14),
-    0 3px 10px rgba(0, 0, 0, 0.3);
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    0 3px 10px rgba(0, 0, 0, 0.25);
   transition: all var(--duration-fast, 160ms) var(--ease-apple);
   text-decoration: none;
 }
 
 .oauth-btn:hover {
-  background: rgba(255, 255, 255, 0.09);
-  border-color: rgba(255, 255, 255, 0.24);
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.60);
   color: #FFFFFF;
   transform: translateY(-1px);
   box-shadow: 
-    0 0 0 1px rgba(0, 0, 0, 0.45),
-    inset 0 1px 0 rgba(255, 255, 255, 0.22),
-    0 6px 18px rgba(0, 0, 0, 0.45);
+    inset 0 1px 0 rgba(255, 255, 255, 0.50),
+    0 6px 18px rgba(0, 0, 0, 0.35);
 }
 
 .oauth-btn:active {
   transform: translateY(0.5px) scale(0.96);
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(255, 255, 255, 0.06);
   transition-duration: 0.05s;
 }
 
-.oauth-icon {
-  width: 18px;
-  height: 18px;
-  max-width: 18px;
-  max-height: 18px;
+.oauth-icon,
+.oauth-btn svg,
+.oauth-btn img {
+  width: 18px !important;
+  height: 18px !important;
+  max-width: 18px !important;
+  max-height: 18px !important;
   flex-shrink: 0;
   display: inline-block;
+  object-fit: contain;
 }
 
 /* ─── FOOTER LINKS & TEXT ─── */

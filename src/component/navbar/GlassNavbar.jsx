@@ -9,16 +9,20 @@ import {
   User, 
   ShieldCheck, 
   LogOut, 
-  LogIn
+  LogIn,
+  Home,
+  BookOpen,
+  Layers,
+  Users
 } from "lucide-react";
 import "./GlassNavbar.css";
 
 const navLinks = [
-  { to: "/", label: "Home" },
-  { to: "/resources", label: "Resources" },
-  { to: "/premium", label: "Premium", isPremium: true },
-  { to: "/mvp-projects", label: "MVP Projects" },
-  { to: "/credits", label: "Credits" },
+  { to: "/", label: "Home", icon: Home },
+  { to: "/resources", label: "Resources", icon: BookOpen },
+  { to: "/premium", label: "Premium", isPremium: true, icon: Crown },
+  { to: "/mvp-projects", label: "MVP Projects", icon: Layers },
+  { to: "/credits", label: "Credits", icon: Users },
 ];
 
 export default function GlassNavbar({ variant = "standard", onSkipNotes }) {
@@ -183,14 +187,14 @@ export default function GlassNavbar({ variant = "standard", onSkipNotes }) {
 
           {/* Desktop Navigation Links */}
           <div className="capsule-links">
-            {navLinks.map(({ to, label, isPremium }) => (
+            {navLinks.map(({ to, label, isPremium, icon: Icon }) => (
               <NavLink
                 key={to}
                 to={to}
                 end={to === "/"}
                 className={({ isActive }) => `capsule-link ${isActive ? "active" : ""} ${isPremium ? "is-premium" : ""}`}
               >
-                {isPremium && <Crown size={13} className="premium-crown" aria-hidden="true" />}
+                {Icon && <Icon size={13.5} className={isPremium ? "premium-crown" : "nav-link-icon"} aria-hidden="true" />}
                 <span>{label}</span>
               </NavLink>
             ))}
