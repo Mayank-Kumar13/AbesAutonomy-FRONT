@@ -1,236 +1,261 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { 
-  Sparkles, 
   ChevronLeft, 
   ChevronRight, 
-  RotateCw,
-  Hand
+  Sparkles,
+  Users
 } from 'lucide-react';
-import Lanyard from './Lanyard';
-import { 
-  createPhotoBadgeCanvas, 
-  createBackBadgeCanvas, 
-  createStrapCanvas 
-} from './badgeTextureGenerator';
+import ProfileCard from '../../component/credits/ProfileCard';
 import CreditsParticleScene from './CreditsParticleScene';
 import './CreditsExperience.css';
 
-// Verified team members dataset with remote + local fallback photo paths
-const DEFAULT_MEMBERS = [
+// Local verified metadata (cutouts & handles) matching contributors
+const MEMBER_META = {
+  'mayank kumar': {
+    cardPhoto: '/images/contributors/mayank_kumar_card.png',
+    handle: 'tomar.13',
+    roleFallback: 'Founder & Lead Architect'
+  },
+  'mayank kotuli': {
+    cardPhoto: '/images/contributors/mayank_kotuli_card.png',
+    handle: '_mayank099_',
+    roleFallback: 'Founder & Product Engineer'
+  },
+  'mukul yadav': {
+    cardPhoto: '/images/contributors/mukul_yadav_card.png',
+    handle: 'mukul_yddv08',
+    roleFallback: 'Co-Founder & Core Developer'
+  },
+  'mayank chaudhary': {
+    cardPhoto: '/images/contributors/mayank_chaudhary_card.png',
+    handle: 'mayankchaudhary_03',
+    roleFallback: 'Communications & PR Strategist'
+  },
+  'mayank sharma': {
+    cardPhoto: '/images/contributors/mayank_sharma_card.png',
+    handle: 'mynk_911',
+    roleFallback: 'Motion & Media Producer'
+  },
+  'medhawin tiwari': {
+    cardPhoto: '/images/contributors/medhawin_tiwari_card.png',
+    handle: 'medhawintiwari',
+    roleFallback: 'Visual & Interface Designer'
+  },
+  'kanishq atterya': {
+    cardPhoto: '/images/contributors/kanishq_atterya_card.png',
+    handle: 'kanishq_attreya',
+    roleFallback: 'Academic Contributions Head'
+  },
+  'nitin bhardwaj': {
+    cardPhoto: '/images/contributors/nitin_bhardwaj_card.png',
+    handle: 'nitin_bhardwaj',
+    roleFallback: '10 SGPA Topper Contributor'
+  }
+};
+
+// Default fallback role sections (identical to public API schema)
+const DEFAULT_ROLE_SECTIONS = [
   {
-    _id: "m-1",
-    name: "Mayank Kumar",
-    role: "Founder & Lead Architect",
-    description: "Still figuring it out, but never settling for a version that isn’t mine.",
-    photoUrl: "https://ik.imagekit.io/dfkux2rsp/credits/IMG20260925161102.jpg_cVTTyjULF.jpeg",
-    localPhoto: "/images/contributors/mayank_kumar.jpg",
-    year: "2nd",
-    github: "https://github.com/Mayank-Kumar13",
-    linkedin: "https://www.linkedin.com/in/mayank-kumar-206209377/",
-    instagram: "https://www.instagram.com/tomar.13/",
-    focal: { focalX: 0.50, focalY: 0.32 },
+    _id: "sec-founders",
+    title: "Founders",
+    members: [
+      {
+        _id: "m-1",
+        name: "Mayank Kumar",
+        role: "Founder & Lead Architect",
+        description: "Still figuring it out, but never settling for a version that isn’t mine.",
+        cardPhoto: "/images/contributors/mayank_kumar_card.png",
+        handle: "tomar.13",
+        status: "Online",
+        statusColor: "#22c55e",
+        github: "https://github.com/Mayank-Kumar13",
+        linkedin: "https://www.linkedin.com/in/mayank-kumar-206209377/",
+        instagram: "https://www.instagram.com/tomar.13/"
+      },
+      {
+        _id: "m-2",
+        name: "Mayank Kotuli",
+        role: "Founder & Product Engineer",
+        description: "Turning ideas into products, and problems into possibilities.",
+        cardPhoto: "/images/contributors/mayank_kotuli_card.png",
+        handle: "_mayank099_",
+        status: "Online",
+        statusColor: "#22c55e",
+        github: "https://github.com/mayankkotuli099",
+        linkedin: "https://www.linkedin.com/in/mayank-kotuli-445891363/",
+        instagram: "https://www.instagram.com/_mayank099_/"
+      }
+    ]
   },
   {
-    _id: "m-2",
-    name: "Mayank Kotuli",
-    role: "Co-Founder & Product Engineer",
-    description: "Turning ideas into products, and problems into possibilities.",
-    photoUrl: "https://ik.imagekit.io/dfkux2rsp/credits/mayankpfp_j-PzvfhM7.jpeg",
-    localPhoto: "/images/contributors/mayank_kotuli.jpg",
-    year: "2nd",
-    github: "https://github.com/mayankkotuli099",
-    linkedin: "https://www.linkedin.com/in/mayank-kotuli-445891363/",
-    instagram: "https://www.instagram.com/_mayank099_/",
-    focal: { focalX: 0.50, focalY: 0.30 },
+    _id: "sec-cofounder",
+    title: "Co-Founder",
+    members: [
+      {
+        _id: "m-3",
+        name: "Mukul Yadav",
+        role: "Co-Founder & Core Developer",
+        description: "Learning as I build, building as I learn.",
+        cardPhoto: "/images/contributors/mukul_yadav_card.png",
+        handle: "mukul_yddv08",
+        status: "Online",
+        statusColor: "#22c55e",
+        github: "https://github.com/mukul2007yadav-lab",
+        linkedin: "https://www.linkedin.com/in/mukul-yadav-19ab44377/",
+        instagram: "https://www.instagram.com/mukul_yddv08/?hl=en"
+      }
+    ]
   },
   {
-    _id: "m-3",
-    name: "Mukul Yadav",
-    role: "Co-Founder & Core Developer",
-    description: "Learning as I build, building as I learn.",
-    photoUrl: "https://ik.imagekit.io/dfkux2rsp/credits/WhatsApp_Image_2026-09-26_at_14.14.13_WEZH6863R.jpeg",
-    localPhoto: "/images/contributors/mukul_yadav.jpg",
-    year: "2nd",
-    github: "https://github.com/mukul2007yadav-lab",
-    linkedin: "https://www.linkedin.com/in/mukul-yadav-19ab44377/",
-    instagram: "https://www.instagram.com/mukul_yddv08/?hl=en",
-    focal: { focalX: 0.50, focalY: 0.32 },
+    _id: "sec-social",
+    title: "Social Media & Production",
+    members: [
+      {
+        _id: "m-4",
+        name: "Mayank Chaudhary",
+        role: "Communications & PR Strategist",
+        description: "Driving community outreach, strategic partnerships, and student engagement.",
+        cardPhoto: "/images/contributors/mayank_chaudhary_card.png",
+        handle: "mayankchaudhary_03",
+        status: "Online",
+        statusColor: "#22c55e",
+        github: "https://github.com/MAYANKCHAUDHARY03",
+        linkedin: "https://www.linkedin.com/in/mayank-chaudhary03/",
+        instagram: "https://www.instagram.com/mayankchaudhary_03"
+      },
+      {
+        _id: "m-5",
+        name: "Mayank Sharma",
+        role: "Motion & Media Producer",
+        description: "Crafting digital stories, cinematic edits, and platform visual narratives.",
+        cardPhoto: "/images/contributors/mayank_sharma_card.png",
+        handle: "mynk_911",
+        status: "Online",
+        statusColor: "#22c55e",
+        github: "https://github.com/mykcodes",
+        linkedin: "https://www.linkedin.com/in/mynksharma/",
+        instagram: "https://www.instagram.com/mynk_911?stkn=eHdienJ1Nm1kdjQ5"
+      },
+      {
+        _id: "m-6",
+        name: "Medhawin Tiwari",
+        role: "Visual & Interface Designer",
+        description: "Designing modern aesthetics, brand materials, and intuitive visual assets.",
+        cardPhoto: "/images/contributors/medhawin_tiwari_card.png",
+        handle: "medhawintiwari",
+        status: "Online",
+        statusColor: "#22c55e",
+        github: "https://github.com/medhawintiwari",
+        linkedin: "https://www.linkedin.com/in/medhawin-tiwari-8a833038b/",
+        instagram: "https://www.instagram.com/medhawintiwari?stkn=a215ZWYzNjB2OWh2"
+      }
+    ]
   },
   {
-    _id: "m-4",
-    name: "Mayank Chaudhary",
-    role: "Communications & PR Strategist",
-    description: "Driving community outreach, strategic partnerships, and student engagement.",
-    photoUrl: "https://ik.imagekit.io/dfkux2rsp/credits/Chaudhary_hNJuPzOXu.jpeg",
-    localPhoto: "/images/contributors/mayank_chaudhary.jpg",
-    year: "2nd",
-    github: "https://github.com/MAYANKCHAUDHARY03",
-    linkedin: "https://www.linkedin.com/in/mayank-chaudhary03/",
-    instagram: "https://www.instagram.com/mayankchaudhary_03",
-    focal: { focalX: 0.50, focalY: 0.28 },
+    _id: "sec-academics",
+    title: "Contributors Head",
+    members: [
+      {
+        _id: "m-7",
+        name: "Kanishq Atterya",
+        role: "Academic Contributions Head",
+        description: "Curating verified syllabus modules, lecture notes, and topper resources.",
+        cardPhoto: "/images/contributors/kanishq_atterya_card.png",
+        handle: "kanishq_attreya",
+        status: "Online",
+        statusColor: "#22c55e",
+        github: "https://github.com/Kanishqattreya19",
+        linkedin: "https://www.linkedin.com/in/kanishq-attreya-b62109369",
+        instagram: "https://www.instagram.com/kanishq_attreya?stkn=MTR6b2dkdG56MmJ5dQ=="
+      }
+    ]
   },
   {
-    _id: "m-5",
-    name: "Mayank Sharma",
-    role: "Motion & Media Producer",
-    description: "Crafting digital stories, cinematic edits, and platform visual narratives.",
-    photoUrl: "https://ik.imagekit.io/dfkux2rsp/credits/sharma_nbREYwqb0.png",
-    localPhoto: "/images/contributors/mayank_sharma.png",
-    year: "2nd",
-    github: "https://github.com/mykcodes",
-    linkedin: "https://www.linkedin.com/in/mynksharma/",
-    instagram: "https://www.instagram.com/mynk_911?stkn=eHdienJ1Nm1kdjQ5",
-    focal: { focalX: 0.50, focalY: 0.35 },
-  },
-  {
-    _id: "m-6",
-    name: "Medhawin Tiwari",
-    role: "Visual & Interface Designer",
-    description: "Designing modern aesthetics, brand materials, and intuitive visual assets.",
-    photoUrl: "https://ik.imagekit.io/dfkux2rsp/credits/portfolioimage_NnIsksNCA.png",
-    localPhoto: "/images/contributors/medhawin_tiwari.png",
-    year: "2nd",
-    github: "https://github.com/medhawintiwari",
-    linkedin: "https://www.linkedin.com/in/medhawin-tiwari-8a833038b/",
-    instagram: "https://www.instagram.com/medhawintiwari?stkn=a215ZWYzNjB2OWh2",
-    focal: { focalX: 0.50, focalY: 0.35 },
-  },
-  {
-    _id: "m-7",
-    name: "Kanishq Atterya",
-    role: "Academic Contributions Head",
-    description: "Curating verified syllabus modules, lecture notes, and topper resources.",
-    photoUrl: "https://ik.imagekit.io/dfkux2rsp/credits/kanishq_XuT23cowB.jpeg",
-    localPhoto: "/images/contributors/kanishq_atterya.jpg",
-    year: "2nd",
-    github: "https://github.com/Kanishqattreya19",
-    linkedin: "https://www.linkedin.com/in/kanishq-attreya-b62109369",
-    instagram: "https://www.instagram.com/kanishq_attreya?stkn=MTR6b2dkdG56MmJ5dQ==",
-    focal: { focalX: 0.50, focalY: 0.30 },
-  },
-  {
-    _id: "m-8",
-    name: "Nitin Bhardwaj",
-    role: "10 SGPA Topper Contributor",
-    description: "Authoring high-yield handwritten solutions for semester exam excellence.",
-    photoUrl: "https://ik.imagekit.io/dfkux2rsp/credits/NITIN_qtQoWQAwx.jpeg",
-    localPhoto: "/images/contributors/nitin_bhardwaj.jpg",
-    year: "2nd",
-    github: "",
-    linkedin: "",
-    instagram: "",
-    focal: { focalX: 0.50, focalY: 0.26 },
-  },
+    _id: "sec-contributors",
+    title: "Contributors",
+    members: [
+      {
+        _id: "m-8",
+        name: "Nitin Bhardwaj",
+        role: "10 SGPA Topper Contributor",
+        description: "Authoring high-yield handwritten solutions for semester exam excellence.",
+        cardPhoto: "/images/contributors/nitin_bhardwaj_card.png",
+        handle: "nitin_bhardwaj",
+        status: "Online",
+        statusColor: "#22c55e",
+        github: "",
+        linkedin: "",
+        instagram: ""
+      }
+    ]
+  }
 ];
 
 export default function CreditsExperience({ liveSections = [] }) {
-  // Aggregate members from live backend sections if provided, else use defaults
-  const members = useMemo(() => {
+  // Process live backend sections or fallback to default
+  const sections = useMemo(() => {
     if (Array.isArray(liveSections) && liveSections.length > 0) {
-      const flattened = [];
-      liveSections.forEach((sec) => {
-        if (Array.isArray(sec.members) && sec.members.length > 0) {
-          sec.members.forEach((m) => {
-            if (m.isVisible !== false) {
-              flattened.push({
+      const valid = liveSections
+        .filter((sec) => sec.isPublished !== false && Array.isArray(sec.members) && sec.members.length > 0)
+        .map((sec) => {
+          const processedMembers = sec.members
+            .filter((m) => m.isVisible !== false)
+            .map((m) => {
+              const nameKey = (m.name || '').toLowerCase().trim();
+              const meta = MEMBER_META[nameKey] || {};
+              const defaultHandle = nameKey ? nameKey.replace(/\s+/g, '_') : 'contributor';
+              return {
                 ...m,
-                sectionTitle: sec.title,
-                focal: { focalX: 0.50, focalY: 0.32 },
-              });
-            }
-          });
-        }
-      });
-      if (flattened.length > 0) return flattened;
+                role: m.role || meta.roleFallback || 'Contributor',
+                cardPhoto: meta.cardPhoto || m.photoUrl || '/images/contributors/mayank_kumar_card.png',
+                handle: meta.handle || defaultHandle,
+                status: 'Online',
+                statusColor: '#22c55e',
+                github: m.github || '',
+                linkedin: m.linkedin || '',
+                instagram: m.instagram || '',
+              };
+            });
+          return {
+            ...sec,
+            members: processedMembers,
+          };
+        })
+        .filter((sec) => sec.members.length > 0);
+
+      if (valid.length > 0) return valid;
     }
-    return DEFAULT_MEMBERS;
+    return DEFAULT_ROLE_SECTIONS;
   }, [liveSections]);
 
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [isFlipped, setIsFlipped] = useState(false);
-  const [hasInteracted, setHasInteracted] = useState(false);
-  const [loadedImages, setLoadedImages] = useState({});
-  const [canvasTextures, setCanvasTextures] = useState({});
+  const [activeSectionIndex, setActiveSectionIndex] = useState(0);
+  const [slideDirection, setSlideDirection] = useState('next'); // 'next' | 'prev'
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const touchStartRef = useRef({ x: 0, y: 0 });
 
-  const activeMember = members[currentIndex] || members[0];
+  const activeSection = sections[activeSectionIndex] || sections[0];
 
-  // Procedural strap texture canvas
-  const strapCanvas = useMemo(() => {
-    return createStrapCanvas({ width: 1024, height: 128 });
-  }, []);
+  const goToSection = useCallback((targetIndex, direction) => {
+    if (targetIndex === activeSectionIndex || isTransitioning) return;
+    setSlideDirection(direction || (targetIndex > activeSectionIndex ? 'next' : 'prev'));
+    setIsTransitioning(true);
+    setActiveSectionIndex(targetIndex);
+    setTimeout(() => {
+      setIsTransitioning(false);
+    }, 450);
+  }, [activeSectionIndex, isTransitioning]);
 
-  // Preload all contributor photos with local fallback safety
-  useEffect(() => {
-    members.forEach((member) => {
-      if (!loadedImages[member._id]) {
-        const primarySrc = member.photoUrl || member.localPhoto;
-        const fallbackSrc = member.localPhoto || member.photoUrl;
-
-        const img = new Image();
-        img.crossOrigin = 'anonymous';
-        img.onload = () => {
-          setLoadedImages((prev) => ({ ...prev, [member._id]: img }));
-        };
-        img.onerror = () => {
-          if (fallbackSrc && fallbackSrc !== primarySrc) {
-            const fallbackImg = new Image();
-            fallbackImg.onload = () => {
-              setLoadedImages((prev) => ({ ...prev, [member._id]: fallbackImg }));
-            };
-            fallbackImg.onerror = () => {
-              setLoadedImages((prev) => ({ ...prev, [member._id]: null }));
-            };
-            fallbackImg.src = fallbackSrc;
-          } else {
-            setLoadedImages((prev) => ({ ...prev, [member._id]: null }));
-          }
-        };
-        img.src = primarySrc;
-      }
-    });
-  }, [members, loadedImages]);
-
-  // Generate front (photograph-only) and back (complete profile) textures for active member
-  useEffect(() => {
-    const member = activeMember;
-    if (!member) return;
-
-    const img = loadedImages[member._id];
-    const focal = member.focal || { focalX: 0.50, focalY: 0.35 };
-
-    // Front Face: 100% Photograph Only (No labels, no names, no barcodes)
-    const front = createPhotoBadgeCanvas(img, {
-      focalX: focal.focalX,
-      focalY: focal.focalY,
-      fallbackName: member.name,
-    });
-
-    // Back Face: Complete Contributor Profile with Interactive Social Link Hitboxes
-    const back = createBackBadgeCanvas(member);
-
-    setCanvasTextures((prev) => ({
-      ...prev,
-      [member._id]: { front, back },
-    }));
-  }, [activeMember, loadedImages]);
-
-  // Navigation handlers
   const handlePrev = useCallback(() => {
-    setIsFlipped(false);
-    setCurrentIndex((prev) => (prev > 0 ? prev - 1 : members.length - 1));
-  }, [members.length]);
+    const nextIdx = activeSectionIndex > 0 ? activeSectionIndex - 1 : sections.length - 1;
+    goToSection(nextIdx, 'prev');
+  }, [activeSectionIndex, sections.length, goToSection]);
 
   const handleNext = useCallback(() => {
-    setIsFlipped(false);
-    setCurrentIndex((prev) => (prev < members.length - 1 ? prev + 1 : 0));
-  }, [members.length]);
+    const nextIdx = activeSectionIndex < sections.length - 1 ? activeSectionIndex + 1 : 0;
+    goToSection(nextIdx, 'next');
+  }, [activeSectionIndex, sections.length, goToSection]);
 
-  const handleFlipToggle = useCallback(() => {
-    setHasInteracted(true);
-    setIsFlipped((prev) => !prev);
-  }, []);
-
-  // Keyboard controls: Arrow Left/Right to change contributor, Space/Enter to flip
+  // Keyboard navigation: Left / Right arrows
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
@@ -240,20 +265,43 @@ export default function CreditsExperience({ liveSections = [] }) {
       } else if (e.key === 'ArrowRight') {
         e.preventDefault();
         handleNext();
-      } else if (e.key === ' ' || e.key === 'Enter') {
-        e.preventDefault();
-        handleFlipToggle();
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [handlePrev, handleNext, handleFlipToggle]);
+  }, [handlePrev, handleNext]);
 
-  const activeFront = canvasTextures[activeMember?._id]?.front || null;
-  const activeBack = canvasTextures[activeMember?._id]?.back || null;
+  // Touch Swipe Gestures
+  const handleTouchStart = (e) => {
+    if (e.touches && e.touches[0]) {
+      touchStartRef.current = {
+        x: e.touches[0].clientX,
+        y: e.touches[0].clientY
+      };
+    }
+  };
+
+  const handleTouchEnd = (e) => {
+    if (e.changedTouches && e.changedTouches[0]) {
+      const dx = e.changedTouches[0].clientX - touchStartRef.current.x;
+      const dy = e.changedTouches[0].clientY - touchStartRef.current.y;
+      // Horizontal swipe must dominate vertical scroll
+      if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+        if (dx < 0) {
+          handleNext();
+        } else {
+          handlePrev();
+        }
+      }
+    }
+  };
 
   return (
-    <div className="credits-root">
+    <div 
+      className="credits-root"
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+    >
       {/* 3D Celestial Background Particles */}
       <CreditsParticleScene />
 
@@ -264,135 +312,114 @@ export default function CreditsExperience({ liveSections = [] }) {
       </div>
 
       <main className="credits-layout-container">
-        {/* Minimal Restrained Header */}
+        {/* Subtle, Refined Apple iOS 27 Heading */}
         <header className="credits-page-header">
           <div className="credits-badge-pill">
             <Sparkles size={11} className="credits-badge-sparkle" />
             <span>ARCHITECTURAL COLLECTIVE</span>
           </div>
-          <h1 className="credits-main-title">
-            The Minds Behind <span className="gold-text-glow">ABES Autonomy</span>
-          </h1>
-          <p className="credits-main-subtitle">
-            Hover or drag the identity badge to swing • Click to flip between portrait and full profile
-          </p>
+
+          <div className="credits-heading-slider" key={activeSection.title}>
+            <h1 className={`credits-role-heading anim-slide-${slideDirection}`}>
+              {activeSection.title}
+            </h1>
+            <p className={`credits-role-meta anim-fade-${slideDirection}`}>
+              <Users size={12} className="inline mr-1 opacity-70" />
+              <span>
+                {activeSection.members.length === 1 
+                  ? '1 Contributor' 
+                  : `${activeSection.members.length} Contributors`}
+              </span>
+              <span className="credits-meta-sep">•</span>
+              <span>Section {String(activeSectionIndex + 1).padStart(2, '0')} of {String(sections.length).padStart(2, '0')}</span>
+            </p>
+          </div>
         </header>
 
-        {/* ONE LARGE CENTERED 3D IDENTITY BADGE STAGE */}
-        <section className="credits-stage-section" aria-label="3D Contributor Identity Showcase">
-          <div className="credits-lanyard-stage">
-            <Lanyard
-              frontImage={activeFront}
-              backImage={activeBack}
-              contributor={activeMember}
-              strapImage={strapCanvas}
-              imageFit="cover"
-              cardColor="#FFFFFF"
-              orientation="portrait"
-              finish="glossy"
-              cornerRadius={0.3}
-              size={0.88}
-              anchor="center"
-              strapLength={0.44}
-              strapColor="#111111"
-              strapWidth={0.65}
-              metal="silver"
-              gravity={1}
-              damping={0.62}
-              elasticity={0.55}
-              breeze={0.35}
-              interactive={true}
-              intro={true}
-              isFlipped={isFlipped}
-              onFlip={(flipped) => {
-                setHasInteracted(true);
-                setIsFlipped(flipped);
-              }}
-            />
-
-            {/* Subtle Floating Interaction Hint (Auto-fades on user interaction) */}
-            <div 
-              className={`credits-interaction-hint ${hasInteracted ? 'is-faded' : ''}`}
-              aria-hidden="true"
-            >
-              <div className="hint-pulsing-dot" />
-              <span>{isFlipped ? 'CLICK CARD TO SHOW PORTRAIT' : 'CLICK CARD TO REVEAL PROFILE'}</span>
-            </div>
+        {/* Grouped Cards Stage with Swipe/Slide Animation */}
+        <section 
+          className="credits-stage-section" 
+          aria-label={`${activeSection.title} Contributor Showcase`}
+        >
+          <div 
+            key={`section-cards-${activeSectionIndex}`} 
+            className={`credits-cards-row anim-stage-${slideDirection} cards-count-${activeSection.members.length}`}
+          >
+            {activeSection.members.map((member) => (
+              <div key={member._id || member.name} className="credits-card-wrapper">
+                <ProfileCard
+                  avatarUrl={member.cardPhoto}
+                  name={member.name}
+                  title={member.role}
+                  handle={member.handle}
+                  status={member.status || 'Online'}
+                  statusColor={member.statusColor || '#22c55e'}
+                  socials={{
+                    github: member.github,
+                    linkedin: member.linkedin,
+                    instagram: member.instagram
+                  }}
+                  theme="dark"
+                  radius={18}
+                  holo={0.82}
+                  glare={0.52}
+                  enableTilt={true}
+                  tiltStrength={12}
+                  parallax={8}
+                  intro={true}
+                />
+              </div>
+            ))}
           </div>
 
-          {/* Minimal Frosted Glass Navigation Pill */}
-          <nav className="credits-nav-capsule" aria-label="Contributor Navigation">
+          {/* Minimal Apple Liquid Glass Navigation Capsule */}
+          <nav className="credits-nav-capsule" aria-label="Section Navigation">
             <button
               type="button"
               className="credits-nav-btn"
               onClick={handlePrev}
-              aria-label="Previous Contributor"
-              title="Previous Contributor (← Arrow)"
+              aria-label="Previous Section"
+              title="Previous Role (← Arrow)"
             >
               <ChevronLeft size={18} />
             </button>
 
-            <div className="credits-nav-counter">
-              <span className="counter-current">
-                {String(currentIndex + 1).padStart(2, '0')}
-              </span>
-              <span className="counter-divider">/</span>
-              <span className="counter-total">
-                {String(members.length).padStart(2, '0')}
-              </span>
+            {/* Interactive Section Indicator Tabs */}
+            <div className="credits-section-pills" role="tablist" aria-label="Select Role Section">
+              {sections.map((sec, idx) => {
+                const isActive = idx === activeSectionIndex;
+                return (
+                  <button
+                    key={sec._id || sec.title}
+                    type="button"
+                    role="tab"
+                    aria-selected={isActive}
+                    aria-label={`View ${sec.title}`}
+                    className={`credits-section-pill-tab ${isActive ? 'is-active' : ''}`}
+                    onClick={() => goToSection(idx)}
+                  >
+                    <span className="tab-dot" />
+                    <span className="tab-title">{sec.title}</span>
+                  </button>
+                );
+              })}
             </div>
 
             <button
               type="button"
               className="credits-nav-btn"
               onClick={handleNext}
-              aria-label="Next Contributor"
-              title="Next Contributor (→ Arrow)"
+              aria-label="Next Section"
+              title="Next Role (→ Arrow)"
             >
               <ChevronRight size={18} />
             </button>
-
-            <div className="nav-capsule-divider" />
-
-            <button
-              type="button"
-              className={`credits-flip-btn ${isFlipped ? 'is-active' : ''}`}
-              onClick={handleFlipToggle}
-              aria-label={isFlipped ? "Flip to Portrait Photo" : "Flip to Profile Details"}
-              title="Flip Card (Spacebar)"
-            >
-              <RotateCw size={14} className={isFlipped ? 'icon-rotated' : ''} />
-              <span>{isFlipped ? 'View Photo' : 'View Profile'}</span>
-            </button>
           </nav>
-
-          {/* Minimal Dot Scrubber */}
-          <div className="credits-dots-bar" role="tablist" aria-label="Select Contributor">
-            {members.map((m, idx) => (
-              <button
-                key={m._id}
-                type="button"
-                role="tab"
-                aria-selected={idx === currentIndex}
-                aria-label={`Select ${m.name}`}
-                title={m.name}
-                className={`credits-dot ${idx === currentIndex ? 'active' : ''}`}
-                onClick={() => {
-                  setHasInteracted(true);
-                  setIsFlipped(false);
-                  setCurrentIndex(idx);
-                }}
-              />
-            ))}
-          </div>
 
           {/* Accessible Screen-Reader Summary */}
           <div className="home-sr-only" aria-live="polite">
-            Current Contributor: {activeMember.name}, {activeMember.role}. 
-            {activeMember.description}. 
-            {activeMember.github && `GitHub: ${activeMember.github}`}
-            {activeMember.linkedin && `LinkedIn: ${activeMember.linkedin}`}
-            {activeMember.instagram && `Instagram: ${activeMember.instagram}`}
+            Current Section: {activeSection.title} with {activeSection.members.length} members:
+            {activeSection.members.map((m) => `${m.name} (${m.role})`).join(', ')}
           </div>
         </section>
       </main>
