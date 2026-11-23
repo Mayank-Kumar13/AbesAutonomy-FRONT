@@ -280,6 +280,7 @@
   display: flex;
   flex: 1;
   flex-direction: column;
+  justify-content: center;
   gap: 3px;
   min-width: 0;
 }

@@ -2,7 +2,6 @@ import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import { 
   ChevronLeft, 
   ChevronRight, 
-  Sparkles,
   Users
 } from 'lucide-react';
 import ProfileCard from '../../component/credits/ProfileCard';
@@ -312,26 +311,24 @@ export default function CreditsExperience({ liveSections = [] }) {
       </div>
 
       <main className="credits-layout-container">
-        {/* Subtle, Refined Apple iOS 27 Heading */}
+        {/* Prominent Apple iOS Liquid Glass Heading */}
         <header className="credits-page-header">
-          <div className="credits-badge-pill">
-            <Sparkles size={11} className="credits-badge-sparkle" />
-            <span>ARCHITECTURAL COLLECTIVE</span>
-          </div>
-
           <div className="credits-heading-slider" key={activeSection.title}>
             <h1 className={`credits-role-heading anim-slide-${slideDirection}`}>
               {activeSection.title}
             </h1>
+            {activeSection.description && (
+              <p className={`credits-section-desc anim-fade-${slideDirection}`}>
+                {activeSection.description}
+              </p>
+            )}
             <p className={`credits-role-meta anim-fade-${slideDirection}`}>
-              <Users size={12} className="inline mr-1 opacity-70" />
+              <Users size={14} className="credits-meta-icon" />
               <span>
                 {activeSection.members.length === 1 
                   ? '1 Contributor' 
                   : `${activeSection.members.length} Contributors`}
               </span>
-              <span className="credits-meta-sep">•</span>
-              <span>Section {String(activeSectionIndex + 1).padStart(2, '0')} of {String(sections.length).padStart(2, '0')}</span>
             </p>
           </div>
         </header>
@@ -352,8 +349,6 @@ export default function CreditsExperience({ liveSections = [] }) {
                   name={member.name}
                   title={member.role}
                   handle={member.handle}
-                  status={member.status || 'Online'}
-                  statusColor={member.statusColor || '#22c55e'}
                   socials={{
                     github: member.github,
                     linkedin: member.linkedin,
