@@ -1,134 +1,51 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "../auth/AuthContext";
-import { getSupabaseFallbackUrl, isImageKitThrottled, markImageKitFailure, markImageKitSuccess } from "../utils/storageFallback";
+import { getSupabaseFallbackUrl } from "../utils/storageFallback";
 import { Database, RefreshCw, Wrench, ArrowLeft } from "lucide-react";
 
-export default function Pdfviewer({ file, isImageFlag, isDarkMode }) {
-  const { user } = useAuth();
+import { loadDocument } from "../utils/documentLoader";
 
-  const [activeFile, setActiveFile] = useState(file);
-  const [isUsingFallback, setIsUsingFallback] = useState(false);
-  const [fallbackAttempted, setFallbackAttempted] = useState(false);
-
-  // Sync activeFile when file prop changes
-  useEffect(() => {
-    if (isImageKitThrottled()) {
-      const fallback = getSupabaseFallbackUrl(file);
-      if (fallback) {
-        setActiveFile(fallback);
-        setIsUsingFallback(true);
-        setFallbackAttempted(true);
-        return;
-      }
-    }
-
-    setActiveFile(file);
-    setIsUsingFallback(false);
-    setFallbackAttempted(false);
-  }, [file]);
-
-  const cleanFileUrl = activeFile ? activeFile.split('?')[0] : '';
-  const isOffice = cleanFileUrl ? /\.(docx?|pptx?|xlsx?)$/i.test(cleanFileUrl) : false;
-  const isExplicitImage = cleanFileUrl ? /\.(png|jpe?g|webp|gif|bmp|jfif|heic)$/i.test(cleanFileUrl) : false;
-  
-  // A resource is a PDF if:
-  // - It has .pdf extension
-  // - Or its clean URL ends with /pdf (like /api/notes/:id/pdf)
-  // - Or it's neither an office doc nor an image (almost all notes on ABES Autonomy are PDFs)
-  const isPdf = activeFile
-    ? (/\.(pdf)$/i.test(cleanFileUrl) || /\/pdf$/i.test(cleanFileUrl) || (!isOffice && !isExplicitImage && !isImageFlag))
-    : true;
-
-  const initialIsImage = !isPdf && (isImageFlag || isExplicitImage);
-  const [isImage, setIsImage] = useState(initialIsImage);
-
-  const [fallbackUnavailable, setFallbackUnavailable] = useState(false);
-
-  // Trigger fallback switch safely
-  const triggerFallback = useCallback(async () => {
-    if (fallbackAttempted) return;
-    setFallbackAttempted(true);
-
-    const fallback = getSupabaseFallbackUrl(file);
-    if (!fallback) {
-      setFallbackUnavailable(true);
-      return;
-    }
-
-    try {
-      const probe = await fetch(fallback, { method: 'GET', headers: { Range: 'bytes=0-10' } });
-      if (probe.ok || probe.status === 206) {
-        console.info("[Pdfviewer] Switching to Supabase Storage fallback URL:", fallback);
-        setActiveFile(fallback);
-        setIsUsingFallback(true);
-      } else {
-        console.warn("[Pdfviewer] Supabase fallback file does not exist (status " + probe.status + "):", fallback);
-        setFallbackUnavailable(true);
-      }
-    } catch {
-      // If probe was blocked by CORS, try loading activeFile fallback anyway
-      setActiveFile(fallback);
-      setIsUsingFallback(true);
-    }
-  }, [file, fallbackAttempted]);
-
-  // For PDFs: preflight probe to detect ImageKit bandwidth limit (403, 429) or failure
-  useEffect(() => {
-    if (!file || isUsingFallback || fallbackAttempted) return;
-
-    // Only probe external ImageKit URLs
-    if (file.includes('ik.imagekit.io') || file.includes('imagekit')) {
-      const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), 6000);
-
-      fetch(file, { method: 'GET', headers: { Range: 'bytes=0-10' }, signal: controller.signal })
-        .then((res) => {
-          clearTimeout(timer);
-          if (res.ok || res.status === 206) {
-            markImageKitSuccess();
-          } else {
-            console.warn(`[Pdfviewer] Primary provider probe failed with status ${res.status}. Falling back to Supabase...`);
-            markImageKitFailure(res.status);
-            triggerFallback();
-          }
-        })
-        .catch((err) => {
-          clearTimeout(timer);
-          console.warn("[Pdfviewer] Primary provider probe network error. Falling back to Supabase...", err.message);
-          markImageKitFailure('network_error');
-          triggerFallback();
-        });
-
-      return () => {
-        clearTimeout(timer);
-        controller.abort();
-      };
-    }
-  }, [file, isUsingFallback, fallbackAttempted, triggerFallback]);
+export default function Pdfviewer({ file, backendUrl, isImageFlag, isDarkMode }) {
+  const { user, token } = useAuth();
+  const [document, setDocument] = useState(null);
+  const [loadError, setLoadError] = useState('');
+  const [retry, setRetry] = useState(0);
+  const cleanFileUrl = (file || '').split(/[?#]/)[0];
+  const isOffice = /\.(docx?|pptx?|xlsx?)$/i.test(cleanFileUrl);
 
   useEffect(() => {
-    if (activeFile && !initialIsImage && !isPdf && !isOffice) {
-      const img = new Image();
-      img.onload = () => setIsImage(true);
-      img.src = activeFile;
-    }
-  }, [activeFile, initialIsImage, isPdf, isOffice]);
+    setDocument(null);
+    setLoadError('');
+    if (!file || isOffice) return;
+    const controller = new AbortController();
+    let objectUrl;
+    const fallbackUrl = !backendUrl && file.includes('ik.imagekit.io/') ? getSupabaseFallbackUrl(file) : '';
+    loadDocument({ file, backendUrl, fallbackUrl, signal: controller.signal, token })
+      .then(({ blob, isImage, source }) => {
+        if (controller.signal.aborted) return;
+        objectUrl = URL.createObjectURL(blob);
+        setDocument({ url: objectUrl, isImage, source });
+      })
+      .catch(error => {
+        if (!controller.signal.aborted) setLoadError(error.message);
+      });
+    return () => {
+      controller.abort();
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+    };
+  }, [file, backendUrl, isOffice, token, retry]);
 
-  if (!activeFile) {
-    return <p style={{ textAlign: "center", padding: "20px" }}>Loading Document...</p>;
-  }
+  const activeFile = isOffice ? file : document?.url;
+  const isImage = document?.isImage ?? isImageFlag;
+  const isUsingFallback = document && document.source !== file;
+  const fallbackUnavailable = Boolean(loadError);
+  const triggerFallback = () => setLoadError('This document could not be displayed. Please try again.');
+  const viewerUrl = isOffice
+    ? 'https://view.officeapps.live.com/op/embed.aspx?src=' + encodeURIComponent(file)
+    : '/pdfjs-6.1.200-dist/web/viewer.html?file=' + encodeURIComponent(activeFile || '');
 
-  let viewerUrl = activeFile;
-  if (isPdf && !isOffice) {
-    let resolvedPdfUrl = activeFile;
-    if (typeof window !== 'undefined' && activeFile.startsWith('/')) {
-      resolvedPdfUrl = `${window.location.origin}${activeFile}`;
-    }
-    viewerUrl = `/pdfjs-6.1.200-dist/web/viewer.html?file=${encodeURIComponent(resolvedPdfUrl)}`;
-  } else if (isOffice) {
-    viewerUrl = `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(activeFile)}`;
-  } else if (!isImage) {
-    viewerUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(activeFile)}&embedded=true`;
+  if (!activeFile && !fallbackUnavailable) {
+    return <p role="status" style={{ textAlign: "center", padding: "20px" }}>Loading Document...</p>;
   }
 
   const viewerName = user ? (user.name || user.email) : 'Guest User';
@@ -159,7 +76,7 @@ export default function Pdfviewer({ file, isImageFlag, isDarkMode }) {
           border: '1px solid rgba(255,255,255,0.2)'
         }}>
           <span style={{ fontSize: '14px' }}>🛡️</span>
-          <span>Backup Storage Active (Supabase)</span>
+          <span>Backup source active</span>
         </div>
       )}
 
@@ -246,7 +163,7 @@ export default function Pdfviewer({ file, isImageFlag, isDarkMode }) {
                 backgroundColor: '#38bdf8',
                 boxShadow: '0 0 8px #38bdf8'
               }} />
-              <span>Database Maintenance</span>
+              <span>Document unavailable</span>
             </div>
 
             {/* Main Headline */}
@@ -259,7 +176,7 @@ export default function Pdfviewer({ file, isImageFlag, isDarkMode }) {
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent'
             }}>
-              We are working on the database
+              Unable to load this document
             </h3>
 
             {/* English Message only */}
@@ -270,7 +187,7 @@ export default function Pdfviewer({ file, isImageFlag, isDarkMode }) {
               margin: '0 0 0.7rem 0',
               maxWidth: '440px'
             }}>
-              We are currently optimizing and upgrading our database to provide a faster and more reliable experience.
+              {loadError}
             </p>
 
             <p style={{
@@ -280,14 +197,14 @@ export default function Pdfviewer({ file, isImageFlag, isDarkMode }) {
               margin: '0 0 1.8rem 0',
               maxWidth: '440px'
             }}>
-              This document will be accessible shortly. Thank you for your patience!
+              Check your connection and try loading the document again.
             </p>
 
             {/* Action Buttons */}
             <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', justifyContent: 'center' }}>
               <button
                 type="button"
-                onClick={() => window.location.reload()}
+                onClick={() => setRetry(value => value + 1)}
                 style={{
                   display: 'inline-flex',
                   alignItems: 'center',
@@ -354,6 +271,17 @@ export default function Pdfviewer({ file, isImageFlag, isDarkMode }) {
       ) : (
         <iframe
           src={viewerUrl}
+          onLoad={async (event) => {
+            if (isOffice) return;
+            try {
+              const app = event.currentTarget.contentWindow.PDFViewerApplication;
+              if (!app) throw new Error('PDF viewer could not start. Please update your browser and try again.');
+              await app.initializedPromise;
+              app.eventBus.on('documenterror', () => setLoadError('This PDF could not be displayed. Please try again.'));
+            } catch (error) {
+              setLoadError(error.message);
+            }
+          }}
           width="100%"
           height="100%"
           style={{
