@@ -51,9 +51,8 @@ const App = () => {
   const [showStartupIntro] = useState(() => !isAuthPage && path !== '/credits');
 
   return (
-    <>
+    <GlobalStatusGuard>
       {showStartupIntro && <IntroOverlay locationKey={location.key} />}
-      <GlobalStatusGuard>
       {!isAuthPage && <LoginToast />}
       {!isAuthPage && <LiveTracker />}
       {!isAuthPage && <GlobalAnnouncement />}
@@ -89,8 +88,7 @@ const App = () => {
         </Routes>
       </Suspense>
       {!hideFooter && !isHomePage && <Footer />}
-      </GlobalStatusGuard>
-    </>
+    </GlobalStatusGuard>
   )
 }
 export default App;

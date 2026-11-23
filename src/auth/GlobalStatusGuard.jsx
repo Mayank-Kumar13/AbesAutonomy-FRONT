@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useLocation, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 import UnderConstruction from '../pages/UnderConstruction/UnderConstruction';
@@ -12,6 +12,14 @@ const GlobalStatusGuard = ({ children }) => {
   const { websiteStatus, user, loading } = useAuth();
   const location = useLocation();
 
+  useEffect(() => {
+    try {
+      localStorage.removeItem('bypass_construction');
+    } catch {
+      // ignore
+    }
+  }, []);
+
   if (loading) {
     return (
       <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#080a0e' }}>
@@ -20,23 +28,8 @@ const GlobalStatusGuard = ({ children }) => {
     );
   }
 
-  // In local development, preview mode, or review testing, allow designing and previewing the full application
-  // without being locked out by the production backend's UNDER_CONSTRUCTION status.
-  const hasPreviewAccess = typeof window !== 'undefined' && (
-    window.location.hostname === 'localhost' || 
-    window.location.hostname === '127.0.0.1' || 
-    window.location.hostname.endsWith('.local') ||
-    window.location.hostname.startsWith('192.168.') ||
-    window.location.hostname.startsWith('10.') ||
-    window.location.hostname.startsWith('172.') ||
-    window.location.search.includes('preview=true') ||
-    window.location.search.includes('bypass=true') ||
-    localStorage.getItem('bypass_construction') === 'true'
-  );
-  const isDev = import.meta.env.DEV || hasPreviewAccess;
-  const forceConstruction = import.meta.env.VITE_ENFORCE_UNDER_CONSTRUCTION === 'true';
-  const isUnderConstruction = websiteStatus === 'UNDER_CONSTRUCTION' && (!isDev || forceConstruction);
-  const isAdmin = user?.role === 'admin';
+  const isUnderConstruction = websiteStatus === 'UNDER_CONSTRUCTION' || import.meta.env.VITE_ENFORCE_UNDER_CONSTRUCTION === 'true';
+  const isAdmin = Boolean(user && (user.role === 'admin' || user.isSuperAdmin === true));
 
   // If the site is under construction and the user is NOT an admin
   if (isUnderConstruction && !isAdmin) {
@@ -59,7 +52,7 @@ const GlobalStatusGuard = ({ children }) => {
       );
     }
     
-    // Otherwise, show the Under Construction page
+    // Otherwise, strictly show the Under Construction page
     return <UnderConstruction />;
   }
 

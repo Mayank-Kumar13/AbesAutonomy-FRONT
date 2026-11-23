@@ -1,10 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../../auth/AuthContext';
 import './UnderConstruction.css';
 
 const UnderConstruction = () => {
   const [progress, setProgress] = useState(0);
+  const { user, logout } = useAuth();
+
   useEffect(() => {
+    try {
+      localStorage.removeItem('bypass_construction');
+    } catch {
+      // ignore
+    }
     const timer = setTimeout(() => setProgress(85), 600);
     return () => clearTimeout(timer);
   }, []);
@@ -106,36 +114,35 @@ const UnderConstruction = () => {
           We'll be back very soon with an incredible new experience!
         </p>
 
-        {/* Design preview & Admin links */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '16px', marginTop: '1.2rem' }}>
-          <button
-            type="button"
-            onClick={() => {
-              localStorage.setItem('bypass_construction', 'true');
-              window.location.href = '/';
-            }}
-            style={{
-              background: 'rgba(255, 255, 255, 0.08)',
-              border: '1px solid rgba(255, 255, 255, 0.16)',
-              borderRadius: '9999px',
-              padding: '6px 14px',
-              color: '#DFCAAA',
-              fontSize: '0.78rem',
-              fontWeight: '550',
-              cursor: 'pointer',
-              transition: 'all 0.18s ease'
-            }}
-          >
-            ✦ Enter Design Preview
-          </button>
-          <Link
-            to="/login"
-            state={{ from: { pathname: '/admin' } }}
-            className="uc-admin-link"
-            style={{ marginTop: 0 }}
-          >
-            Admin Login
-          </Link>
+        {/* Admin links */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: '1.2rem' }}>
+          {user ? (
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
+              <span style={{ fontSize: '0.78rem', color: 'rgba(255, 255, 255, 0.4)' }}>
+                Signed in as <strong style={{ color: '#DFCAAA' }}>{user.name || user.email}</strong> (Non-Admin)
+              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  logout?.();
+                  window.location.href = '/login';
+                }}
+                className="uc-admin-link"
+                style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+              >
+                Log Out / Switch to Admin Account
+              </button>
+            </div>
+          ) : (
+            <Link
+              to="/login"
+              state={{ from: { pathname: '/admin' } }}
+              className="uc-admin-link"
+              style={{ marginTop: 0 }}
+            >
+              Admin Login
+            </Link>
+          )}
         </div>
       </div>
     </div>
