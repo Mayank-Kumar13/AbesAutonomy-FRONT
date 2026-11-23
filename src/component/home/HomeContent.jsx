@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowDown, ArrowUpRight, BookOpen, Notebook, Sparkles, ShieldCheck } from 'lucide-react';
+import { ArrowDown, ArrowUpRight } from 'lucide-react';
 import HomeNavigation from './HomeNavigation';
 import { getJourneyState } from './journey';
 import './HomeContent.css';
@@ -191,75 +191,11 @@ export default function HomeContent() {
           </div>
         </section>
 
-        {/* Liquid Glass Showcase Section */}
         <section className="home-notes" id="all-notes" ref={notesRef} aria-labelledby="notes-title">
-          <div className="notes-atmosphere" aria-hidden="true" />
-          
-          <div className="notes-content">
-            <div className="notes-badge-pill anim-fade-in">
-              <Sparkles size={13} className="notes-badge-icon" />
-              <span>ACADEMIC PREPARATION SIMPLIFIED</span>
-            </div>
-
-            <h2 id="notes-title" tabIndex={-1}>
-              All Your Academic Notes.<br />
-              <em>Organized in One Sanctuary.</em>
-            </h2>
-
-            <p className="notes-description">
-              Engineered exclusively for ABES Engineering College students. Access verified theory notes,
-              handwritten topper solutions, syllabus guides, and previous year examination papers without the chaos.
-            </p>
-
-            {/* Feature Cards Grid (Apple Clear Glass style) */}
-            <div className="home-features-grid">
-              <div className="home-glass-card glass-clear">
-                <div className="card-icon-bubble">
-                  <BookOpen size={22} />
-                </div>
-                <h3>Structured Theory</h3>
-                <p>Curated notes, unit-wise syllabus breakdowns, and lecture slide decks indexed by semester and branch.</p>
-              </div>
-
-              <div className="home-glass-card glass-clear">
-                <div className="card-icon-bubble">
-                  <Notebook size={22} />
-                </div>
-                <h3>Handwritten Notes</h3>
-                <p>Authentic, high-resolution notes penned by academic achievers for intuitive end-semester revision.</p>
-              </div>
-
-              <div className="home-glass-card glass-clear">
-                <div className="card-icon-bubble">
-                  <ShieldCheck size={22} />
-                </div>
-                <h3>Integrated Reader</h3>
-                <p>Comfortable in-browser PDF study suite with dark mode, reading-time counter, and direct downloads.</p>
-              </div>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="notes-action-row">
-              <Link 
-                to="/resources" 
-                className="glass-btn-primary home-cta-btn"
-                style={{ color: '#08090C', textDecoration: 'none' }}
-              >
-                <span style={{ color: '#08090C', WebkitTextFillColor: '#08090C' }}>Explore Academic Resources</span>
-                <ArrowUpRight size={17} style={{ color: '#08090C', stroke: '#08090C' }} />
-              </Link>
-              <Link to="/mvp-projects" className="glass-btn-secondary home-sec-btn">
-                <span>View MVP Projects</span>
-              </Link>
-            </div>
-          </div>
-
-          <div className="notes-bottom">
-            <span>ABES AUTONOMY &copy; 2025&ndash;2026</span>
-            <a href="#campus" aria-label="Back to the top">
-              BACK TO TOP <ArrowUpRight size={13} />
-            </a>
-          </div>
+          <h2 id="notes-title" tabIndex={-1}>Get your all notes here</h2>
+          <Link to="/resources" className="glass-btn-primary home-cta-btn">
+            Explore Notes <ArrowUpRight size={17} aria-hidden="true" />
+          </Link>
         </section>
       </main>
     </div>

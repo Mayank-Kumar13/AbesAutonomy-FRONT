@@ -3,8 +3,7 @@
 The reference video's sequence is mapped to native scrolling: the wordmark rises
 from below the roofline, holds behind the campus, then the camera moves toward the
 lettering and dissolves into the notes destination. Scrolling back reverses it.
-The destination preserves the glass UI's three academic feature cards and its
-resources/project links. The shared footer is not rendered on this route.
+The destination shows a heading and an Explore Notes link to Resources. The shared footer is not rendered on this route.
 
 The campus is a procedural 3D interpretation of the supplied ABES photograph,
 not a photograph or a surveyed architectural model. Its wings, window bays,
