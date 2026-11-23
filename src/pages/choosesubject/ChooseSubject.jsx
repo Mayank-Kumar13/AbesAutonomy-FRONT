@@ -216,8 +216,8 @@ const ChooseSubject = () => {
           </div>
         ) : (
           <div className="resource-shelf__grid">
-            {displayedSubjects.map((subject) => (
-              <ResourceCover key={subject.heading} type={resourceType} title={subject.heading}
+            {displayedSubjects.map((subject, index) => (
+              <ResourceCover key={subject.heading} colourIndex={index} title={subject.heading}
                 detail={subject.count == null ? subject.para : `${subject.count} file${subject.count === 1 ? '' : 's'}`}
                 icon={subject.icon} to="/subject"
                 state={{ heading: subject.heading, para: subject.para, year: selectedYear, resourceType, resourceTitle, branch: activeGroup }} />

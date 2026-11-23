@@ -207,7 +207,7 @@ const Subject = () => {
           </div>
         ) : (
           <div className="subject-units-flow">
-            {Object.entries(groupedNotes).map(([unitName, unitNotes]) => (
+            {Object.entries(groupedNotes).map(([unitName, unitNotes], unitIndex) => (
               <section key={unitName} className="unit-cover-section" aria-label={unitName}>
                 <div className="unit-panel-header">
                   <div className="unit-title-wrap">
@@ -218,8 +218,8 @@ const Subject = () => {
                 </div>
 
                 <div className="resource-shelf__grid">
-                  {unitNotes.map(note => (
-                    <ResourceCover key={note._id} type={note.resourceType || resourceType}
+                  {unitNotes.map((note, index) => (
+                    <ResourceCover key={note._id} colourIndex={unitIndex + index}
                       heading="h3" title={note.title} icon={<FileText size={30} strokeWidth={1.25} />}
                       detail={[unitName, note.viewsCount > 0 && `${note.viewsCount} reads`].filter(Boolean).join(' · ')}
                       to="/pdfpreview" state={{
