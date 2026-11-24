@@ -26,7 +26,18 @@ export default function PdfPreview() {
   const location = useLocation();
   const { user, token } = useAuth();
 
-  const { pdfUrl, title = "PDF Preview", noteId, subject = "", isImage = false } = location.state || {};
+  const queryParams = new URLSearchParams(location.search);
+  const searchNoteId = queryParams.get('noteId') || '';
+  const searchPdfUrl = queryParams.get('pdfUrl') || '';
+  const searchTitle = queryParams.get('title') || 'PDF Preview';
+
+  const { 
+    pdfUrl = searchPdfUrl, 
+    title = searchTitle, 
+    noteId = searchNoteId, 
+    subject = (queryParams.get('subject') || ''), 
+    isImage = false 
+  } = location.state || {};
   
   const [isNavbarVisible, setIsNavbarVisible] = useState(false);
   const [showReviewPrompt, setShowReviewPrompt] = useState(false);
@@ -479,7 +490,6 @@ export default function PdfPreview() {
         message={accessDeniedMessage}
         onClose={() => {
           setShowPremiumModal(false);
-          navigate(-1);
         }}
         onSuccess={() => {
           setShowPremiumModal(false);

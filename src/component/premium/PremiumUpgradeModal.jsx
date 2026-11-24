@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../auth/AuthContext';
 import { paymentApi } from '../../services/api';
 import { openRazorpayCheckout } from '../../utils/razorpay';
-import { Crown, Check, X, Shield, Zap, Sparkles } from 'lucide-react';
+import { Crown, Check, X, Shield, Zap, Sparkles, ArrowRight, Loader2 } from 'lucide-react';
 import './PremiumUpgradeModal.css';
 
 export default function PremiumUpgradeModal({
@@ -14,20 +14,19 @@ export default function PremiumUpgradeModal({
 }) {
   const { user, setTokenAndLoad } = useAuth();
   const navigate = useNavigate();
-  const [selectedPlan, setSelectedPlan] = useState('premium_4_months');
-  const [loading, setLoading] = useState(false);
+  const [loadingPlan, setLoadingPlan] = useState(null);
   const [error, setError] = useState('');
 
   if (!isOpen) return null;
 
   const handleCheckout = async (planId) => {
     if (!user) {
-      onClose();
+      if (onClose) onClose();
       navigate('/login', { state: { from: { pathname: '/premium' } } });
       return;
     }
 
-    setLoading(true);
+    setLoadingPlan(planId);
     setError('');
 
     try {
@@ -47,7 +46,7 @@ export default function PremiumUpgradeModal({
         if (currentToken) await setTokenAndLoad(currentToken);
 
         if (onSuccess) onSuccess(verifyRes.data);
-        onClose();
+        if (onClose) onClose();
         navigate('/payment/success', {
           state: {
             plan: orderDetails.plan,
@@ -62,105 +61,229 @@ export default function PremiumUpgradeModal({
         setError(err.message || 'Payment processing failed. Please try again.');
       }
     } finally {
-      setLoading(false);
+      setLoadingPlan(null);
     }
+  };
+
+  const handleViewAllPlans = () => {
+    if (onClose) onClose();
+    navigate('/premium');
   };
 
   return (
     <div className="pum-backdrop" onClick={onClose}>
-      <div className="pum-card" onClick={(e) => e.stopPropagation()}>
+      <div 
+        className="pum-modal-container" 
+        onClick={(e) => e.stopPropagation()} 
+        role="dialog" 
+        aria-modal="true" 
+        aria-labelledby="pum-title"
+      >
+        {/* Ambient Modal Lighting Orbs */}
+        <div className="pum-ambient-orbs" aria-hidden="true">
+          <div className="pum-orb-glow" />
+          <div className="pum-orb-caustic" />
+        </div>
+
+        {/* Mac OS Frosted Titlebar */}
         <div className="pum-window-header">
-          <div className="mac-dots" aria-hidden="true">
-            <span className="mac-dot red" onClick={onClose} title="Close" />
-            <span className="mac-dot amber" />
-            <span className="mac-dot green" />
+          <div className="pum-mac-dots" aria-hidden="true">
+            <span className="pum-dot pum-dot-red" onClick={onClose} title="Close" />
+            <span className="pum-dot pum-dot-amber" />
+            <span className="pum-dot pum-dot-green" />
           </div>
+
+          <div className="pum-header-chip">
+            <Crown size={12} className="pum-chip-crown" />
+            <span>ABES AUTONOMY PREMIUM</span>
+          </div>
+
           <button className="pum-close-btn" onClick={onClose} aria-label="Close modal">
-            <X size={16} />
+            <X size={15} />
           </button>
         </div>
 
-        <div className="pum-badge">
-          <Crown size={14} />
-          <span>ABES Autonomy Premium</span>
+        {/* Modal Hero Title & Subtitle */}
+        <div className="pum-modal-hero">
+          <h2 id="pum-title" className="pum-title">
+            Unlock Unlimited <span>Learning</span>
+          </h2>
+          <p className="pum-subtitle">
+            {message || 'You have reached your 3 free document accesses. Continue studying without limits.'}
+          </p>
         </div>
 
-        <h2 className="pum-title">
-          Unlock Unlimited <span>Learning</span>
-        </h2>
-
-        <p className="pum-message">{message}</p>
-
-        <div className="pum-pyq-notice">
-          <Sparkles size={14} />
-          <span>PYQ Previous Year Questions remain 100% Free Forever for all students!</span>
-        </div>
-
+        {/* Error Alert if any */}
         {error && (
-          <div style={{ color: '#fca5a5', fontSize: '0.85rem', marginBottom: '1rem', background: 'rgba(239, 68, 68, 0.1)', padding: '8px', borderRadius: '8px' }}>
+          <div className="pum-error-banner" role="alert">
             {error}
           </div>
         )}
 
-        <div className="pum-plans-grid">
-          {/* Plan 1 */}
-          <div
-            className={`pum-plan-card ${selectedPlan === 'premium_1_month' ? 'selected' : ''}`}
-            onClick={() => setSelectedPlan('premium_1_month')}
-          >
-            <h3 className="pum-plan-name">Monthly Plan</h3>
-            <div className="pum-plan-price">₹49</div>
-            <div className="pum-plan-duration">Validity: 30 Days</div>
-            <ul className="pum-plan-features">
-              <li><Check size={14} color="#C5AC86" /> All premium PDFs & Notes</li>
-              <li><Check size={14} color="#C5AC86" /> AI Study Assistant</li>
-              <li><Check size={14} color="#C5AC86" /> Verified Study Materials</li>
-              <li><Check size={14} color="#C5AC86" /> Premium Student Badge</li>
-            </ul>
-            <button
-              className="pum-upgrade-btn"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleCheckout('premium_1_month');
-              }}
-              disabled={loading}
-            >
-              {loading && selectedPlan === 'premium_1_month' ? 'Opening UPI...' : 'Get Monthly (₹49)'}
-            </button>
+        {/* ─── SIDE-BY-SIDE 2-COLUMN LIQUID GLASS PLANS GRID ─── */}
+        <div className="pum-cards-grid">
+          {/* ── CARD 1: Monthly Plan (₹49) ── */}
+          <div className="pum-glass-card pum-card-monthly">
+            {/* Cylindrical Optical Refraction Meniscus Lens */}
+            <div className="pum-card-refraction-lens" aria-hidden="true">
+              <div className="pum-lens-caustic" />
+            </div>
+
+            <div className="pum-card-content">
+              {/* Badge Pill Header */}
+              <div className="pum-card-top-row">
+                <div className="pum-badge-pill standard">
+                  <Sparkles size={11} />
+                  <span>EXAM SPRINT</span>
+                </div>
+              </div>
+
+              <div className="pum-plan-header">
+                <div className="pum-plan-meta">
+                  <span className="pum-plan-title">Monthly Plan</span>
+                  <span className="pum-plan-sub">30-Day Complete Notes Pass</span>
+                </div>
+
+                <div className="pum-price-wrap">
+                  <span className="pum-price-num">₹49</span>
+                  <span className="pum-price-period">/m</span>
+                </div>
+              </div>
+
+              <div className="pum-divider" />
+
+              <ul className="pum-checklist">
+                <li>
+                  <span className="pum-check-circle"><Check size={11} strokeWidth={2.8} /></span>
+                  <span>Unlimited access to all subject notes & theory PDFs</span>
+                </li>
+                <li>
+                  <span className="pum-check-circle"><Check size={11} strokeWidth={2.8} /></span>
+                  <span>AI Academic Study Assistant & instant solver</span>
+                </li>
+                <li>
+                  <span className="pum-check-circle"><Check size={11} strokeWidth={2.8} /></span>
+                  <span>Handwritten toppers' notes & assignments</span>
+                </li>
+                <li>
+                  <span className="pum-check-circle"><Check size={11} strokeWidth={2.8} /></span>
+                  <span>PYQs included 100% free forever</span>
+                </li>
+                <li>
+                  <span className="pum-check-circle"><Check size={11} strokeWidth={2.8} /></span>
+                  <span>Verified student Premium badge</span>
+                </li>
+              </ul>
+
+              <button
+                type="button"
+                className="pum-cta-btn pum-btn-outline"
+                onClick={() => handleCheckout('premium_1_month')}
+                disabled={loadingPlan !== null}
+              >
+                {loadingPlan === 'premium_1_month' ? (
+                  <>
+                    <Loader2 size={14} className="pum-spinner" />
+                    <span>Opening Payment...</span>
+                  </>
+                ) : (
+                  <span>Get 1 Month • ₹49</span>
+                )}
+              </button>
+            </div>
           </div>
 
-          {/* Plan 2 */}
-          <div
-            className={`pum-plan-card best-value ${selectedPlan === 'premium_4_months' ? 'selected' : ''}`}
-            onClick={() => setSelectedPlan('premium_4_months')}
-          >
-            <div className="pum-best-value-pill">BEST VALUE</div>
-            <h3 className="pum-plan-name">Semester Plan</h3>
-            <div className="pum-plan-price">₹139</div>
-            <div className="pum-plan-duration">Validity: 120 Days (Full Semester)</div>
-            <ul className="pum-plan-features">
-              <li><Check size={14} color="#C5AC86" /> All Monthly Features</li>
-              <li><Check size={14} color="#C5AC86" /> Complete Semester Validity</li>
-              <li><Check size={14} color="#C5AC86" /> AI-Powered Learning Tools</li>
-              <li><Check size={14} color="#C5AC86" /> Priority AI Query Processing</li>
-            </ul>
-            <button
-              className="pum-upgrade-btn"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleCheckout('premium_4_months');
-              }}
-              disabled={loading}
-            >
-              {loading && selectedPlan === 'premium_4_months' ? 'Opening UPI...' : 'Get Semester (₹139)'}
-            </button>
+          {/* ── CARD 2: Semester Plan (₹139) - BEST VALUE / HIGHLIGHTED ── */}
+          <div className="pum-glass-card pum-card-semester featured">
+            {/* Cylindrical Optical Refraction Meniscus Lens */}
+            <div className="pum-card-refraction-lens" aria-hidden="true">
+              <div className="pum-lens-caustic" />
+            </div>
+
+            <div className="pum-card-content">
+              {/* Badge Pill Header */}
+              <div className="pum-card-top-row">
+                <div className="pum-badge-pill featured">
+                  <Crown size={11} />
+                  <span>MOST POPULAR • FULL SEMESTER</span>
+                </div>
+              </div>
+
+              <div className="pum-plan-header">
+                <div className="pum-plan-meta">
+                  <span className="pum-plan-title featured">Semester Plan</span>
+                  <span className="pum-plan-sub">Full Semester Coverage (₹34.75/mo)</span>
+                </div>
+
+                <div className="pum-price-wrap">
+                  <span className="pum-price-num featured">₹139</span>
+                  <span className="pum-price-period">/4m</span>
+                </div>
+              </div>
+
+              <div className="pum-divider featured" />
+
+              <ul className="pum-checklist">
+                <li className="pum-highlight-item">
+                  <span className="pum-check-circle featured"><Check size={11} strokeWidth={2.8} /></span>
+                  <span><strong>All Monthly Plan features included</strong></span>
+                </li>
+                <li>
+                  <span className="pum-check-circle featured"><Check size={11} strokeWidth={2.8} /></span>
+                  <span>Full 120-Day semester exam protection</span>
+                </li>
+                <li>
+                  <span className="pum-check-circle featured"><Check size={11} strokeWidth={2.8} /></span>
+                  <span>Priority AI Study Assistant query processing</span>
+                </li>
+                <li>
+                  <span className="pum-check-circle featured"><Check size={11} strokeWidth={2.8} /></span>
+                  <span>Complete question bank & solved sample papers</span>
+                </li>
+                <li>
+                  <span className="pum-check-circle featured"><Check size={11} strokeWidth={2.8} /></span>
+                  <span>Early access to upcoming 2.0 academic tools</span>
+                </li>
+              </ul>
+
+              <button
+                type="button"
+                className="pum-cta-btn pum-btn-featured"
+                onClick={() => handleCheckout('premium_4_months')}
+                disabled={loadingPlan !== null}
+              >
+                {loadingPlan === 'premium_4_months' ? (
+                  <>
+                    <Loader2 size={14} className="pum-spinner" />
+                    <span>Opening Payment...</span>
+                  </>
+                ) : (
+                  <>
+                    <Zap size={14} />
+                    <span>Get Semester Pass • ₹139</span>
+                  </>
+                )}
+              </button>
+            </div>
           </div>
         </div>
 
-        <p className="pum-footer-note">
-          <Shield size={13} />
-          <span>One-time payment • No auto-renewal • Or check out our <a href="/premium" style={{ color: '#DFCAAA', textDecoration: 'underline' }}>₹499 Lifetime Degree Pass</a></span>
-        </p>
+        {/* Modal Bottom Footer: View all plans & Trust Note */}
+        <div className="pum-modal-footer">
+          <button
+            type="button"
+            className="pum-view-all-link"
+            onClick={handleViewAllPlans}
+          >
+            <span>Looking for Degree Lifetime Pass (₹499)? View all plans & comparison</span>
+            <ArrowRight size={13} />
+          </button>
+
+          <div className="pum-trust-line">
+            <Shield size={12} />
+            <span>One-Time Payment • No Auto-Renewal • Instant UPI Activation via Razorpay</span>
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -83,8 +83,8 @@ export default function PremiumPage() {
       a: 'Yes, absolutely! All PYQs and solution hints are 100% free forever for every student, whether you have a free or premium account. PYQ views never count against your free document limit.',
     },
     {
-      q: 'How does the 5-free-document system work?',
-      a: 'As a free student, your first 5 eligible premium document accesses are completely free of cost. Once you access a document, you can revisit and re-read it as many times as you like without consuming additional credits.',
+      q: 'How does the 3-free-document system work?',
+      a: 'As a free student, your first 3 eligible premium document accesses are completely free of cost. Once you access a document, you can revisit and re-read it as many times as you like without consuming additional credits.',
     },
     {
       q: 'What is included in the ₹499 Lifetime Access Plan?',
@@ -352,14 +352,14 @@ export default function PremiumPage() {
                 </tr>
                 <tr>
                   <td className="prem-td-feature">Theory & Subject Notes</td>
-                  <td><span className="prem-status-dim">5 Free Accesses</span></td>
+                  <td><span className="prem-status-dim">3 Pdf Access</span></td>
                   <td><span className="prem-pill gold">Unlimited</span></td>
                   <td className="prem-td-highlight"><span className="prem-pill gold">Unlimited</span></td>
                   <td><span className="prem-pill gold">Unlimited</span></td>
                 </tr>
                 <tr>
                   <td className="prem-td-feature">Question Banks & Model Solutions</td>
-                  <td><span className="prem-status-dim">5 Free Accesses</span></td>
+                  <td><span className="prem-status-dim">3 Pdf Access</span></td>
                   <td><span className="prem-pill gold">Unlimited</span></td>
                   <td className="prem-td-highlight"><span className="prem-pill gold">Unlimited</span></td>
                   <td><span className="prem-pill gold">Unlimited</span></td>
@@ -373,7 +373,7 @@ export default function PremiumPage() {
                 </tr>
                 <tr>
                   <td className="prem-td-feature">High-Speed Watermarked PDFs</td>
-                  <td><span className="prem-status-dim">Free Quota Only</span></td>
+                  <td><span className="prem-status-dim">3 Pdf Access</span></td>
                   <td><span className="prem-pill gold">Unlimited</span></td>
                   <td className="prem-td-highlight"><span className="prem-pill gold">Unlimited</span></td>
                   <td><span className="prem-pill gold">Unlimited + Offline</span></td>

@@ -1,140 +1,612 @@
 /**
- * ABES AUTONOMY — PREMIUM UPGRADE MODAL LIQUID GLASS STYLES
+ * ABES AUTONOMY — PREMIUM UPGRADE MODAL APPLE iOS 27 LIQUID GLASS STYLES
+ * Side-by-side Monthly & Semester pricing cards with meniscus refraction,
+ * zero unnecessary scrolling on desktop/tablet, and high contrast typography.
  */
 
 .pum-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.78);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  background: rgba(3, 4, 7, 0.78);
+  backdrop-filter: blur(22px) saturate(160%);
+  -webkit-backdrop-filter: blur(22px) saturate(160%);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 99999;
-  padding: 1rem;
+  padding: 18px;
+  animation: pumFadeIn 0.22s var(--ease-apple, cubic-bezier(0.16, 1, 0.3, 1));
 }
 
-.pum-card {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0.03) 50%, rgba(255, 255, 255, 0.08) 100%), rgba(11, 14, 21, 0.90);
+@keyframes pumFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ─── MODAL MAIN CONTAINER (NON-SCROLLING BY DEFAULT) ─── */
+.pum-modal-container {
+  position: relative;
+  max-width: 860px;
+  width: 100%;
+  border-radius: 26px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.02) 40%, rgba(255, 255, 255, 0.06) 100%), rgba(11, 14, 21, 0.92);
   backdrop-filter: blur(52px) saturate(220%) contrast(1.10);
   -webkit-backdrop-filter: blur(52px) saturate(220%) contrast(1.10);
-  border: 1px solid rgba(255, 255, 255, 0.45);
-  border-radius: var(--radius-xl, 26px);
-  max-width: 540px;
-  width: 100%;
-  padding: 0 32px 32px;
-  position: relative;
+  border: 1px solid rgba(255, 255, 255, 0.38);
   box-shadow: 
-    0 32px 80px -15px rgba(0, 0, 0, 0.90),
-    0 0 36px rgba(197, 172, 134, 0.25),
-    inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.95),
-    inset 0 -1px 0.5px rgba(255, 255, 255, 0.25);
-  color: #FFFFFF;
-  text-align: center;
-  max-height: 90vh;
+    0 36px 90px -20px rgba(0, 0, 0, 0.95),
+    0 0 36px rgba(197, 172, 134, 0.18),
+    inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.90),
+    inset 0 -1px 0.5px rgba(255, 255, 255, 0.20);
+  padding: 0 28px 22px;
+  overflow: hidden;
+  max-height: 94vh;
   overflow-y: auto;
-  font-family: var(--font-family-sans);
+  font-family: var(--font-family-sans, -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', sans-serif);
+  color: #FFFFFF;
+  animation: pumScaleUp 0.28s var(--ease-apple, cubic-bezier(0.16, 1, 0.3, 1));
 }
 
-.pum-card::before {
+@keyframes pumScaleUp {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Top Meniscus Specular Ridge along Modal Rim */
+.pum-modal-container::before {
   content: '';
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.65) 30%, #FFFFFF 50%, rgba(255, 255, 255, 0.65) 70%, transparent 100%);
   pointer-events: none;
+  z-index: 5;
 }
 
+/* Ambient Backlight Orbs */
+.pum-ambient-orbs {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.pum-orb-glow {
+  position: absolute;
+  top: -80px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 500px;
+  height: 220px;
+  background: radial-gradient(ellipse at 50% 0%, rgba(197, 172, 134, 0.15) 0%, transparent 70%);
+}
+
+.pum-orb-caustic {
+  position: absolute;
+  bottom: -40px;
+  right: 10%;
+  width: 320px;
+  height: 180px;
+  background: radial-gradient(ellipse at 50% 50%, rgba(56, 189, 248, 0.05) 0%, transparent 70%);
+}
+
+/* ─── MAC OS WINDOW HEADER ─── */
 .pum-window-header {
+  position: relative;
+  z-index: 2;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 0 14px;
+  padding: 13px 0 11px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  margin-bottom: 24px;
+  margin-bottom: 14px;
 }
 
-.pum-window-header .mac-dots {
+.pum-mac-dots {
   display: flex;
   align-items: center;
   gap: 7px;
+}
+
+.pum-dot {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
   cursor: pointer;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.pum-dot-red {
+  background: #FF5F56;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+}
+.pum-dot-amber {
+  background: #FFBD2E;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+}
+.pum-dot-green {
+  background: #27C93F;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.pum-dot:hover {
+  transform: scale(1.15);
+}
+
+/* Header Chip Pill */
+.pum-header-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 3px 11px;
+  border-radius: 9999px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--brand-gold, #C5AC86);
+}
+
+.pum-chip-crown {
+  color: var(--brand-gold, #C5AC86);
 }
 
 .pum-close-btn {
   background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.10);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   color: var(--text-secondary, #A1A1A6);
-  width: 28px;
-  height: 28px;
+  width: 27px;
+  height: 27px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.16s ease;
 }
 
 .pum-close-btn:hover {
-  background: rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.15);
   color: #FFFFFF;
-  transform: scale(1.06);
+  transform: scale(1.08);
 }
 
 .pum-close-btn:active {
   transform: scale(0.92);
 }
 
-.pum-upgrade-btn {
-  width: 100%;
-  padding: 11px 20px;
-  border-radius: var(--radius-pill, 9999px);
-  background: rgba(255, 255, 255, 0.18);
-  backdrop-filter: blur(20px) saturate(180%) brightness(1.12);
-  -webkit-backdrop-filter: blur(20px) saturate(180%) brightness(1.12);
+/* ─── MODAL HERO TITLE ─── */
+.pum-modal-hero {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.pum-title {
+  font-size: clamp(21px, 2.8vw, 26px);
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  margin: 0 0 5px;
+  color: #FFFFFF;
+}
+
+.pum-title span {
+  color: var(--brand-gold, #C5AC86);
+  background: linear-gradient(135deg, #FFFFFF 20%, #DFCAAA 70%, #C5AC86 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.pum-subtitle {
+  font-size: 13.5px;
+  color: var(--text-secondary, #A1A1A6);
+  margin: 0 auto;
+  max-width: 600px;
+  line-height: 1.45;
+}
+
+.pum-error-banner {
+  position: relative;
+  z-index: 2;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  color: #FCA5A5;
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  text-align: center;
+  margin-bottom: 14px;
+}
+
+/* ─── SIDE-BY-SIDE 2-COLUMN CARDS GRID ─── */
+.pum-cards-grid {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  align-items: stretch;
+  margin-bottom: 14px;
+}
+
+/* ─── INDIVIDUAL LIQUID GLASS CARD ─── */
+.pum-glass-card {
+  position: relative;
+  border-radius: 20px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 60%, rgba(255, 255, 255, 0.04) 100%), rgba(16, 18, 24, 0.78);
+  backdrop-filter: blur(36px) saturate(200%);
+  -webkit-backdrop-filter: blur(36px) saturate(200%);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 
+    0 18px 42px -10px rgba(0, 0, 0, 0.70),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.80),
+    inset 0 -1px 0.5px rgba(255, 255, 255, 0.15);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: transform 0.22s var(--ease-apple, ease), border-color 0.22s ease, box-shadow 0.22s ease;
+}
+
+.pum-glass-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.40);
+  box-shadow: 
+    0 24px 50px -10px rgba(0, 0, 0, 0.80),
+    inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.95);
+}
+
+/* ─── FEATURED SEMESTER CARD (BEST VALUE) ─── */
+.pum-glass-card.featured {
+  background: linear-gradient(180deg, rgba(223, 202, 170, 0.12) 0%, rgba(255, 255, 255, 0.02) 55%, rgba(197, 172, 134, 0.05) 100%), rgba(18, 20, 26, 0.84);
+  border-color: rgba(223, 202, 170, 0.55);
+  box-shadow: 
+    0 24px 60px -12px rgba(0, 0, 0, 0.85),
+    0 0 32px rgba(197, 172, 134, 0.22),
+    inset 0 1.5px 1.5px 0 rgba(255, 255, 255, 0.95),
+    inset 0 0 20px rgba(197, 172, 134, 0.10);
+}
+
+.pum-glass-card.featured:hover {
+  border-color: rgba(223, 202, 170, 0.80);
+  box-shadow: 
+    0 28px 65px -12px rgba(0, 0, 0, 0.90),
+    0 0 42px rgba(197, 172, 134, 0.35),
+    inset 0 1.5px 1.5px 0 rgba(255, 255, 255, 1);
+}
+
+/* ─── CYLINDRICAL REFRACTION MENISCUS LENS ─── */
+.pum-card-refraction-lens {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 64px;
+  background: radial-gradient(ellipse at 50% -20%, rgba(255, 255, 255, 0.32) 0%, rgba(255, 255, 255, 0.06) 50%, transparent 80%);
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.pum-glass-card.featured .pum-card-refraction-lens {
+  background: radial-gradient(ellipse at 50% -20%, rgba(223, 202, 170, 0.42) 0%, rgba(255, 255, 255, 0.12) 50%, transparent 80%);
+}
+
+.pum-lens-caustic {
+  position: absolute;
+  top: 0;
+  left: 20%;
+  right: 20%;
+  height: 1.5px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8), transparent);
+}
+
+/* ─── CARD CONTENT ─── */
+.pum-card-content {
+  position: relative;
+  z-index: 2;
+  padding: 16px 18px 16px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+/* Top Row Badge Pill */
+.pum-card-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin-bottom: 10px;
+  min-height: 22px;
+}
+
+.pum-badge-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border-radius: 9999px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+}
+
+.pum-badge-pill.standard {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.pum-badge-pill.featured {
+  background: linear-gradient(135deg, #E6D2B5 0%, #C5AC86 100%);
+  color: #121316;
+  box-shadow: 0 4px 12px rgba(197, 172, 134, 0.35);
+}
+
+.pum-plan-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.pum-plan-meta {
+  display: flex;
+  flex-direction: column;
+}
+
+.pum-plan-title {
+  font-size: 17px;
+  font-weight: 750;
+  letter-spacing: -0.015em;
+  color: #FFFFFF;
+}
+
+.pum-plan-title.featured {
+  color: #F8F5F0;
+}
+
+.pum-plan-sub {
+  font-size: 12px;
+  color: var(--text-secondary, #A1A1A6);
+  margin-top: 2px;
+}
+
+/* Price Wrap */
+.pum-price-wrap {
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+  white-space: nowrap;
+}
+
+.pum-price-num {
+  font-size: 28px;
+  font-weight: 850;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  color: #FFFFFF;
+}
+
+.pum-price-num.featured {
+  color: #DFCAAA;
+  text-shadow: 0 0 18px rgba(223, 202, 170, 0.45);
+}
+
+.pum-price-period {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-secondary, #A1A1A6);
+}
+
+/* Divider */
+.pum-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.10);
+  margin: 0 0 12px;
+}
+
+.pum-divider.featured {
+  background: linear-gradient(90deg, rgba(223, 202, 170, 0.35), rgba(255, 255, 255, 0.10));
+}
+
+/* ─── CHECKLIST ─── */
+.pum-checklist {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+
+.pum-checklist li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 12.5px;
+  line-height: 1.35;
+  color: rgba(245, 245, 247, 0.90);
+}
+
+.pum-highlight-item {
   color: #FFFFFF !important;
-  -webkit-text-fill-color: #FFFFFF !important;
-  border: 1px solid rgba(255, 255, 255, 0.65);
-  font-size: 14px;
-  font-weight: 650;
-  cursor: pointer;
-  box-shadow: 
-    inset 0 1.5px 1px 0 #FFFFFF,
-    inset 0 -1px 0.5px rgba(255, 255, 255, 0.25),
-    0 4px 16px rgba(0, 0, 0, 0.35),
-    0 0 14px rgba(255, 255, 255, 0.15) inset;
-  transition: all var(--duration-fast, 160ms) var(--ease-apple);
-  margin-top: 14px;
 }
 
-.pum-upgrade-btn:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.30);
-  border-color: #FFFFFF;
-  transform: translateY(-1px);
-  box-shadow: 
-    inset 0 1.5px 1px 0 #FFFFFF,
-    0 0 24px rgba(255, 255, 255, 0.40),
-    0 6px 20px rgba(0, 0, 0, 0.40);
-}
-
-.pum-upgrade-btn:active:not(:disabled) {
-  transform: scale(0.96);
-  background: rgba(255, 255, 255, 0.20);
-  transition-duration: 0.05s;
-}
-
-.pum-crown-bubble {
-  width: 60px;
-  height: 60px;
+.pum-check-circle {
+  width: 17px;
+  height: 17px;
   border-radius: 50%;
-  background: rgba(197, 172, 134, 0.12);
-  border: 1px solid rgba(197, 172, 134, 0.28);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.22);
   display: flex;
   align-items: center;
   justify-content: center;
+  color: #FFFFFF;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.pum-check-circle.featured {
+  background: rgba(197, 172, 134, 0.18);
+  border-color: rgba(223, 202, 170, 0.45);
+  color: #DFCAAA;
+}
+
+/* ─── CTA BUTTONS ─── */
+.pum-cta-btn {
+  width: 100%;
+  padding: 10px 18px;
+  border-radius: 9999px;
+  font-size: 13.5px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  cursor: pointer;
+  transition: all 0.18s var(--ease-apple, ease);
+  margin-top: auto;
+}
+
+.pum-btn-outline {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  color: #FFFFFF;
+  box-shadow: 
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.65),
+    0 4px 14px rgba(0, 0, 0, 0.35);
+}
+
+.pum-btn-outline:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.70);
+  transform: translateY(-1px);
+  box-shadow: 
+    inset 0 1px 1px 0 #FFFFFF,
+    0 6px 18px rgba(0, 0, 0, 0.45);
+}
+
+.pum-btn-outline:active:not(:disabled) {
+  transform: scale(0.97);
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.pum-btn-featured {
+  background: linear-gradient(180deg, #FDFCFB 0%, #E9E6E2 100%);
+  border: 1px solid #FFFFFF;
+  color: #0E0F12 !important;
+  -webkit-text-fill-color: #0E0F12 !important;
+  box-shadow: 
+    0 4px 20px rgba(223, 202, 170, 0.45),
+    inset 0 1.5px 1px 0 #FFFFFF;
+}
+
+.pum-btn-featured:hover:not(:disabled) {
+  background: #FFFFFF;
+  transform: translateY(-1px);
+  box-shadow: 
+    0 8px 26px rgba(223, 202, 170, 0.60),
+    inset 0 1.5px 1px 0 #FFFFFF;
+}
+
+.pum-btn-featured:active:not(:disabled) {
+  transform: scale(0.97);
+  background: #E5E1DC;
+}
+
+.pum-cta-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.pum-spinner {
+  animation: pumSpin 0.9s linear infinite;
+}
+
+@keyframes pumSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* ─── MODAL FOOTER ─── */
+.pum-modal-footer {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.pum-view-all-link {
+  background: transparent;
+  border: none;
   color: var(--brand-gold, #C5AC86);
-  margin: 0 auto 18px;
+  font-size: 12.5px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: all 0.15s ease;
+}
+
+.pum-view-all-link:hover {
+  color: #FFFFFF;
+  text-decoration: underline;
+  transform: translateX(1px);
+}
+
+.pum-trust-line {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--text-tertiary, #76767B);
+  letter-spacing: 0.02em;
+}
+
+/* ─── RESPONSIVE BREAKPOINTS ─── */
+@media (max-width: 680px) {
+  .pum-modal-container {
+    padding: 0 16px 16px;
+    max-height: 92vh;
+  }
+
+  .pum-cards-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .pum-glass-card {
+    border-radius: 18px;
+  }
+
+  .pum-title {
+    font-size: 20px;
+  }
+
+  .pum-price-num {
+    font-size: 24px;
+  }
 }
