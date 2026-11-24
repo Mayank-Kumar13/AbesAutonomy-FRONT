@@ -60,33 +60,35 @@ const App = () => {
       {!hideNavAndFooter && !isHomePage && <Navbar />}
       <Scroll />
       <Suspense fallback={<div className="flex h-screen items-center justify-center text-white"><div className="animate-spin h-8 w-8 border-4 border-blue-500 rounded-full border-t-transparent"></div></div>}>
-        <Routes>
-          <Route path="/" element={<HomeContent />} />
-          <Route path="/premium" element={<PremiumPage />} />
-          <Route path="/payment/success" element={<PaymentResult type="success" />} />
-          <Route path="/payment/failed" element={<PaymentResult type="failed" />} />
-          <Route path="/payment/pending" element={<PaymentResult type="pending" />} />
-          <Route path="/resources" element={<ProtectedRoute><Resources/></ProtectedRoute>} />
-          <Route path="/credits" element={<Credits />} />
-          <Route path="/mvp-projects" element={<Amcat />} />
-          <Route path="/Choosesubject" element={<ProtectedRoute><ChooseSubject /></ProtectedRoute>} />
-          <Route path="/Subject" element={<ProtectedRoute><Subject /></ProtectedRoute>} />
-          <Route path="/pdfpreview" element={<ProtectedRoute><Pdfpreview /></ProtectedRoute>} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
-          <Route path="/auth/callback" element={<OAuthCallback />} />
-          <Route path="/auth/google/callback" element={<ProviderCallback provider="google" />} />
-          <Route path="/auth/github/callback" element={<ProviderCallback provider="github" />} />
-          <Route path="/about" element={<About/>}/>
-          <Route path="/privacy" element={<PrivacyPolicy />} />
-          <Route path="/terms" element={<Terms />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/contribute" element={<Contribute />} />
-          <Route path="/under-construction" element={<UnderConstruction />} />
-          <Route path="/admin" element={<AdminRoute><AdminPanel /></AdminRoute>} />
-        </Routes>
+        <div key={location.pathname} className="page-transition-container">
+          <Routes>
+            <Route path="/" element={<HomeContent />} />
+            <Route path="/premium" element={<PremiumPage />} />
+            <Route path="/payment/success" element={<PaymentResult type="success" />} />
+            <Route path="/payment/failed" element={<PaymentResult type="failed" />} />
+            <Route path="/payment/pending" element={<PaymentResult type="pending" />} />
+            <Route path="/resources" element={<ProtectedRoute><Resources/></ProtectedRoute>} />
+            <Route path="/credits" element={<Credits />} />
+            <Route path="/mvp-projects" element={<Amcat />} />
+            <Route path="/Choosesubject" element={<ProtectedRoute><ChooseSubject /></ProtectedRoute>} />
+            <Route path="/Subject" element={<ProtectedRoute><Subject /></ProtectedRoute>} />
+            <Route path="/pdfpreview" element={<ProtectedRoute><Pdfpreview /></ProtectedRoute>} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/auth/callback" element={<OAuthCallback />} />
+            <Route path="/auth/google/callback" element={<ProviderCallback provider="google" />} />
+            <Route path="/auth/github/callback" element={<ProviderCallback provider="github" />} />
+            <Route path="/about" element={<About/>}/>
+            <Route path="/privacy" element={<PrivacyPolicy />} />
+            <Route path="/terms" element={<Terms />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/contribute" element={<Contribute />} />
+            <Route path="/under-construction" element={<UnderConstruction />} />
+            <Route path="/admin" element={<AdminRoute><AdminPanel /></AdminRoute>} />
+          </Routes>
+        </div>
       </Suspense>
       {!hideFooter && !isHomePage && <Footer />}
     </GlobalStatusGuard>

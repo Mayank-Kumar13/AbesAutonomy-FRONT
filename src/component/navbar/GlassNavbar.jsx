@@ -38,7 +38,89 @@ export default function GlassNavbar({ variant = "standard", onSkipNotes }) {
 
   const capsuleRef = useRef(null);
   const userMenuRef = useRef(null);
+  const linksContainerRef = useRef(null);
+  const linkRefs = useRef([]);
   const lastScrollY = useRef(0);
+
+  const [indicatorStyle, setIndicatorStyle] = useState(null);
+  const [hasTransitioned, setHasTransitioned] = useState(false);
+
+  // Check if a link is considered active (including nested/sub routes)
+  const isLinkActive = useCallback((to) => {
+    const currentPath = location.pathname.toLowerCase();
+    const targetPath = to.toLowerCase();
+    if (targetPath === "/") return currentPath === "/";
+    if (targetPath === "/resources") {
+      return (
+        currentPath === "/resources" ||
+        currentPath.startsWith("/choosesubject") ||
+        currentPath.startsWith("/subject")
+      );
+    }
+    return currentPath === targetPath || currentPath.startsWith(targetPath + "/");
+  }, [location.pathname]);
+
+  const getActiveIndex = useCallback(() => {
+    return navLinks.findIndex(({ to }) => isLinkActive(to));
+  }, [isLinkActive]);
+
+  // Smoothly measure and update the active sliding pill indicator
+  const updateIndicator = useCallback((enableTransition = true) => {
+    const activeIndex = getActiveIndex();
+    if (activeIndex === -1) {
+      setIndicatorStyle((prev) => (prev ? { ...prev, opacity: 0 } : null));
+      return;
+    }
+
+    const activeEl = linkRefs.current[activeIndex];
+    const containerEl = linksContainerRef.current;
+
+    if (activeEl && containerEl) {
+      const elRect = activeEl.getBoundingClientRect();
+      const containerRect = containerEl.getBoundingClientRect();
+
+      const left = elRect.left - containerRect.left;
+      const top = elRect.top - containerRect.top;
+      const width = elRect.width;
+      const height = elRect.height;
+
+      setIndicatorStyle({
+        transform: `translate3d(${left}px, ${top}px, 0)`,
+        width: `${width}px`,
+        height: `${height}px`,
+        opacity: 1,
+      });
+
+      if (enableTransition) {
+        setHasTransitioned(true);
+      }
+    }
+  }, [getActiveIndex]);
+
+  // Update indicator position whenever the route changes
+  useEffect(() => {
+    updateIndicator(hasTransitioned);
+  }, [location.pathname, updateIndicator, hasTransitioned]);
+
+  // Initial placement without animation so it doesn't jump from (0,0)
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => {
+      updateIndicator(false);
+      setTimeout(() => setHasTransitioned(true), 60);
+    });
+
+    const handleResize = () => updateIndicator(false);
+    window.addEventListener("resize", handleResize);
+
+    if (document.fonts?.ready) {
+      document.fonts.ready.then(() => updateIndicator(false));
+    }
+
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener("resize", handleResize);
+    };
+  }, [updateIndicator]);
 
   // Track scroll position and direction: auto-hide when scrolling down to avoid
   // obstructing content, and smoothly restore when scrolling up or at top.
@@ -186,18 +268,30 @@ export default function GlassNavbar({ variant = "standard", onSkipNotes }) {
           </Link>
 
           {/* Desktop Navigation Links */}
-          <div className="capsule-links">
-            {navLinks.map(({ to, label, isPremium, icon: Icon }) => (
-              <NavLink
-                key={to}
-                to={to}
-                end={to === "/"}
-                className={({ isActive }) => `capsule-link ${isActive ? "active" : ""} ${isPremium ? "is-premium" : ""}`}
-              >
-                {Icon && <Icon size={13.5} className={isPremium ? "premium-crown" : "nav-link-icon"} aria-hidden="true" />}
-                <span>{label}</span>
-              </NavLink>
-            ))}
+          <div className="capsule-links" ref={linksContainerRef}>
+            {/* Smooth Sliding Active Pill Indicator */}
+            {indicatorStyle && (
+              <div 
+                className={`capsule-active-indicator ${!hasTransitioned ? "no-transition" : ""}`}
+                style={indicatorStyle}
+                aria-hidden="true"
+              />
+            )}
+            {navLinks.map(({ to, label, isPremium, icon: Icon }, index) => {
+              const active = isLinkActive(to);
+              return (
+                <NavLink
+                  key={to}
+                  ref={(el) => (linkRefs.current[index] = el)}
+                  to={to}
+                  end={to === "/"}
+                  className={`capsule-link ${active ? "active" : ""} ${isPremium ? "is-premium" : ""}`}
+                >
+                  {Icon && <Icon size={13.5} className={isPremium ? "premium-crown" : "nav-link-icon"} aria-hidden="true" />}
+                  <span>{label}</span>
+                </NavLink>
+              );
+            })}
           </div>
 
           {/* Right Action: Auth or Profile */}
