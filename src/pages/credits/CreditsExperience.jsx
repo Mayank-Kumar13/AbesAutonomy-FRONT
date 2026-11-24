@@ -228,9 +228,11 @@ export default function CreditsExperience({ liveSections = [] }) {
   }, [liveSections]);
 
   const [activeSectionIndex, setActiveSectionIndex] = useState(0);
+  const [activeCardIndex, setActiveCardIndex] = useState(0);
   const [slideDirection, setSlideDirection] = useState('next'); // 'next' | 'prev'
   const [isTransitioning, setIsTransitioning] = useState(false);
-  const touchStartRef = useRef({ x: 0, y: 0 });
+  const touchStartRef = useRef({ x: 0, y: 0, insideCards: false });
+  const cardsRowRef = useRef(null);
 
   const activeSection = sections[activeSectionIndex] || sections[0];
 
@@ -239,6 +241,7 @@ export default function CreditsExperience({ liveSections = [] }) {
     setSlideDirection(direction || (targetIndex > activeSectionIndex ? 'next' : 'prev'));
     setIsTransitioning(true);
     setActiveSectionIndex(targetIndex);
+    setActiveCardIndex(0);
     setTimeout(() => {
       setIsTransitioning(false);
     }, 450);
@@ -273,15 +276,21 @@ export default function CreditsExperience({ liveSections = [] }) {
   // Touch Swipe Gestures
   const handleTouchStart = (e) => {
     if (e.touches && e.touches[0]) {
+      const insideCards = Boolean(e.target && e.target.closest && e.target.closest('.credits-cards-row'));
       touchStartRef.current = {
         x: e.touches[0].clientX,
-        y: e.touches[0].clientY
+        y: e.touches[0].clientY,
+        insideCards
       };
     }
   };
 
   const handleTouchEnd = (e) => {
     if (e.changedTouches && e.changedTouches[0]) {
+      // If user swiped inside a multi-card row, let horizontal card scrolling handle it
+      if (touchStartRef.current.insideCards && activeSection.members.length > 1) {
+        return;
+      }
       const dx = e.changedTouches[0].clientX - touchStartRef.current.x;
       const dy = e.changedTouches[0].clientY - touchStartRef.current.y;
       // Horizontal swipe must dominate vertical scroll
@@ -292,6 +301,26 @@ export default function CreditsExperience({ liveSections = [] }) {
           handlePrev();
         }
       }
+    }
+  };
+
+  // Scroll handler for tracking active card index on mobile
+  const handleCardsScroll = (e) => {
+    const container = e.currentTarget;
+    const cardEl = container.querySelector('.credits-card-wrapper');
+    if (!cardEl) return;
+    const cardWidth = cardEl.offsetWidth || 320;
+    const gap = 16;
+    const scrollLeft = container.scrollLeft;
+    const idx = Math.round(scrollLeft / (cardWidth + gap));
+    setActiveCardIndex(Math.min(activeSection.members.length - 1, Math.max(0, idx)));
+  };
+
+  const scrollToCard = (targetIdx) => {
+    if (cardsRowRef.current) {
+      const cardEl = cardsRowRef.current.children[targetIdx];
+      cardEl?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      setActiveCardIndex(targetIdx);
     }
   };
 
@@ -339,8 +368,10 @@ export default function CreditsExperience({ liveSections = [] }) {
           aria-label={`${activeSection.title} Contributor Showcase`}
         >
           <div 
+            ref={cardsRowRef}
             key={`section-cards-${activeSectionIndex}`} 
             className={`credits-cards-row anim-stage-${slideDirection} cards-count-${activeSection.members.length}`}
+            onScroll={handleCardsScroll}
           >
             {activeSection.members.map((member) => (
               <div key={member._id || member.name} className="credits-card-wrapper">
@@ -366,6 +397,23 @@ export default function CreditsExperience({ liveSections = [] }) {
               </div>
             ))}
           </div>
+
+          {/* Member dots pagination when section has multiple cards on mobile/tablet */}
+          {activeSection.members.length > 1 && (
+            <div className="credits-member-indicator" role="tablist" aria-label="Member cards pagination">
+              {activeSection.members.map((m, mIdx) => (
+                <button
+                  key={m._id || m.name || mIdx}
+                  type="button"
+                  role="tab"
+                  aria-selected={mIdx === activeCardIndex}
+                  aria-label={`View ${m.name}`}
+                  className={`credits-member-dot ${mIdx === activeCardIndex ? 'is-active' : ''}`}
+                  onClick={() => scrollToCard(mIdx)}
+                />
+              ))}
+            </div>
+          )}
 
           {/* Minimal Apple Liquid Glass Navigation Capsule */}
           <nav className="credits-nav-capsule" aria-label="Section Navigation">

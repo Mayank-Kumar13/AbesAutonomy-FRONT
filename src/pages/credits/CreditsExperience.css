@@ -382,6 +382,10 @@
 }
 
 /* ─── RESPONSIVE BEHAVIOR ─── */
+.credits-member-indicator {
+  display: none;
+}
+
 @media (max-width: 1100px) {
   .credits-cards-row.cards-count-3 {
     gap: 16px;
@@ -390,17 +394,28 @@
 
 @media (max-width: 900px) {
   .credits-root {
-    padding: 82px 12px 28px;
+    padding: 76px 8px 24px;
+  }
+
+  .credits-stage-section {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
 
   .credits-cards-row {
-    gap: 20px;
+    gap: 16px;
+    width: 100%;
     overflow-x: auto;
     scroll-snap-type: x mandatory;
     -webkit-overflow-scrolling: touch;
-    padding: 8px 12px 20px;
+    /* Center the active card in the viewport symmetrically on mobile */
+    padding: 8px calc(50vw - 160px) 14px;
     scrollbar-width: none;
     box-sizing: border-box;
+    justify-content: flex-start;
+    margin: 4px 0 8px;
   }
 
   .credits-cards-row::-webkit-scrollbar {
@@ -409,21 +424,49 @@
 
   .credits-cards-row.cards-count-1 {
     justify-content: center;
-  }
-
-  .credits-cards-row.cards-count-2,
-  .credits-cards-row.cards-count-3 {
-    justify-content: flex-start;
+    padding-left: 12px;
+    padding-right: 12px;
   }
 
   .credits-card-wrapper {
+    flex: 0 0 auto;
     scroll-snap-align: center;
     scroll-snap-stop: always;
+  }
+
+  /* Member dots indicator for multi-member sections on mobile */
+  .credits-member-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    margin: 6px 0 16px;
+    user-select: none;
+  }
+
+  .credits-member-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.22);
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    padding: 0;
+    cursor: pointer;
+    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .credits-member-dot.is-active {
+    width: 20px;
+    border-radius: 9999px;
+    background: linear-gradient(90deg, #DFCAAA, #C5AC86);
+    border-color: #DFCAAA;
+    box-shadow: 0 0 10px rgba(223, 202, 170, 0.65);
   }
 
   .credits-nav-capsule {
     gap: 4px;
     padding: 4px 8px;
+    max-width: calc(100vw - 24px);
   }
 
   .credits-section-pill-tab {
@@ -434,11 +477,11 @@
 
 @media (max-width: 600px) {
   .credits-page-header {
-    margin-bottom: 16px;
+    margin-bottom: 12px;
   }
 
   .credits-role-heading {
-    font-size: clamp(28px, 8.5vw, 38px);
+    font-size: clamp(26px, 7.5vw, 36px);
     line-height: 1.15;
   }
 
@@ -446,8 +489,20 @@
     display: none;
   }
 
+  /* Active section pill shows title on mobile so user knows current role */
+  .credits-section-pill-tab.is-active .tab-title {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 650;
+    margin-left: 2px;
+  }
+
   .credits-section-pill-tab {
-    padding: 8px 10px;
+    padding: 6px 8px;
+  }
+
+  .credits-section-pill-tab.is-active {
+    padding: 6px 12px;
   }
 
   .credits-section-pill-tab .tab-dot {
@@ -456,6 +511,6 @@
   }
 
   .credits-cards-row {
-    margin-bottom: 24px;
+    margin-bottom: 4px;
   }
 }
