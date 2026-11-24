@@ -3,6 +3,7 @@ import { useAuth } from "../auth/AuthContext";
 import { getSupabaseFallbackUrl } from "../utils/storageFallback";
 import { Database, RefreshCw, Wrench, ArrowLeft } from "lucide-react";
 
+import OfficePreview from "./OfficePreview";
 import { loadDocument } from "../utils/documentLoader";
 
 export default function Pdfviewer({ file, backendUrl, isImageFlag, isDarkMode }) {
@@ -11,7 +12,7 @@ export default function Pdfviewer({ file, backendUrl, isImageFlag, isDarkMode })
   const [loadError, setLoadError] = useState('');
   const [retry, setRetry] = useState(0);
   const cleanFileUrl = (file || '').split(/[?#]/)[0];
-  const isOffice = /\.(docx?|pptx?|xlsx?)$/i.test(cleanFileUrl);
+  const isOffice = /^https?:\/\//i.test(file || '') && /\.(doc|ppt|xlsx?)$/i.test(cleanFileUrl);
 
   useEffect(() => {
     setDocument(null);
@@ -21,8 +22,12 @@ export default function Pdfviewer({ file, backendUrl, isImageFlag, isDarkMode })
     let objectUrl;
     const fallbackUrl = !backendUrl && file.includes('ik.imagekit.io/') ? getSupabaseFallbackUrl(file) : '';
     loadDocument({ file, backendUrl, fallbackUrl, signal: controller.signal, token })
-      .then(({ blob, isImage, source }) => {
+      .then(({ blob, isImage, source, format }) => {
         if (controller.signal.aborted) return;
+        if (format) {
+          setDocument({ blob, format, source });
+          return;
+        }
         objectUrl = URL.createObjectURL(blob);
         setDocument({ url: objectUrl, isImage, source });
       })
@@ -44,7 +49,7 @@ export default function Pdfviewer({ file, backendUrl, isImageFlag, isDarkMode })
     ? 'https://view.officeapps.live.com/op/embed.aspx?src=' + encodeURIComponent(file)
     : '/pdfjs-6.1.200-dist/web/viewer.html?file=' + encodeURIComponent(activeFile || '');
 
-  if (!activeFile && !fallbackUnavailable) {
+  if (!activeFile && !document?.format && !fallbackUnavailable) {
     return <p role="status" style={{ textAlign: "center", padding: "20px" }}>Loading Document...</p>;
   }
 
@@ -259,6 +264,8 @@ export default function Pdfviewer({ file, backendUrl, isImageFlag, isDarkMode })
             </div>
           </div>
         </div>
+      ) : document?.format ? (
+        <OfficePreview blob={document.blob} format={document.format} dark={isDarkMode} />
       ) : isImage ? (
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', background: isDarkMode ? '#111' : '#0f172a' }}>
           <img

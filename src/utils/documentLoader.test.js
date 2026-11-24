@@ -52,3 +52,17 @@ test('cancelled requests never start a fallback fetch', async (t) => {
   await assert.rejects(loadDocument({ file: 'https://cdn.test/a.pdf', fallbackUrl: 'https://backup.test/a.pdf', signal: controller.signal }), { name: 'AbortError' });
   assert.equal(requests, 1);
 });
+
+test('recognizes protected Word and PowerPoint files even when the endpoint labels them PDF', async (t) => {
+  const { default: JSZip } = await import('jszip');
+  for (const [format, part] of [['pptx', 'ppt/presentation.xml'], ['docx', 'word/document.xml']]) {
+    const bytes = await new JSZip().file(part, '<document/>').generateAsync({ type: 'uint8array' });
+    const fetchMock = t.mock.method(globalThis, 'fetch', async () => new Response(bytes, {
+      headers: { 'Content-Type': 'application/pdf' },
+    }));
+    const result = await loadDocument({ file: '/api/notes/123/pdf' });
+    assert.equal(result.format, format);
+    assert.equal(result.isImage, false);
+    fetchMock.mock.restore();
+  }
+});

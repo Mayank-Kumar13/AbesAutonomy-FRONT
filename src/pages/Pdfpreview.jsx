@@ -245,18 +245,8 @@ export default function PdfPreview() {
     ? "/api"
     : (import.meta.env.VITE_API_URL || "/api");
 
-  const effectiveToken = token || localStorage.getItem("token") || "";
-
-  const appendToken = (url, authToken) => {
-    if (!url || !authToken) return url;
-    if (url.includes('token=')) return url;
-    const sep = url.includes('?') ? '&' : '?';
-    return `${url}${sep}token=${encodeURIComponent(authToken)}`;
-  };
-
-  const viewerFileUrl = pdfUrl
-    ? (pdfUrl.startsWith('/api') ? appendToken(pdfUrl, effectiveToken) : pdfUrl)
-    : (noteId ? appendToken(`${API_BASE}/notes/${noteId}/pdf`, effectiveToken) : "");
+  const backendDocumentUrl = noteId ? `${API_BASE}/notes/${noteId}/pdf` : "";
+  const viewerFileUrl = pdfUrl || backendDocumentUrl;
 
   const [isDownloading, setIsDownloading] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -358,7 +348,7 @@ export default function PdfPreview() {
             ) : (
               <Download size={15} />
             )}
-            <span>{isDownloading ? "Saving..." : (isImage ? "Save Image" : "Download PDF")}</span>
+            <span>{isDownloading ? "Saving..." : (isImage ? "Save Image" : "Download file")}</span>
           </button>
 
           {/* Study Engagement Status Indicator */}
@@ -406,7 +396,7 @@ export default function PdfPreview() {
         ) : (
           <Pdfviewer 
             file={viewerFileUrl} 
-            backendUrl={noteId ? `${API_BASE}/notes/${noteId}/pdf` : ''} 
+            backendUrl={backendDocumentUrl}
             isImageFlag={isImage} 
             isDarkMode={isDarkMode} 
           />
