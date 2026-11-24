@@ -87,7 +87,7 @@ export default function PremiumPage() {
       a: 'As a free student, your first 3 eligible premium document accesses are completely free of cost. Once you access a document, you can revisit and re-read it as many times as you like without consuming additional credits.',
     },
     {
-      q: 'What is included in the ₹499 Lifetime Access Plan?',
+      q: 'What is included in the ₹399 Lifetime Access Plan?',
       a: 'The Lifetime Plan grants you permanent, unrestricted access across all 8 semesters for your entire degree tenure. There are zero recurring renewals or annual maintenance fees.',
     },
     {
@@ -135,7 +135,7 @@ export default function PremiumPage() {
 
           {/* 3 Floating Liquid Glass Cards */}
           <div className="prem-cards-grid">
-            {/* ── CARD 1: ₹49/m (Monthly Plan) ── */}
+            {/* ── CARD 1: ₹29/m (Monthly Plan) ── */}
             <div className="prem-glass-card">
               {/* Cylindrical Optical Refraction Meniscus Lens */}
               <div className="prem-card-refraction-lens" aria-hidden="true">
@@ -150,7 +150,7 @@ export default function PremiumPage() {
                   </div>
 
                   <div className="prem-price-block">
-                    <span className="prem-price-num">₹49</span>
+                    <span className="prem-price-num">₹29</span>
                     <span className="prem-price-period">/m</span>
                   </div>
                 </div>
@@ -191,7 +191,7 @@ export default function PremiumPage() {
               </div>
             </div>
 
-            {/* ── CARD 2: ₹139/4m (Semester Plan - BEST VALUE / HIGHLIGHTED) ── */}
+            {/* ── CARD 2: ₹99/4m (Semester Plan - BEST VALUE / HIGHLIGHTED) ── */}
             <div className="prem-glass-card featured-popular">
               {/* Cylindrical Optical Refraction Meniscus Lens */}
               <div className="prem-card-refraction-lens" aria-hidden="true">
@@ -207,11 +207,11 @@ export default function PremiumPage() {
                 <div className="prem-card-top">
                   <div className="prem-plan-meta">
                     <span className="prem-plan-label featured">Semester Plan</span>
-                    <span className="prem-plan-sub">Full Semester Coverage (₹34.75/mo)</span>
+                    <span className="prem-plan-sub">Full Semester Coverage (₹24.75/mo)</span>
                   </div>
 
                   <div className="prem-price-block">
-                    <span className="prem-price-num featured">₹139</span>
+                    <span className="prem-price-num featured">₹99</span>
                     <span className="prem-price-period">/4m</span>
                   </div>
                 </div>
@@ -253,7 +253,7 @@ export default function PremiumPage() {
               </div>
             </div>
 
-            {/* ── CARD 3: ₹499 (Lifetime Plan - DEGREE PASS) ── */}
+            {/* ── CARD 3: ₹399 (Lifetime Plan - DEGREE PASS) ── */}
             <div className="prem-glass-card">
               {/* Cylindrical Optical Refraction Meniscus Lens */}
               <div className="prem-card-refraction-lens" aria-hidden="true">
@@ -273,7 +273,7 @@ export default function PremiumPage() {
                   </div>
 
                   <div className="prem-price-block">
-                    <span className="prem-price-num">₹499</span>
+                    <span className="prem-price-num">₹399</span>
                     <span className="prem-price-period">/lifetime</span>
                   </div>
                 </div>
@@ -337,9 +337,9 @@ export default function PremiumPage() {
                 <tr>
                   <th className="prem-th-feature">Feature / Resource</th>
                   <th>Free Student</th>
-                  <th>Monthly (₹49)</th>
-                  <th className="prem-th-highlight">Full Semester (₹139)</th>
-                  <th>Lifetime (₹499)</th>
+                  <th>Monthly (₹29)</th>
+                  <th className="prem-th-highlight">Full Semester (₹99)</th>
+                  <th>Lifetime (₹399)</th>
                 </tr>
               </thead>
               <tbody>
@@ -395,8 +395,8 @@ export default function PremiumPage() {
                 <tr>
                   <td className="prem-td-feature">Effective Cost</td>
                   <td><span className="prem-status-dim">₹0</span></td>
-                  <td><span className="prem-status-text">₹49 / month</span></td>
-                  <td className="prem-td-highlight"><span className="prem-pill gold">₹34.75 / mo (Save 29%)</span></td>
+                  <td><span className="prem-status-text">₹29 / month</span></td>
+                  <td className="prem-td-highlight"><span className="prem-pill gold">₹24.75 / mo (Save 15%)</span></td>
                   <td><span className="prem-pill gold">One-time forever</span></td>
                 </tr>
               </tbody>

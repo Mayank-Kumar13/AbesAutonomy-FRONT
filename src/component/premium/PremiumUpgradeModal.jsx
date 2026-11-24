@@ -122,7 +122,7 @@ export default function PremiumUpgradeModal({
 
         {/* ─── SIDE-BY-SIDE 2-COLUMN LIQUID GLASS PLANS GRID ─── */}
         <div className="pum-cards-grid">
-          {/* ── CARD 1: Monthly Plan (₹49) ── */}
+          {/* ── CARD 1: Monthly Plan (₹29) ── */}
           <div className="pum-glass-card pum-card-monthly">
             {/* Cylindrical Optical Refraction Meniscus Lens */}
             <div className="pum-card-refraction-lens" aria-hidden="true">
@@ -145,7 +145,7 @@ export default function PremiumUpgradeModal({
                 </div>
 
                 <div className="pum-price-wrap">
-                  <span className="pum-price-num">₹49</span>
+                  <span className="pum-price-num">₹29</span>
                   <span className="pum-price-period">/m</span>
                 </div>
               </div>
@@ -187,13 +187,13 @@ export default function PremiumUpgradeModal({
                     <span>Opening Payment...</span>
                   </>
                 ) : (
-                  <span>Get 1 Month • ₹49</span>
+                  <span>Get 1 Month • ₹29</span>
                 )}
               </button>
             </div>
           </div>
 
-          {/* ── CARD 2: Semester Plan (₹139) - BEST VALUE / HIGHLIGHTED ── */}
+          {/* ── CARD 2: Semester Plan (₹99) - BEST VALUE / HIGHLIGHTED ── */}
           <div className="pum-glass-card pum-card-semester featured">
             {/* Cylindrical Optical Refraction Meniscus Lens */}
             <div className="pum-card-refraction-lens" aria-hidden="true">
@@ -212,11 +212,11 @@ export default function PremiumUpgradeModal({
               <div className="pum-plan-header">
                 <div className="pum-plan-meta">
                   <span className="pum-plan-title featured">Semester Plan</span>
-                  <span className="pum-plan-sub">Full Semester Coverage (₹34.75/mo)</span>
+                  <span className="pum-plan-sub">Full Semester Coverage (₹24.75/mo)</span>
                 </div>
 
                 <div className="pum-price-wrap">
-                  <span className="pum-price-num featured">₹139</span>
+                  <span className="pum-price-num featured">₹99</span>
                   <span className="pum-price-period">/4m</span>
                 </div>
               </div>
@@ -260,7 +260,7 @@ export default function PremiumUpgradeModal({
                 ) : (
                   <>
                     <Zap size={14} />
-                    <span>Get Semester Pass • ₹139</span>
+                    <span>Get Semester Pass • ₹99</span>
                   </>
                 )}
               </button>
@@ -275,7 +275,7 @@ export default function PremiumUpgradeModal({
             className="pum-view-all-link"
             onClick={handleViewAllPlans}
           >
-            <span>Looking for Degree Lifetime Pass (₹499)? View all plans & comparison</span>
+            <span>Looking for Degree Lifetime Pass (₹399)? View all plans & comparison</span>
             <ArrowRight size={13} />
           </button>
 

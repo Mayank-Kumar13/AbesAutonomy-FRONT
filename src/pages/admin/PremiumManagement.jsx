@@ -282,17 +282,25 @@ export default function PremiumManagement() {
             </div>
 
             <div className="pm-metric-card">
-              <div className="pm-metric-label">2-Month Plan (₹100)</div>
-              <div className="pm-metric-val">{analytics.plan2mSales}</div>
-              <div className="pm-metric-sub">60-day validity sales</div>
+              <div className="pm-metric-label">1-Month Plan (₹29)</div>
+              <div className="pm-metric-val">{analytics.plan1mSales || 0}</div>
+              <div className="pm-metric-sub">30-day exam sprint sales</div>
             </div>
 
             <div className="pm-metric-card">
-              <div className="pm-metric-label">4-Month Plan (₹150)</div>
+              <div className="pm-metric-label">Semester Plan (₹99)</div>
               <div className="pm-metric-val" style={{ color: '#C5AC86' }}>
-                {analytics.plan4mSales}
+                {analytics.plan4mSales || 0}
               </div>
-              <div className="pm-metric-sub">Semester Best Value sales</div>
+              <div className="pm-metric-sub">Full semester sales</div>
+            </div>
+
+            <div className="pm-metric-card">
+              <div className="pm-metric-label">Lifetime Pass (₹399)</div>
+              <div className="pm-metric-val" style={{ color: '#60a5fa' }}>
+                {analytics.planLifetimeSales || 0}
+              </div>
+              <div className="pm-metric-sub">Degree lifetime sales</div>
             </div>
           </div>
 
