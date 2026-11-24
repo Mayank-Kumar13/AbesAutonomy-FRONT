@@ -41,16 +41,18 @@
 
 /* ─── APPLE iOS 27 LIQUID GLASS IDENTITY CARD ─── */
 .prof-glass-identity-card {
-  background: rgba(255, 255, 255, 0.07);
-  backdrop-filter: blur(36px) saturate(210%) brightness(1.08);
-  -webkit-backdrop-filter: blur(36px) saturate(210%) brightness(1.08);
-  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: 
+    linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.02) 40%, rgba(255, 255, 255, 0.07) 100%),
+    rgba(8, 11, 18, 0.94);
+  backdrop-filter: blur(64px) saturate(220%) contrast(1.15);
+  -webkit-backdrop-filter: blur(64px) saturate(220%) contrast(1.15);
+  border: 1.5px solid rgba(255, 255, 255, 0.42);
   border-radius: 32px;
   padding: 24px 28px 36px;
   box-shadow: 
-    0 32px 80px -16px rgba(0, 0, 0, 0.65),
+    0 36px 90px -16px rgba(0, 0, 0, 0.90),
     inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.95),
-    inset 0 -1px 0.5px rgba(255, 255, 255, 0.20),
+    inset 0 -1px 0.5px rgba(255, 255, 255, 0.25),
     0 0 24px rgba(255, 255, 255, 0.08) inset;
   position: relative;
   overflow: hidden;
@@ -279,7 +281,11 @@
   border-radius: 20px;
   padding: 20px 24px;
   margin-bottom: 30px;
-  border: 1px solid rgba(255, 255, 255, 0.28);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.10) 0%, rgba(255, 255, 255, 0.02) 60%, rgba(255, 255, 255, 0.06) 100%), rgba(12, 15, 24, 0.82) !important;
+  backdrop-filter: blur(48px) saturate(200%) !important;
+  -webkit-backdrop-filter: blur(48px) saturate(200%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.32) !important;
+  box-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.65), inset 0 1px 0.5px 0 rgba(255, 255, 255, 0.8) !important;
 }
 
 .prof-membership-content {
@@ -427,7 +433,11 @@
 .prof-form-card {
   border-radius: 20px;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.10) 0%, rgba(255, 255, 255, 0.02) 60%, rgba(255, 255, 255, 0.06) 100%), rgba(12, 15, 24, 0.82) !important;
+  backdrop-filter: blur(48px) saturate(200%) !important;
+  -webkit-backdrop-filter: blur(48px) saturate(200%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.32) !important;
+  box-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.65), inset 0 1px 0.5px 0 rgba(255, 255, 255, 0.8) !important;
 }
 
 .prof-field-row {
@@ -618,7 +628,10 @@
 .prof-telemetry-card {
   padding: 14px 18px;
   border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.09) 0%, rgba(255, 255, 255, 0.02) 60%, rgba(255, 255, 255, 0.05) 100%), rgba(14, 18, 26, 0.80) !important;
+  backdrop-filter: blur(40px) !important;
+  -webkit-backdrop-filter: blur(40px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.28) !important;
 }
 
 .prof-telemetry-label {
@@ -662,7 +675,10 @@
 .prof-history-table-wrap {
   border-radius: 18px;
   overflow-x: auto;
-  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.10) 0%, rgba(255, 255, 255, 0.02) 60%, rgba(255, 255, 255, 0.06) 100%), rgba(12, 15, 23, 0.86) !important;
+  backdrop-filter: blur(48px) !important;
+  -webkit-backdrop-filter: blur(48px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.32) !important;
 }
 
 .prof-history-table {

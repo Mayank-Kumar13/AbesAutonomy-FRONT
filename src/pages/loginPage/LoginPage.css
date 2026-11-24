@@ -79,17 +79,17 @@
   width: 100%;
   max-width: 420px;
   margin: auto 0;
-  background: rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(40px) saturate(200%) brightness(1.10);
-  -webkit-backdrop-filter: blur(40px) saturate(200%) brightness(1.10);
-  border: 1px solid rgba(255, 255, 255, 0.40);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0.03) 50%, rgba(255, 255, 255, 0.08) 100%), rgba(10, 13, 20, 0.90);
+  backdrop-filter: blur(52px) saturate(220%) contrast(1.10);
+  -webkit-backdrop-filter: blur(52px) saturate(220%) contrast(1.10);
+  border: 1px solid rgba(255, 255, 255, 0.42);
   border-radius: 26px;
   box-shadow: 
-    0 32px 80px -16px rgba(0, 0, 0, 0.55),
+    0 32px 80px -16px rgba(0, 0, 0, 0.90),
     0 0 36px rgba(255, 255, 255, 0.08),
-    inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.90),
-    inset 0 -1px 0.5px 0 rgba(255, 255, 255, 0.20),
-    0 0 24px 2px rgba(255, 255, 255, 0.12) inset;
+    inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.95),
+    inset 0 -1px 0.5px 0 rgba(255, 255, 255, 0.25),
+    0 0 24px 2px rgba(255, 255, 255, 0.08) inset;
   overflow: hidden;
   transition: all var(--duration-normal, 260ms) var(--ease-apple);
 }

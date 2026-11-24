@@ -133,15 +133,15 @@
 /* Giant Bold Typography "Pricing" Sitting Behind Cards */
 .prem-bg-pricing-text {
   position: absolute;
-  top: -30px;
+  top: -55px;
   left: 50%;
   transform: translateX(-50%);
-  font-size: clamp(90px, 16vw, 195px);
+  font-size: clamp(80px, 14vw, 175px);
   font-weight: 850;
   line-height: 0.85;
   letter-spacing: -0.04em;
   color: #FFFFFF;
-  opacity: 0.96;
+  opacity: 0.95;
   text-align: center;
   white-space: nowrap;
   pointer-events: none;
@@ -158,21 +158,23 @@
   position: relative;
   z-index: 2;
   align-items: stretch;
-  padding-top: 90px; /* Allows the top of 'Pricing' to peek out boldly behind the cards */
+  padding-top: 110px; /* Allows the top of 'Pricing' to peek out boldly behind the cards without colliding with text */
 }
 
 /* ─── LIQUID GLASS CARD CONTAINER ─── */
 .prem-glass-card {
   position: relative;
-  background: rgba(255, 255, 255, 0.055);
-  backdrop-filter: blur(28px) saturate(200%) brightness(1.08);
-  -webkit-backdrop-filter: blur(28px) saturate(200%) brightness(1.08);
-  border: 1px solid rgba(255, 255, 255, 0.28);
+  background: 
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0.02) 28%, transparent 60%),
+    linear-gradient(180deg, rgba(8, 11, 18, 0.94) 0%, rgba(10, 13, 20, 0.90) 100%);
+  backdrop-filter: blur(60px) saturate(220%) contrast(1.15);
+  -webkit-backdrop-filter: blur(60px) saturate(220%) contrast(1.15);
+  border: 1.5px solid rgba(255, 255, 255, 0.42);
   border-radius: 28px;
   box-shadow: 
-    0 30px 70px -15px rgba(0, 0, 0, 0.65),
-    inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.90),
-    inset 0 -1px 0.5px rgba(255, 255, 255, 0.20),
+    0 32px 80px -16px rgba(0, 0, 0, 0.90),
+    inset 0 2px 1.5px 0 rgba(255, 255, 255, 0.95),
+    inset 0 -1.5px 1px rgba(255, 255, 255, 0.25),
     0 0 24px rgba(255, 255, 255, 0.08) inset;
   transition: transform 280ms cubic-bezier(0.16, 1, 0.3, 1),
               border-color 280ms ease,
@@ -184,11 +186,11 @@
 
 .prem-glass-card:hover {
   transform: translateY(-6px);
-  border-color: rgba(255, 255, 255, 0.45);
+  border-color: rgba(255, 255, 255, 0.60);
   box-shadow: 
-    0 36px 85px -12px rgba(0, 0, 0, 0.75),
+    0 40px 95px -12px rgba(0, 0, 0, 0.90),
     inset 0 2px 1.5px 0 #FFFFFF,
-    0 0 32px rgba(255, 255, 255, 0.12) inset;
+    0 0 32px rgba(255, 255, 255, 0.15) inset;
 }
 
 /* ─── CYLINDRICAL OPTICAL REFRACTION MENISCUS LENS ─── */
@@ -201,12 +203,12 @@
   height: 120px;
   pointer-events: none;
   z-index: 1;
-  background: radial-gradient(ellipse 120% 70% at 50% 0%, rgba(255, 255, 255, 0.26) 0%, rgba(255, 255, 255, 0.06) 45%, transparent 100%);
+  background: radial-gradient(ellipse 120% 70% at 50% 0%, rgba(255, 255, 255, 0.28) 0%, rgba(255, 255, 255, 0.06) 45%, transparent 100%);
   border-top-left-radius: inherit;
   border-top-right-radius: inherit;
   box-shadow: 
     inset 0 2px 1.5px rgba(255, 255, 255, 0.95),
-    inset 0 8px 24px -6px rgba(255, 255, 255, 0.22);
+    inset 0 8px 24px -6px rgba(255, 255, 255, 0.25);
 }
 
 .prem-lens-caustic {
@@ -221,13 +223,13 @@
 
 /* ─── HIGHLIGHTED / MOST POPULAR MIDDLE CARD ─── */
 .prem-glass-card.featured-popular {
-  border-color: rgba(223, 202, 170, 0.65);
-  background: rgba(255, 255, 255, 0.075);
+  border-color: rgba(223, 202, 170, 0.75);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.16) 0%, rgba(223, 202, 170, 0.06) 40%, rgba(255, 255, 255, 0.08) 100%), rgba(12, 15, 23, 0.88);
   box-shadow: 
-    0 36px 85px -12px rgba(0, 0, 0, 0.8),
-    0 0 45px -8px rgba(197, 172, 134, 0.28),
+    0 40px 90px -12px rgba(0, 0, 0, 0.90),
+    0 0 50px -8px rgba(197, 172, 134, 0.32),
     inset 0 2px 1.5px 0 #FFFFFF,
-    inset 0 0 28px rgba(223, 202, 170, 0.12);
+    inset 0 0 30px rgba(223, 202, 170, 0.15);
   transform: translateY(-4px);
 }
 
@@ -235,8 +237,8 @@
   transform: translateY(-10px);
   border-color: rgba(255, 255, 255, 0.85);
   box-shadow: 
-    0 44px 100px -10px rgba(0, 0, 0, 0.9),
-    0 0 60px -5px rgba(223, 202, 170, 0.4),
+    0 48px 110px -10px rgba(0, 0, 0, 0.95),
+    0 0 65px -5px rgba(223, 202, 170, 0.45),
     inset 0 2px 1.5px 0 #FFFFFF;
 }
 
@@ -292,15 +294,18 @@
   font-weight: 750;
   color: #FFFFFF;
   letter-spacing: -0.015em;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.95);
 }
 
 .prem-plan-label.featured {
   color: #FFFFFF;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.95);
 }
 
 .prem-plan-sub {
   font-size: 13.5px;
   color: var(--text-secondary, #A1A1A6);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
 }
 
 /* Price Block (Large Bold Display) */
@@ -317,6 +322,7 @@
   color: #FFFFFF;
   letter-spacing: -0.035em;
   line-height: 1;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.95);
 }
 
 .prem-price-num.featured {
@@ -466,7 +472,11 @@
   font-size: 13px;
   font-weight: 550;
   color: var(--text-secondary, #A1A1A6);
-  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.03) 100%), rgba(11, 14, 22, 0.84);
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  box-shadow: inset 0 1px 0.5px rgba(255, 255, 255, 0.7), 0 8px 24px -4px rgba(0, 0, 0, 0.5);
 }
 
 .prem-toggle-dot {
@@ -523,10 +533,13 @@
 .prem-comparison-table-wrap {
   border-radius: 24px;
   overflow-x: auto;
-  border: 1px solid rgba(255, 255, 255, 0.32);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.03) 50%, rgba(255, 255, 255, 0.06) 100%), rgba(10, 13, 20, 0.88);
+  backdrop-filter: blur(52px) saturate(210%) contrast(1.08);
+  -webkit-backdrop-filter: blur(52px) saturate(210%) contrast(1.08);
+  border: 1.5px solid rgba(255, 255, 255, 0.38);
   box-shadow: 
-    0 24px 60px -12px rgba(0, 0, 0, 0.55),
-    inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.85);
+    0 32px 80px -16px rgba(0, 0, 0, 0.85),
+    inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.95);
 }
 
 .prem-table {
@@ -625,14 +638,20 @@
 .prem-faq-item {
   border-radius: 18px;
   overflow: hidden;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.10) 0%, rgba(255, 255, 255, 0.02) 60%, rgba(255, 255, 255, 0.06) 100%), rgba(12, 15, 22, 0.82) !important;
+  backdrop-filter: blur(48px) saturate(200%) !important;
+  -webkit-backdrop-filter: blur(48px) saturate(200%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.32) !important;
+  box-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.65), inset 0 1px 0.5px 0 rgba(255, 255, 255, 0.8) !important;
   transition: all 240ms ease;
 }
 
 .prem-faq-item.is-open {
-  border-color: rgba(255, 255, 255, 0.5);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0.03) 60%, rgba(255, 255, 255, 0.08) 100%), rgba(14, 18, 26, 0.88) !important;
+  border-color: rgba(255, 255, 255, 0.55) !important;
   box-shadow: 
-    0 16px 36px -8px rgba(0, 0, 0, 0.4),
-    inset 0 1.5px 0.5px 0 #FFFFFF;
+    0 24px 50px -8px rgba(0, 0, 0, 0.75),
+    inset 0 1.5px 0.5px 0 #FFFFFF !important;
 }
 
 .prem-faq-question {

@@ -157,7 +157,11 @@ const GlobalAnnouncement = () => {
           width: calc(100vw - 52px);
           padding: 22px;
           border-radius: var(--radius-xl, 24px);
-          box-shadow: 0 24px 60px -10px rgba(0, 0, 0, 0.85), inset 0 1px 0 rgba(255, 255, 255, 0.16);
+          background: linear-gradient(135deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0.03) 50%, rgba(255, 255, 255, 0.08) 100%), rgba(8, 10, 16, 0.96) !important;
+          backdrop-filter: blur(64px) saturate(220%) contrast(1.15) !important;
+          -webkit-backdrop-filter: blur(64px) saturate(220%) contrast(1.15) !important;
+          border: 1px solid rgba(255, 255, 255, 0.45) !important;
+          box-shadow: 0 32px 80px -15px rgba(0, 0, 0, 0.95), inset 0 1.5px 1px 0 #FFFFFF, inset 0 -1px 0.5px rgba(255, 255, 255, 0.25) !important;
         }
 
         .announcement-header {

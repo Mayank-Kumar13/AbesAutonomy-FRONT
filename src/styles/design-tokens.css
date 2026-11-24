@@ -12,33 +12,39 @@
   --bg-tertiary: #131722;
   --bg-elevated: #181D2A;
 
-  /* ─── APPLE iOS 27 LIQUID GLASS MATERIAL PALETTE (CRYSTAL REFRACTIVE, NO DARKNESS) ─── */
-  /* Frosted Glass: High optical refraction, crystal clear diffusion, specular bevel, no darkness */
-  --glass-frosted-bg: rgba(255, 255, 255, 0.08);
-  --glass-frosted-bg-scrolled: rgba(255, 255, 255, 0.12);
-  --glass-frosted-bg-hover: rgba(255, 255, 255, 0.14);
-  --glass-frosted-border: rgba(255, 255, 255, 0.35);
-  --glass-frosted-border-hover: rgba(255, 255, 255, 0.60);
-  --glass-frosted-bevel: inset 0 1.5px 0.5px 0 rgba(255, 255, 255, 0.85), inset 0 -1px 0 0 rgba(255, 255, 255, 0.25);
-  --glass-frosted-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.45), 0 0 16px 2px rgba(255, 255, 255, 0.10) inset;
-  --glass-frosted-blur: 24px;
+  /* ─── APPLE iOS 27 LIQUID GLASS MATERIAL PALETTE (DEEP OPTICAL DIFFUSION & REFRACTION) ─── */
+  /* Frosted Glass: Authentic liquid glass with deep 48px blur, optical refraction backing, specular rims, and zero text clash */
+  --glass-frosted-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.03) 50%, rgba(255, 255, 255, 0.07) 100%), rgba(12, 15, 22, 0.82);
+  --glass-frosted-bg-scrolled: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.04) 50%, rgba(255, 255, 255, 0.09) 100%), rgba(10, 13, 20, 0.88);
+  --glass-frosted-bg-hover: linear-gradient(135deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0.05) 50%, rgba(255, 255, 255, 0.10) 100%), rgba(14, 18, 26, 0.85);
+  --glass-frosted-border: rgba(255, 255, 255, 0.40);
+  --glass-frosted-border-hover: rgba(255, 255, 255, 0.65);
+  --glass-frosted-bevel: inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.95), inset 0 -1px 0.5px 0 rgba(255, 255, 255, 0.25);
+  --glass-frosted-shadow: 0 24px 60px -12px rgba(0, 0, 0, 0.75), 0 0 20px 2px rgba(255, 255, 255, 0.08) inset;
+  --glass-frosted-blur: 56px;
 
-  /* Clear Glass: Optical clarity, specular edge highlights, refined interaction */
-  --glass-clear-bg: rgba(255, 255, 255, 0.07);
-  --glass-clear-bg-hover: rgba(255, 255, 255, 0.12);
-  --glass-clear-border: rgba(255, 255, 255, 0.30);
-  --glass-clear-border-hover: rgba(255, 255, 255, 0.55);
-  --glass-clear-bevel: inset 0 1.5px 0.5px 0 rgba(255, 255, 255, 0.75), inset 0 -1px 0 0 rgba(255, 255, 255, 0.2);
-  --glass-clear-shadow: 0 12px 32px -6px rgba(0, 0, 0, 0.35);
-  --glass-clear-blur: 20px;
+  /* Clear Glass: Refined optical clarity with strong 48px diffusion backing */
+  --glass-clear-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.02) 60%, rgba(255, 255, 255, 0.06) 100%), rgba(10, 13, 20, 0.88);
+  --glass-clear-bg-hover: linear-gradient(135deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0.04) 60%, rgba(255, 255, 255, 0.08) 100%), rgba(14, 18, 26, 0.92);
+  --glass-clear-border: rgba(255, 255, 255, 0.35);
+  --glass-clear-border-hover: rgba(255, 255, 255, 0.58);
+  --glass-clear-bevel: inset 0 1.5px 0.5px 0 rgba(255, 255, 255, 0.85), inset 0 -1px 0 0 rgba(255, 255, 255, 0.2);
+  --glass-clear-shadow: 0 16px 40px -8px rgba(0, 0, 0, 0.55);
+  --glass-clear-blur: 48px;
 
-  /* Diffused Glass: Soft backdrop diffusion for ambient groups and secondary panels */
-  --glass-diffused-bg: rgba(255, 255, 255, 0.05);
-  --glass-diffused-border: rgba(255, 255, 255, 0.22);
-  --glass-diffused-blur: 28px;
+  /* Diffused Glass: Deep atmospheric backdrop diffusion for secondary panels */
+  --glass-diffused-bg: rgba(10, 13, 20, 0.90);
+  --glass-diffused-border: rgba(255, 255, 255, 0.30);
+  --glass-diffused-blur: 60px;
+
+  /* Overlay / Dialog Glass: Solid non-bleeding liquid glass for floating dialogs and dropdowns */
+  --glass-overlay-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0.03) 50%, rgba(255, 255, 255, 0.08) 100%), rgba(8, 10, 16, 0.96);
+  --glass-overlay-blur: 64px;
+  --glass-overlay-border: rgba(255, 255, 255, 0.45);
+  --glass-overlay-shadow: 0 32px 80px -16px rgba(0, 0, 0, 0.95), inset 0 1.5px 1px 0 #FFFFFF, inset 0 -1px 0.5px 0 rgba(255, 255, 255, 0.25);
 
   /* Optical Glass Edge & Sheen Properties */
-  --glass-rim-glow: 0 0 2px 1px rgba(255, 255, 255, 0.5) inset, 0 0 16px 2px rgba(255, 255, 255, 0.15) inset;
+  --glass-rim-glow: 0 0 2px 1px rgba(255, 255, 255, 0.5) inset, 0 0 16px 2px rgba(255, 255, 255, 0.12) inset;
   --glass-sheen: linear-gradient(135deg, rgba(255, 255, 255, 0.5) 0%, transparent 40%, transparent 65%, rgba(255, 255, 255, 0.15) 100%);
   --glass-specular-ridge: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.6) 30%, #FFFFFF 50%, rgba(255, 255, 255, 0.6) 70%, transparent 100%);
 
