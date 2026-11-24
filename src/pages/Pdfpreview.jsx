@@ -3,7 +3,6 @@ import Pdfviewer from "../component/Pdfviewer";
 import { useEffect, useState, useRef, useCallback } from "react";
 import { notesApi, trackingApi } from "../services/api";
 import { useAuth } from "../auth/AuthContext";
-import ReviewModal from "../component/home/ReviewModal";
 import Navbar from "../component/navbar/Navbar";
 import { downloadNoteFile } from "../utils/downloadHelper";
 import PremiumUpgradeModal from "../component/premium/PremiumUpgradeModal";
@@ -40,8 +39,6 @@ export default function PdfPreview() {
   } = location.state || {};
   
   const [isNavbarVisible, setIsNavbarVisible] = useState(false);
-  const [showReviewPrompt, setShowReviewPrompt] = useState(false);
-  const [showActualReviewModal, setShowActualReviewModal] = useState(false);
   const [showStillReadingPrompt, setShowStillReadingPrompt] = useState(false);
   const [isReadingActive, setIsReadingActive] = useState(true);
   const [accessDenied, setAccessDenied] = useState(false);
@@ -226,31 +223,6 @@ export default function PdfPreview() {
       notesApi.incrementView(noteId).catch(() => {});
     }
   }, [noteId]);
-
-  useEffect(() => {
-    if (!user || user.hasReviewed) return;
-
-    const lastAsked = localStorage.getItem("reviewPopupCooldown");
-    if (lastAsked && Date.now() - parseInt(lastAsked, 10) < 24 * 60 * 60 * 1000) {
-      return;
-    }
-
-    const timer = setTimeout(() => {
-      setShowReviewPrompt(true);
-    }, 300000);
-
-    return () => clearTimeout(timer);
-  }, [user]);
-
-  const handleReviewLater = () => {
-    localStorage.setItem("reviewPopupCooldown", Date.now().toString());
-    setShowReviewPrompt(false);
-  };
-
-  const handleReviewNow = () => {
-    setShowReviewPrompt(false);
-    setShowActualReviewModal(true);
-  };
 
   const API_BASE = (import.meta.env.VITE_API_URL && import.meta.env.VITE_API_URL.includes("abes.work"))
     ? "/api"
@@ -440,49 +412,6 @@ export default function PdfPreview() {
           </button>
         </div>
       )}
-
-      {/* Review Prompt Modal */}
-      {showReviewPrompt && (
-        <div className="pdf-review-overlay anim-fade-in">
-          <div className="pdf-review-card glass-frosted anim-scale-in">
-            <div className="review-sparkle-bubble">
-              <Sparkles size={28} />
-            </div>
-            <h2>Enjoying the Study Resources?</h2>
-            <p>
-              You've been studying for a while! If you find these notes helpful, please consider leaving a brief review to support fellow ABES students.
-            </p>
-            <div className="review-btn-row">
-              <button 
-                type="button"
-                onClick={handleReviewNow}
-                className="glass-btn-gold"
-              >
-                Leave a Review
-              </button>
-              <button 
-                type="button"
-                onClick={handleReviewLater}
-                className="glass-btn-secondary"
-              >
-                Maybe Later
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Review Modal */}
-      <ReviewModal 
-        isOpen={showActualReviewModal} 
-        onClose={() => {
-          setShowActualReviewModal(false);
-          localStorage.setItem("reviewPopupCooldown", Date.now().toString());
-        }}
-        onSuccess={() => {
-          setShowActualReviewModal(false);
-        }}
-      />
 
       {/* Premium Upgrade Modal */}
       <PremiumUpgradeModal
