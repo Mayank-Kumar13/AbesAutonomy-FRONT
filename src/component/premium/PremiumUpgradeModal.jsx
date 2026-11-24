@@ -105,12 +105,12 @@ export default function PremiumUpgradeModal({
         <div className="pum-plans-grid">
           {/* Plan 1 */}
           <div
-            className={`pum-plan-card ${selectedPlan === 'premium_2_months' ? 'selected' : ''}`}
-            onClick={() => setSelectedPlan('premium_2_months')}
+            className={`pum-plan-card ${selectedPlan === 'premium_1_month' ? 'selected' : ''}`}
+            onClick={() => setSelectedPlan('premium_1_month')}
           >
-            <h3 className="pum-plan-name">Premium – 2 Months</h3>
-            <div className="pum-plan-price">₹100</div>
-            <div className="pum-plan-duration">Validity: 60 Days</div>
+            <h3 className="pum-plan-name">Monthly Plan</h3>
+            <div className="pum-plan-price">₹49</div>
+            <div className="pum-plan-duration">Validity: 30 Days</div>
             <ul className="pum-plan-features">
               <li><Check size={14} color="#C5AC86" /> All premium PDFs & Notes</li>
               <li><Check size={14} color="#C5AC86" /> AI Study Assistant</li>
@@ -121,11 +121,11 @@ export default function PremiumUpgradeModal({
               className="pum-upgrade-btn"
               onClick={(e) => {
                 e.stopPropagation();
-                handleCheckout('premium_2_months');
+                handleCheckout('premium_1_month');
               }}
               disabled={loading}
             >
-              {loading && selectedPlan === 'premium_2_months' ? 'Opening UPI...' : 'Get 2 Months'}
+              {loading && selectedPlan === 'premium_1_month' ? 'Opening UPI...' : 'Get Monthly (₹49)'}
             </button>
           </div>
 
@@ -135,14 +135,14 @@ export default function PremiumUpgradeModal({
             onClick={() => setSelectedPlan('premium_4_months')}
           >
             <div className="pum-best-value-pill">BEST VALUE</div>
-            <h3 className="pum-plan-name">Premium – 4 Months</h3>
-            <div className="pum-plan-price">₹150</div>
+            <h3 className="pum-plan-name">Semester Plan</h3>
+            <div className="pum-plan-price">₹139</div>
             <div className="pum-plan-duration">Validity: 120 Days (Full Semester)</div>
             <ul className="pum-plan-features">
-              <li><Check size={14} color="#C5AC86" /> All 2-Month Features</li>
+              <li><Check size={14} color="#C5AC86" /> All Monthly Features</li>
               <li><Check size={14} color="#C5AC86" /> Complete Semester Validity</li>
               <li><Check size={14} color="#C5AC86" /> AI-Powered Learning Tools</li>
-              <li><Check size={14} color="#C5AC86" /> Future Premium Updates</li>
+              <li><Check size={14} color="#C5AC86" /> Priority AI Query Processing</li>
             </ul>
             <button
               className="pum-upgrade-btn"
@@ -152,14 +152,14 @@ export default function PremiumUpgradeModal({
               }}
               disabled={loading}
             >
-              {loading && selectedPlan === 'premium_4_months' ? 'Opening UPI...' : 'Get 4 Months (Best Value)'}
+              {loading && selectedPlan === 'premium_4_months' ? 'Opening UPI...' : 'Get Semester (₹139)'}
             </button>
           </div>
         </div>
 
         <p className="pum-footer-note">
           <Shield size={13} />
-          <span>One-time payment • No auto-renewal • Instant UPI activation via Razorpay</span>
+          <span>One-time payment • No auto-renewal • Or check out our <a href="/premium" style={{ color: '#DFCAAA', textDecoration: 'underline' }}>₹499 Lifetime Degree Pass</a></span>
         </p>
       </div>
     </div>

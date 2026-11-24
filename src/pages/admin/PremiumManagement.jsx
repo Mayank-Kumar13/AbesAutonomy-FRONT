@@ -320,7 +320,7 @@ export default function PremiumManagement() {
                         <strong>{t.userName || 'Student'}</strong>
                         <div style={{ fontSize: '0.75rem', color: '#64748b' }}>{t.userEmail}</div>
                       </td>
-                      <td>{t.plan === 'premium_4_months' ? '4 Months' : '2 Months'}</td>
+                      <td>{t.plan === 'premium_lifetime' ? 'Lifetime' : t.plan === 'premium_4_months' ? '4 Months' : t.plan === 'premium_1_month' ? '1 Month' : '2 Months'}</td>
                       <td>₹{t.amount / 100}</td>
                       <td style={{ textTransform: 'uppercase' }}>{t.paymentMethod}</td>
                       <td>
@@ -408,8 +408,12 @@ export default function PremiumManagement() {
                       </span>
                     </td>
                     <td>
-                      {u.premiumPlan === 'premium_4_months'
+                      {u.premiumPlan === 'premium_lifetime'
+                        ? 'Lifetime'
+                        : u.premiumPlan === 'premium_4_months'
                         ? '4 Months'
+                        : u.premiumPlan === 'premium_1_month'
+                        ? '1 Month'
                         : u.premiumPlan === 'premium_2_months'
                         ? '2 Months'
                         : '—'}
@@ -533,7 +537,7 @@ export default function PremiumManagement() {
                     </td>
                     <td style={{ fontFamily: 'monospace', fontSize: '0.78rem' }}>{p.razorpayOrderId}</td>
                     <td style={{ fontFamily: 'monospace', fontSize: '0.78rem' }}>{p.razorpayPaymentId || '—'}</td>
-                    <td>{p.plan === 'premium_4_months' ? '4 Months' : '2 Months'}</td>
+                    <td>{p.plan === 'premium_lifetime' ? 'Lifetime' : p.plan === 'premium_4_months' ? '4 Months' : p.plan === 'premium_1_month' ? '1 Month' : '2 Months'}</td>
                     <td>₹{p.amount / 100}</td>
                     <td style={{ textTransform: 'uppercase' }}>{p.paymentMethod}</td>
                     <td>
@@ -671,8 +675,10 @@ export default function PremiumManagement() {
                     value={modalForm.plan}
                     onChange={(e) => setModalForm({ ...modalForm, plan: e.target.value })}
                   >
-                    <option value="premium_2_months">Premium – 2 Months (60 Days)</option>
-                    <option value="premium_4_months">Premium – 4 Months (120 Days)</option>
+                    <option value="premium_1_month">Monthly Plan – 1 Month (30 Days)</option>
+                    <option value="premium_4_months">Semester Plan – 4 Months (120 Days)</option>
+                    <option value="premium_lifetime">Lifetime Plan – Degree Pass</option>
+                    <option value="premium_2_months">Legacy – 2 Months (60 Days)</option>
                   </select>
                 </div>
               )}

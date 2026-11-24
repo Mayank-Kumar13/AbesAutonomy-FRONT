@@ -27,14 +27,20 @@ export default function PaymentResult({ type = 'success' }) {
 
   const planName =
     stateData.plan?.name ||
-    (subStatus?.premiumPlan === 'premium_4_months'
-      ? 'Premium – 4 Months'
+    (subStatus?.premiumPlan === 'premium_lifetime'
+      ? 'Lifetime Plan'
+      : subStatus?.premiumPlan === 'premium_4_months'
+      ? 'Semester Plan'
+      : subStatus?.premiumPlan === 'premium_1_month'
+      ? 'Monthly Plan'
       : subStatus?.premiumPlan === 'premium_2_months'
       ? 'Premium – 2 Months'
       : 'ABES Autonomy Premium');
 
-  const expiryDate =
-    stateData.subscription?.endDate || subStatus?.premiumExpiryDate;
+  const isLifetime = stateData.plan?.isLifetime || subStatus?.premiumPlan === 'premium_lifetime';
+  const expiryDate = isLifetime
+    ? 'Permanent Lifetime Access'
+    : stateData.subscription?.endDate || subStatus?.premiumExpiryDate;
 
   const paymentId =
     stateData.payment?.razorpayPaymentId || stateData.payment?._id || 'Verified via Razorpay';
