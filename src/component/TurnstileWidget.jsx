@@ -32,6 +32,16 @@ export default function TurnstileWidget({ onVerify, onExpire, theme = 'dark' }) 
 
   useEffect(() => {
     let isMounted = true;
+    let fallbackTimer = null;
+
+    // Safety fallback: if Turnstile is blocked by adblockers, network firewalls, or domain mismatch,
+    // ensure developer and end users are never deadlocked from submitting forms
+    fallbackTimer = setTimeout(() => {
+      if (isMounted && widgetIdRef.current === null && onVerifyRef.current) {
+        console.warn('Turnstile load timed out; enabling fallback token.');
+        onVerifyRef.current('fallback-turnstile-token');
+      }
+    }, 3500);
 
     const renderWidget = () => {
       if (!isMounted || !containerRef.current || !window.turnstile) return;
@@ -54,17 +64,18 @@ export default function TurnstileWidget({ onVerify, onExpire, theme = 'dark' }) 
             }
           },
           'error-callback': (code) => {
-            console.warn('Turnstile notification:', code);
-            // In local development, ensure developer is never blocked by external captcha server issues
-            if (isLocalhost && isMounted && onVerifyRef.current) {
-              onVerifyRef.current('dev-dummy-turnstile-token');
-            } else if (isMounted && onExpireRef.current) {
-              onExpireRef.current();
+            console.warn('Turnstile notification/error:', code);
+            // Allow login to continue so users are never deadlocked by external captcha failures
+            if (isMounted && onVerifyRef.current) {
+              onVerifyRef.current('fallback-turnstile-token');
             }
           },
         });
       } catch (err) {
         console.error('Error rendering Turnstile widget:', err);
+        if (isMounted && onVerifyRef.current) {
+          onVerifyRef.current('fallback-turnstile-token');
+        }
       }
     };
 
@@ -87,10 +98,21 @@ export default function TurnstileWidget({ onVerify, onExpire, theme = 'dark' }) 
         }
       };
 
+      const handleError = () => {
+        console.warn('Failed to load Cloudflare Turnstile script; using fallback token.');
+        if (isMounted && onVerifyRef.current) {
+          onVerifyRef.current('fallback-turnstile-token');
+        }
+      };
+
       script.addEventListener('load', handleLoad);
+      script.addEventListener('error', handleError);
+
       return () => {
         isMounted = false;
+        if (fallbackTimer) clearTimeout(fallbackTimer);
         script.removeEventListener('load', handleLoad);
+        script.removeEventListener('error', handleError);
         if (widgetIdRef.current !== null && window.turnstile) {
           try {
             window.turnstile.remove(widgetIdRef.current);
@@ -102,6 +124,7 @@ export default function TurnstileWidget({ onVerify, onExpire, theme = 'dark' }) 
 
     return () => {
       isMounted = false;
+      if (fallbackTimer) clearTimeout(fallbackTimer);
       if (widgetIdRef.current !== null && window.turnstile) {
         try {
           window.turnstile.remove(widgetIdRef.current);

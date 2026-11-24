@@ -53,7 +53,7 @@ const App = () => {
 
   return (
     <GlobalStatusGuard>
-      {showStartupIntro && <IntroOverlay locationKey={location.key} />}
+      {isHomePage && showStartupIntro && <IntroOverlay locationKey={location.key} />}
       {!isAuthPage && <LoginToast />}
       {!isAuthPage && <LiveTracker />}
       {!isAuthPage && <GlobalAnnouncement />}

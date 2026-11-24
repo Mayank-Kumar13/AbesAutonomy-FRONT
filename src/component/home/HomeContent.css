@@ -289,9 +289,21 @@
   }
 }
 
+/* Phone View: strictly remove scroll to explore button on mobile viewports */
+@media (max-width: 768px) {
+  .campus-scroll-cue {
+    display: none !important;
+  }
+
+  .campus-caption {
+    bottom: 34px;
+    justify-content: center;
+  }
+}
+
 @media (max-width: 540px) {
   .campus-caption {
-    bottom: 118px;
+    bottom: 34px;
     justify-content: center;
     font-size: 12px;
     letter-spacing: 0.12em;
@@ -300,7 +312,6 @@
   .campus-caption span:last-child {
     display: none;
   }
-
 }
 
 /* Reduced motion preference */
