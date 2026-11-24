@@ -118,18 +118,13 @@ export default function PremiumPage() {
       </div>
 
       <div className="prem-container">
-        {/* Top Header Title & Tagline */}
-        <div className="prem-hero-header">
-          <p className="prem-subtitle-lead">
-            Transparent, student-first academic access designed for ABES engineering excellence.
-          </p>
-
-          {error && (
+        {error && (
+          <div className="prem-hero-header">
             <div className="prem-error-alert glass-clear">
               {error}
             </div>
-          )}
-        </div>
+          </div>
+        )}
 
         {/* ─── OPTICAL PRICING SHOWCASE WITH GIANT 'PRICING' BACKDROP ─── */}
         <section className="prem-pricing-showcase">

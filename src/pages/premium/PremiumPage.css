@@ -95,17 +95,17 @@
 /* ─── OPTICAL PRICING SHOWCASE WITH GIANT 'PRICING' BACKDROP ─── */
 .prem-pricing-showcase {
   position: relative;
-  margin-top: 32px;
+  margin-top: 10px;
   margin-bottom: 84px;
 }
 
 /* Giant Bold Typography "Pricing" Sitting Behind Cards */
 .prem-bg-pricing-text {
   position: absolute;
-  top: -60px;
+  top: -20px;
   left: 50%;
   transform: translateX(-50%);
-  font-size: clamp(90px, 16vw, 195px);
+  font-size: clamp(95px, 17vw, 210px);
   font-weight: 850;
   line-height: 0.85;
   letter-spacing: -0.04em;
@@ -127,7 +127,7 @@
   position: relative;
   z-index: 2;
   align-items: stretch;
-  padding-top: 130px; /* Sits cleanly so the top of 'Pricing' shines above the cards, exactly like the reference image */
+  padding-top: 135px; /* Sits cleanly so the top of 'Pricing' shines above the cards, exactly like the reference image */
 }
 
 /* ─── LIQUID GLASS CARD CONTAINER ─── */
