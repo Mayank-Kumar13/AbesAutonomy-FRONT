@@ -229,6 +229,107 @@
   margin-bottom: 14px;
 }
 
+/* ─── 24-HOUR FREE QUOTA RESET TIMER BANNER ─── */
+.pum-timer-banner {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background: linear-gradient(135deg, rgba(197, 172, 134, 0.12) 0%, rgba(197, 172, 134, 0.04) 100%), rgba(20, 24, 34, 0.85);
+  border: 1px solid rgba(197, 172, 134, 0.35);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  border-radius: 14px;
+  padding: 10px 16px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+.pum-timer-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.pum-timer-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: #C5AC86;
+  text-transform: uppercase;
+}
+
+.pum-timer-clock-icon {
+  color: #C5AC86;
+  animation: pumPulse 2s ease-in-out infinite;
+}
+
+@keyframes pumPulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(0.9); opacity: 0.6; }
+}
+
+.pum-timer-clock {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 3px;
+  font-family: var(--font-family-mono, ui-monospace, SFMono-Regular, monospace);
+  color: #FFFFFF;
+  background: rgba(0, 0, 0, 0.35);
+  padding: 3px 8px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.pum-timer-num {
+  font-size: 14.5px;
+  font-weight: 700;
+}
+
+.pum-timer-unit {
+  font-size: 10px;
+  font-weight: 600;
+  color: #C5AC86;
+}
+
+.pum-timer-sep {
+  font-size: 12px;
+  color: rgba(197, 172, 134, 0.6);
+}
+
+.pum-timer-right {
+  flex: 1;
+  text-align: right;
+  min-width: 200px;
+}
+
+.pum-timer-prompt {
+  font-size: 12.5px;
+  color: #D1D5DB;
+}
+
+.pum-timer-prompt strong {
+  color: #FFDFB0;
+  font-weight: 700;
+}
+
+@media (max-width: 640px) {
+  .pum-timer-banner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .pum-timer-right {
+    text-align: left;
+    min-width: 100%;
+  }
+}
+
 /* ─── SIDE-BY-SIDE 2-COLUMN CARDS GRID ─── */
 .pum-cards-grid {
   position: relative;

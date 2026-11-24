@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../auth/AuthContext';
 import { paymentApi } from '../../services/api';
 import { openRazorpayCheckout } from '../../utils/razorpay';
-import { Crown, Check, X, Shield, Zap, Sparkles, ArrowRight, Loader2 } from 'lucide-react';
+import { Crown, Check, X, Shield, Zap, Sparkles, ArrowRight, Loader2, Clock } from 'lucide-react';
 import './PremiumUpgradeModal.css';
 
 export default function PremiumUpgradeModal({
@@ -11,11 +11,33 @@ export default function PremiumUpgradeModal({
   onClose,
   message = 'You have used all 3 free document accesses. Upgrade to Premium for unlimited access.',
   onSuccess,
+  freePdfResetAt: propResetAt,
 }) {
   const { user, setTokenAndLoad } = useAuth();
   const navigate = useNavigate();
   const [loadingPlan, setLoadingPlan] = useState(null);
   const [error, setError] = useState('');
+
+  const targetResetAt = propResetAt || user?.freePdfResetAt || null;
+  const [countdown, setCountdown] = useState(null);
+
+  useEffect(() => {
+    if (!targetResetAt) {
+      setCountdown(null);
+      return;
+    }
+    const tick = () => {
+      const diff = Math.max(0, new Date(targetResetAt).getTime() - Date.now());
+      const totalSecs = Math.floor(diff / 1000);
+      const hours = Math.floor(totalSecs / 3600);
+      const minutes = Math.floor((totalSecs % 3600) / 60);
+      const seconds = totalSecs % 60;
+      setCountdown({ hours, minutes, seconds, totalSecs });
+    };
+    tick();
+    const interval = setInterval(tick, 1000);
+    return () => clearInterval(interval);
+  }, [targetResetAt]);
 
   if (!isOpen) return null;
 
@@ -117,6 +139,33 @@ export default function PremiumUpgradeModal({
         {error && (
           <div className="pum-error-banner" role="alert">
             {error}
+          </div>
+        )}
+
+        {/* 24-Hour Free Quota Reset Timer Banner */}
+        {countdown && (
+          <div className="pum-timer-banner">
+            <div className="pum-timer-left">
+              <div className="pum-timer-label">
+                <Clock size={13} className="pum-timer-clock-icon" />
+                <span>DAILY FREE QUOTA RENEWS IN</span>
+              </div>
+              <div className="pum-timer-clock">
+                <span className="pum-timer-num">{String(countdown.hours).padStart(2, '0')}</span>
+                <span className="pum-timer-unit">h</span>
+                <span className="pum-timer-sep">:</span>
+                <span className="pum-timer-num">{String(countdown.minutes).padStart(2, '0')}</span>
+                <span className="pum-timer-unit">m</span>
+                <span className="pum-timer-sep">:</span>
+                <span className="pum-timer-num">{String(countdown.seconds).padStart(2, '0')}</span>
+                <span className="pum-timer-unit">s</span>
+              </div>
+            </div>
+            <div className="pum-timer-right">
+              <span className="pum-timer-prompt">
+                Don't want to wait? Buy Premium from <strong>₹29</strong> for instant access!
+              </span>
+            </div>
           </div>
         )}
 

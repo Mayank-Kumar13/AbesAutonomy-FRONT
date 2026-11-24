@@ -124,9 +124,29 @@ export default function Profile() {
         .join('')
     : 'AB';
 
-  const freeTotal = subData?.freePdfMax || 5;
+  const freeTotal = subData?.freePdfMax || 3;
   const freeUsed = subData?.freePdfAccessCount || 0;
   const freeRemaining = subData?.freePdfRemaining ?? Math.max(0, freeTotal - freeUsed);
+  const freeResetAt = subData?.freePdfResetAt || user?.freePdfResetAt || null;
+  const [profileTimer, setProfileTimer] = useState(null);
+
+  useEffect(() => {
+    if (!freeResetAt || freeRemaining > 0) {
+      setProfileTimer(null);
+      return;
+    }
+    const update = () => {
+      const diff = Math.max(0, new Date(freeResetAt).getTime() - Date.now());
+      const totalSecs = Math.floor(diff / 1000);
+      const hours = Math.floor(totalSecs / 3600);
+      const minutes = Math.floor((totalSecs % 3600) / 60);
+      const seconds = totalSecs % 60;
+      setProfileTimer(`${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`);
+    };
+    update();
+    const interval = setInterval(update, 1000);
+    return () => clearInterval(interval);
+  }, [freeResetAt, freeRemaining]);
 
   return (
     <div className="prof-page">
@@ -286,7 +306,11 @@ export default function Profile() {
                     </span>
                   </div>
                   <p className="prof-member-desc">
-                    {freeRemaining} free document accesses remaining. Previous Year Questions (PYQs) remain 100% free forever.
+                    {freeRemaining > 0
+                      ? `${freeRemaining} free document accesses remaining. Previous Year Questions (PYQs) remain 100% free forever.`
+                      : profileTimer 
+                        ? `Daily limit reached. Renews in ${profileTimer} (or Upgrade to Premium for unlimited access).`
+                        : `You have used all ${freeTotal} free document accesses for today. Quota renews in 24 hours.`}
                   </p>
                   <div className="prof-quota-bar-track">
                     <div

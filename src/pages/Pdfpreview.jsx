@@ -17,7 +17,8 @@ import {
   Lock, 
   BookOpen, 
   Sparkles,
-  Loader2
+  Loader2,
+  Clock
 } from "lucide-react";
 
 export default function PdfPreview() {
@@ -44,6 +45,24 @@ export default function PdfPreview() {
   const [accessDenied, setAccessDenied] = useState(false);
   const [showPremiumModal, setShowPremiumModal] = useState(false);
   const [accessDeniedMessage, setAccessDeniedMessage] = useState("");
+  const [freePdfResetAt, setFreePdfResetAt] = useState(null);
+  const [countdown, setCountdown] = useState({ hours: 0, minutes: 0, seconds: 0, totalSecs: 0 });
+
+  // Live 24-Hour Free Quota Reset Timer
+  useEffect(() => {
+    if (!freePdfResetAt) return;
+    const tick = () => {
+      const diff = Math.max(0, new Date(freePdfResetAt).getTime() - Date.now());
+      const totalSecs = Math.floor(diff / 1000);
+      const hours = Math.floor(totalSecs / 3600);
+      const minutes = Math.floor((totalSecs % 3600) / 60);
+      const seconds = totalSecs % 60;
+      setCountdown({ hours, minutes, seconds, totalSecs });
+    };
+    tick();
+    const timer = setInterval(tick, 1000);
+    return () => clearInterval(timer);
+  }, [freePdfResetAt]);
 
   // Pre-flight check for access rights on the document
   useEffect(() => {
@@ -53,6 +72,9 @@ export default function PdfPreview() {
           if (res?.data && !res.data.allowed) {
             setAccessDenied(true);
             setAccessDeniedMessage(res.data.message || 'You have used all 3 free document accesses. Upgrade to Premium for unlimited access.');
+            if (res.data.freePdfResetAt) {
+              setFreePdfResetAt(res.data.freePdfResetAt);
+            }
             setShowPremiumModal(true);
           }
         })
@@ -60,6 +82,9 @@ export default function PdfPreview() {
           if (err.status === 403 || err.data?.code === 'PREMIUM_REQUIRED') {
             setAccessDenied(true);
             setAccessDeniedMessage(err.message || 'Active Premium subscription required to view this document.');
+            if (err.data?.freePdfResetAt) {
+              setFreePdfResetAt(err.data.freePdfResetAt);
+            }
             setShowPremiumModal(true);
           }
         });
@@ -354,8 +379,28 @@ export default function PdfPreview() {
                 <Lock size={32} />
               </div>
               <h2>Document Access Locked</h2>
+
+              {/* 24-Hour Free Quota Renewal Timer */}
+              {freePdfResetAt && (
+                <div className="pdf-quota-timer-box">
+                  <div className="quota-timer-label">
+                    <Clock size={14} className="timer-icon-pulse" />
+                    <span>Free Quota Renews In:</span>
+                  </div>
+                  <div className="quota-timer-digits">
+                    <span className="timer-unit">{String(countdown.hours).padStart(2, '0')}<small>h</small></span>
+                    <span className="timer-sep">:</span>
+                    <span className="timer-unit">{String(countdown.minutes).padStart(2, '0')}<small>m</small></span>
+                    <span className="timer-sep">:</span>
+                    <span className="timer-unit">{String(countdown.seconds).padStart(2, '0')}<small>s</small></span>
+                  </div>
+                </div>
+              )}
+
               <p>
-                {accessDeniedMessage || 'You have used all 3 free document accesses. Upgrade to ABES Autonomy Premium for unlimited access to all study materials.'}
+                {accessDeniedMessage || (freePdfResetAt
+                  ? 'You have used all 3 free document accesses for today. Buy ABES Autonomy Premium to continue reading immediately, or wait for the 24-hour timer to renew your free quota.'
+                  : 'You have used all 3 free document accesses. Upgrade to ABES Autonomy Premium for unlimited access to all study materials.')}
               </p>
               <div className="access-btn-row">
                 <button
@@ -371,7 +416,7 @@ export default function PdfPreview() {
                   className="glass-btn-gold"
                 >
                   <Sparkles size={15} />
-                  <span>Upgrade to Premium</span>
+                  <span>Buy Premium • From ₹29</span>
                 </button>
               </div>
             </div>
@@ -417,6 +462,7 @@ export default function PdfPreview() {
       <PremiumUpgradeModal
         isOpen={showPremiumModal}
         message={accessDeniedMessage}
+        freePdfResetAt={freePdfResetAt}
         onClose={() => {
           setShowPremiumModal(false);
         }}
@@ -641,6 +687,62 @@ export default function PdfPreview() {
           font-size: 22px;
           font-weight: 700;
           color: #FFFFFF;
+        }
+
+        .pdf-quota-timer-box {
+          background: rgba(197, 172, 134, 0.08);
+          border: 1px solid rgba(197, 172, 134, 0.28);
+          border-radius: 16px;
+          padding: 12px 18px;
+          margin: 0 auto 18px;
+          max-width: 320px;
+          box-shadow: 0 8px 24px -6px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        .quota-timer-label {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 6px;
+          font-size: 11.5px;
+          font-weight: 600;
+          letter-spacing: 0.04em;
+          text-transform: uppercase;
+          color: #C5AC86;
+          margin-bottom: 6px;
+        }
+
+        .timer-icon-pulse {
+          animation: pulseSlow 2s ease-in-out infinite;
+        }
+
+        @keyframes pulseSlow {
+          0%, 100% { opacity: 1; transform: scale(1); }
+          50% { opacity: 0.6; transform: scale(0.92); }
+        }
+
+        .quota-timer-digits {
+          display: flex;
+          align-items: baseline;
+          justify-content: center;
+          gap: 5px;
+          font-family: var(--font-family-mono, ui-monospace, SFMono-Regular, monospace);
+          font-size: 26px;
+          font-weight: 800;
+          color: #FFFFFF;
+          letter-spacing: 0.02em;
+        }
+
+        .quota-timer-digits small {
+          font-size: 11px;
+          font-weight: 500;
+          color: #C5AC86;
+          margin-left: 2px;
+        }
+
+        .timer-sep {
+          color: rgba(197, 172, 134, 0.5);
+          font-weight: 300;
         }
 
         .access-denied-card p {

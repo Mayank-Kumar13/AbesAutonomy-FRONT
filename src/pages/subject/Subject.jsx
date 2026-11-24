@@ -33,6 +33,7 @@ const Subject = () => {
   const [isDownloadingAll, setIsDownloadingAll] = useState(false);
   const [showPremiumModal, setShowPremiumModal] = useState(false);
   const [downloadingId, setDownloadingId] = useState(null);
+  const [freePdfResetAt, setFreePdfResetAt] = useState(null);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -77,7 +78,8 @@ const Subject = () => {
       });
     } catch (err) {
       console.error("Download failed:", err);
-      if (err.status === 403 || err.data?.code === 'PREMIUM_REQUIRED') {
+      if (err.status === 403 || err.data?.code === 'PREMIUM_REQUIRED' || err.data?.code === 'PREMIUM_DOWNLOAD_REQUIRED') {
+        if (err.data?.freePdfResetAt) setFreePdfResetAt(err.data.freePdfResetAt);
         setShowPremiumModal(true);
       }
     } finally {
@@ -243,6 +245,7 @@ const Subject = () => {
         {showPremiumModal && (
           <PremiumUpgradeModal 
             isOpen={showPremiumModal} 
+            freePdfResetAt={freePdfResetAt}
             onClose={() => setShowPremiumModal(false)} 
           />
         )}
