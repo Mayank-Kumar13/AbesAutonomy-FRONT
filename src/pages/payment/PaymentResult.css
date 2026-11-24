@@ -4,6 +4,7 @@
 
 .pay-res-page {
   min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -12,6 +13,7 @@
   color: var(--text-primary, #F5F5F7);
   font-family: var(--font-family-sans);
   position: relative;
+  box-sizing: border-box;
 }
 
 .pay-res-page::before {

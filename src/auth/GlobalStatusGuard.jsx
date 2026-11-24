@@ -38,7 +38,7 @@ const GlobalStatusGuard = ({ children }) => {
     // Allow admins to authenticate via login or OAuth callback without exposing the rest of the app UI
     if (path === '/login' || path.startsWith('/auth/') || path === '/forgot-password' || path === '/reset-password') {
       return (
-        <div style={{ minHeight: '100vh', backgroundColor: '#080a0e', width: '100%', overflowY: 'auto' }}>
+        <div style={{ minHeight: '100vh', minHeight: '100dvh', backgroundColor: '#080a0e', width: '100%', display: 'flex', flexDirection: 'column' }}>
           <Routes>
             <Route path="/login" element={<LoginPage />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
