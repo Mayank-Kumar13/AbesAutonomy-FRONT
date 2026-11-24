@@ -12,11 +12,18 @@ async function makeViewer(format) {
   const nonce = crypto.randomUUID();
   const script = code => '<script nonce="' + nonce + '">' + code.replace(/<\/script/gi, '<\\/script') + '</script>';
   const render = format === 'pptx'
-    ? 'const width = Math.min(root.clientWidth, 1100); await pptxPreview.init(root, { width, height: width * 9 / 16 }).preview(await event.data.arrayBuffer());'
+    ? `const designWidth = 960;
+       const deck = document.createElement('div');
+       root.appendChild(deck);
+       deck.style.width = designWidth + 'px';
+       const fit = () => { deck.style.zoom = root.clientWidth / designWidth; };
+       fit();
+       new ResizeObserver(fit).observe(root);
+       await pptxPreview.init(deck, { width: designWidth, mode: 'list' }).preview(await event.data.arrayBuffer());`
     : 'await docx.renderAsync(event.data, root, undefined, { inWrapper: true, ignoreWidth: true, renderAltChunks: false, useBase64URL: true });';
   return `<!doctype html><meta charset="utf-8">
     <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'nonce-${nonce}'; style-src 'unsafe-inline'; img-src data: blob:; font-src data: blob:; media-src data: blob:; base-uri 'none'; form-action 'none'">
-    <style>body{background:#e6e8eb;font:16px system-ui;margin:0}main{max-width:1100px;margin:auto}p{text-align:center}.docx-wrapper{padding:12px!important}.docx-wrapper section{max-width:100%;box-sizing:border-box}</style>
+    <style>body{background:#e6e8eb;font:16px system-ui;margin:0}main{margin:auto;max-width:${format === 'pptx' ? 'none' : '1100px'}}p{text-align:center}.docx-wrapper{padding:12px!important}.docx-wrapper section{max-width:100%;box-sizing:border-box}</style>
     <main id="content"></main><p id="status" role="status">Opening document…</p>
     ${modules.map(module => script(module.default)).join('')}
     ${script(`addEventListener('message', async event => {
@@ -47,5 +54,5 @@ export default function OfficePreview({ blob, format, dark }) {
       sentFrame.current = frame;
       frame.contentWindow.postMessage(blob, '*');
     }}
-    style={{ width: '100%', height: '100vh', border: 0, filter: dark ? 'invert(1) hue-rotate(180deg)' : undefined }} />;
+    style={{ width: '100%', height: format === 'pptx' ? '100%' : '100vh', display: 'block', border: 0, filter: dark ? 'invert(1) hue-rotate(180deg)' : undefined }} />;
 }

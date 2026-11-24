@@ -59,7 +59,7 @@ export default function Pdfviewer({ file, backendUrl, isImageFlag, isDarkMode })
 
 
   return (
-    <div style={{ position: 'relative', width: '100%', minHeight: '100vh', overflow: 'hidden' }}>
+    <div style={{ position: 'relative', width: '100%', minHeight: document?.format === 'pptx' ? 0 : '100vh', overflow: 'hidden' }}>
       {/* Fallback storage indicator badge - Admin only */}
       {isUsingFallback && !fallbackUnavailable && isAdmin && (
         <div style={{
