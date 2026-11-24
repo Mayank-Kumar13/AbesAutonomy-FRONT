@@ -5,7 +5,14 @@ const AuthContext = createContext(null);
 const HEARTBEAT_INTERVAL_MS = 60000;
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(() => {
+    try {
+      const saved = localStorage.getItem("abes_user");
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
+  });
   const [token, setToken] = useState(() => localStorage.getItem("token"));
   const [loading, setLoading] = useState(true);
   const [websiteStatus, setWebsiteStatus] = useState('LIVE');
@@ -23,21 +30,40 @@ export function AuthProvider({ children }) {
         authApi.getSettings().catch(() => ({ data: { websiteStatus: 'LIVE' } }))
       ]);
 
-      if (profileRes) {
+      if (profileRes && profileRes.data) {
         setUser(profileRes.data);
+        localStorage.setItem("abes_user", JSON.stringify(profileRes.data));
       } else {
-        if (token) localStorage.removeItem("token");
-        setToken(null);
-        setUser(null);
+        const saved = localStorage.getItem("abes_user");
+        if (saved) {
+          try {
+            setUser(JSON.parse(saved));
+          } catch {
+            setUser(null);
+          }
+        } else {
+          if (token) localStorage.removeItem("token");
+          setToken(null);
+          setUser(null);
+        }
       }
 
       if (settingsRes && settingsRes.data) {
         setWebsiteStatus(settingsRes.data.websiteStatus);
       }
     } catch (err) {
-      if (token) localStorage.removeItem("token");
-      setToken(null);
-      setUser(null);
+      const saved = localStorage.getItem("abes_user");
+      if (saved) {
+        try {
+          setUser(JSON.parse(saved));
+        } catch {
+          setUser(null);
+        }
+      } else {
+        if (token) localStorage.removeItem("token");
+        setToken(null);
+        setUser(null);
+      }
     } finally {
       setLoading(false);
     }
@@ -141,6 +167,7 @@ export function AuthProvider({ children }) {
 
   const logout = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("abes_user");
     setToken(null);
     setUser(null);
   };

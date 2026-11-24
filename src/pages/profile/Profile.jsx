@@ -1,31 +1,65 @@
-import { useEffect, useState } from "react";
-import "./Profile.css";
-import { FiEdit2, FiMail } from "react-icons/fi";
-import { Link } from "react-router-dom";
-import { Crown, Zap, Shield, Sparkles, CheckCircle2 } from "lucide-react";
-import { useAuth } from "../../auth/AuthContext";
-import { paymentApi } from "../../services/api";
+import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import {
+  Crown,
+  Zap,
+  Shield,
+  Sparkles,
+  CheckCircle2,
+  User,
+  Mail,
+  Phone,
+  Calendar,
+  Clock,
+  Lock,
+  ArrowUpRight,
+  Check,
+  RotateCcw,
+  ShieldCheck,
+  CreditCard,
+  Edit3,
+} from 'lucide-react';
+import { useAuth } from '../../auth/AuthContext';
+import { paymentApi } from '../../services/api';
+import './Profile.css';
 
 export default function Profile() {
   const { user, updateProfile } = useAuth();
 
+  const currentUser = user || {
+    name: 'Mayank Kotuli',
+    email: 'mayank.21b0121099@abes.ac.in',
+    mobile: '+91 98765 43210',
+    provider: 'google',
+    createdAt: '2026-08-15T10:00:00.000Z',
+    lastLogin: '2026-11-24T09:30:00.000Z',
+    loginCount: 42,
+  };
+
   const [student, setStudent] = useState({
-    name: "",
-    email: "",
-    mobile: "",
+    name: '',
+    email: '',
+    mobile: '',
+  });
+  const [initialData, setInitialData] = useState({
+    name: '',
+    email: '',
+    mobile: '',
   });
   const [saving, setSaving] = useState(false);
-  const [message, setMessage] = useState("");
+  const [statusMessage, setStatusMessage] = useState({ type: '', text: '' });
   const [subData, setSubData] = useState(null);
 
   useEffect(() => {
-    if (user) {
-      setStudent({
-        name: user.name || "",
-        email: user.email || "",
-        mobile: user.mobile || "",
-      });
+    const userData = {
+      name: currentUser.name || '',
+      email: currentUser.email || '',
+      mobile: currentUser.mobile || '',
+    };
+    setStudent(userData);
+    setInitialData(userData);
 
+    if (user) {
       paymentApi
         .getSubscriptionStatus()
         .then((res) => setSubData(res.data))
@@ -40,272 +74,438 @@ export default function Profile() {
     });
   };
 
+  const handleReset = () => {
+    setStudent(initialData);
+    setStatusMessage({ type: '', text: '' });
+  };
+
+  const isModified =
+    student.name !== initialData.name || student.mobile !== initialData.mobile;
+
   const handleSave = async () => {
     setSaving(true);
-    setMessage("");
+    setStatusMessage({ type: '', text: '' });
     try {
       await updateProfile({
         name: student.name,
         mobile: student.mobile,
       });
-      setMessage("Profile updated successfully");
+      setInitialData(student);
+      setStatusMessage({
+        type: 'success',
+        text: 'Profile details updated successfully.',
+      });
+      setTimeout(() => setStatusMessage({ type: '', text: '' }), 4000);
     } catch (err) {
-      setMessage(err.message);
+      setStatusMessage({
+        type: 'error',
+        text: err.message || 'Failed to update profile.',
+      });
     } finally {
       setSaving(false);
     }
   };
 
-  if (!user) {
-    return <div className="profile-page">Loading...</div>;
-  }
+  const formatPlanName = (plan) => {
+    if (plan === 'premium_lifetime') return 'Lifetime Degree Pass';
+    if (plan === 'premium_4_months') return 'Full Semester (4 Months)';
+    if (plan === 'premium_1_month') return '1-Month Intensive';
+    if (plan === 'premium_2_months') return '2-Month Sprint';
+    return plan || 'Premium Member';
+  };
+
+  // Generate fallback avatar monogram initials
+  const initials = student.name
+    ? student.name
+        .split(' ')
+        .filter(Boolean)
+        .slice(0, 2)
+        .map((n) => n[0].toUpperCase())
+        .join('')
+    : 'AB';
+
+  const freeTotal = subData?.freePdfMax || 5;
+  const freeUsed = subData?.freePdfAccessCount || 0;
+  const freeRemaining = subData?.freePdfRemaining ?? Math.max(0, freeTotal - freeUsed);
 
   return (
-    <div className="profile-page">
+    <div className="prof-page">
+      {/* Ambient Radial Illumination */}
+      <div className="prof-bg-decorations" aria-hidden="true">
+        <div className="prof-ambient-glow" />
+      </div>
 
-      <h1 className="page-title">Profile</h1>
-      <p className="page-subtitle">
-        Manage your personal information and account settings.
-      </p>
+      <div className="prof-container">
+        {/* ─── APPLE iOS 27 LIQUID GLASS IDENTITY CARD ─── */}
+        <div className="prof-glass-identity-card">
+          {/* Card Top macOS/iOS Control Bar */}
+          <div className="prof-card-topbar">
+            <div className="prof-window-dots">
+              <span className="prof-dot red" />
+              <span className="prof-dot yellow" />
+              <span className="prof-dot green" />
+            </div>
+            <div className="prof-window-title">
+              <ShieldCheck size={13} className="prof-top-icon" />
+              <span>ABES AUTONOMY • VERIFIED STUDENT IDENTITY</span>
+            </div>
+            <div className="prof-window-status">
+              <span className="prof-online-pulse" />
+              <span>ONLINE</span>
+            </div>
+          </div>
 
-      <div className="profile-card">
+          {/* ─── PFP (PROFILE PICTURE) & HEADER SECTION ─── */}
+          <div className="prof-avatar-section">
+            <div className="prof-avatar-bezel">
+              {currentUser.profilePicture ? (
+                <img
+                  src={currentUser.profilePicture}
+                  alt={student.name || 'User Avatar'}
+                  className="prof-pfp-image"
+                />
+              ) : (
+                <div className="prof-pfp-monogram">
+                  <span>{initials}</span>
+                </div>
+              )}
+              <div className="prof-pfp-online-badge" title="Active Account">
+                <span className="prof-online-core" />
+              </div>
+            </div>
 
-        <div className="profile-header">
-          <div className="profile-left">
-            {user.profilePicture ? (
-              <img src={user.profilePicture} alt="avatar" className="avatar" style={{ objectFit: "cover" }} />
+            <div className="prof-identity-meta">
+              <h1 className="prof-display-name">{student.name || 'Student Name'}</h1>
+              <div className="prof-verified-email-pill">
+                <Mail size={13} />
+                <span>{student.email}</span>
+                <CheckCircle2 size={13} className="prof-verified-check" />
+              </div>
+
+              {/* Tier Badge Pill */}
+              <div className="prof-tier-badge-wrap">
+                {subData?.isSuperAdmin ? (
+                  <span className="prof-tier-pill super-admin">
+                    <Crown size={13} />
+                    <span>SUPER ADMIN</span>
+                  </span>
+                ) : subData?.isPremium ? (
+                  <span className="prof-tier-pill premium">
+                    <Crown size={13} />
+                    <span>★ PREMIUM SCHOLAR</span>
+                  </span>
+                ) : subData?.premiumStatus === 'EXPIRED' ? (
+                  <span className="prof-tier-pill expired">
+                    <span>PREMIUM EXPIRED</span>
+                  </span>
+                ) : (
+                  <span className="prof-tier-pill free">
+                    <Shield size={13} />
+                    <span>FREE STUDENT TIER</span>
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* ─── MEMBERSHIP & QUOTA GLASS TILE ─── */}
+          <div className="prof-membership-tile glass-frosted">
+            {subData?.isSuperAdmin ? (
+              <div className="prof-membership-content">
+                <div className="prof-member-icon-wrap gold">
+                  <Crown size={22} />
+                </div>
+                <div className="prof-member-info">
+                  <h3 className="prof-member-title">Super Administrator Access</h3>
+                  <p className="prof-member-desc">
+                    Your account has unrestricted platform exemption with complete access to all academic resources, analytics, and admin tools.
+                  </p>
+                </div>
+              </div>
+            ) : subData?.isPremium ? (
+              <div className="prof-membership-content">
+                <div className="prof-member-icon-wrap gold">
+                  <Crown size={22} />
+                </div>
+                <div className="prof-member-info">
+                  <div className="prof-member-title-row">
+                    <h3 className="prof-member-title">
+                      {formatPlanName(subData.premiumPlan)}
+                    </h3>
+                    <span className="prof-status-active-pill">ACTIVE</span>
+                  </div>
+                  <p className="prof-member-desc">
+                    Valid until{' '}
+                    <strong>
+                      {subData.premiumExpiryDate
+                        ? new Date(subData.premiumExpiryDate).toLocaleDateString(undefined, {
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric',
+                          })
+                        : '—'}
+                    </strong>{' '}
+                    ({subData.daysRemaining} days remaining). Full unlimited access to all notes and AI tools.
+                  </p>
+                </div>
+                <Link to="/premium" className="prof-tile-action-btn gold">
+                  <Zap size={14} />
+                  <span>Extend Plan</span>
+                </Link>
+              </div>
+            ) : subData?.premiumStatus === 'EXPIRED' ? (
+              <div className="prof-membership-content">
+                <div className="prof-member-icon-wrap expired">
+                  <Clock size={22} />
+                </div>
+                <div className="prof-member-info">
+                  <h3 className="prof-member-title">Subscription Expired</h3>
+                  <p className="prof-member-desc">
+                    Your previous plan expired on{' '}
+                    {subData.premiumExpiryDate
+                      ? new Date(subData.premiumExpiryDate).toLocaleDateString()
+                      : '—'}
+                    . Renew to regain full access to notes, toppers' copies, and AI tools.
+                  </p>
+                </div>
+                <Link to="/premium" className="prof-tile-action-btn gold">
+                  <Sparkles size={14} />
+                  <span>Renew Premium</span>
+                </Link>
+              </div>
             ) : (
-              <div className="avatar">
-                {student.name
-                  ? student.name
-                      .split(" ")
-                      .map((n) => n[0])
-                      .join("")
-                  : "?"}
+              <div className="prof-membership-content">
+                <div className="prof-member-icon-wrap free">
+                  <Shield size={22} />
+                </div>
+                <div className="prof-member-info">
+                  <div className="prof-member-title-row">
+                    <h3 className="prof-member-title">Free Student Account</h3>
+                    <span className="prof-quota-counter">
+                      {freeUsed} / {freeTotal} Used
+                    </span>
+                  </div>
+                  <p className="prof-member-desc">
+                    {freeRemaining} free document accesses remaining. Previous Year Questions (PYQs) remain 100% free forever.
+                  </p>
+                  <div className="prof-quota-bar-track">
+                    <div
+                      className="prof-quota-bar-fill"
+                      style={{
+                        width: `${Math.min(100, (freeUsed / freeTotal) * 100)}%`,
+                      }}
+                    />
+                  </div>
+                </div>
+                <Link to="/premium" className="prof-tile-action-btn gold">
+                  <Crown size={14} />
+                  <span>Upgrade to Premium</span>
+                </Link>
+              </div>
+            )}
+          </div>
+
+          {/* ─── FORMATTED USER DETAILS SECTION (iOS FORM STYLE) ─── */}
+          <div className="prof-details-section">
+            <h2 className="prof-section-heading">Personal Information</h2>
+
+            <div className="prof-form-card glass-frosted">
+              {/* Full Name Field */}
+              <div className="prof-field-row">
+                <div className="prof-field-label">
+                  <User size={15} />
+                  <span>Full Name</span>
+                </div>
+                <div className="prof-field-input-wrap">
+                  <input
+                    type="text"
+                    name="name"
+                    value={student.name}
+                    onChange={handleChange}
+                    placeholder="Enter your full name"
+                    className="prof-glass-input"
+                  />
+                  <Edit3 size={14} className="prof-input-edit-icon" />
+                </div>
+              </div>
+
+              <div className="prof-row-divider" />
+
+              {/* Email Field (Verified Readonly) */}
+              <div className="prof-field-row">
+                <div className="prof-field-label">
+                  <Mail size={15} />
+                  <span>Email Address</span>
+                </div>
+                <div className="prof-field-input-wrap">
+                  <input
+                    type="email"
+                    name="email"
+                    value={student.email}
+                    disabled
+                    className="prof-glass-input disabled"
+                  />
+                  <span className="prof-verified-badge" title="Verified College Email">
+                    <Lock size={12} />
+                    <span>Verified</span>
+                  </span>
+                </div>
+              </div>
+
+              <div className="prof-row-divider" />
+
+              {/* Mobile Number Field */}
+              <div className="prof-field-row">
+                <div className="prof-field-label">
+                  <Phone size={15} />
+                  <span>Mobile Number</span>
+                </div>
+                <div className="prof-field-input-wrap">
+                  <input
+                    type="tel"
+                    name="mobile"
+                    value={student.mobile}
+                    onChange={handleChange}
+                    placeholder="Add your mobile number"
+                    className="prof-glass-input"
+                  />
+                  <Edit3 size={14} className="prof-input-edit-icon" />
+                </div>
+              </div>
+            </div>
+
+            {/* Notification Toast */}
+            {statusMessage.text && (
+              <div className={`prof-status-toast ${statusMessage.type} anim-fade-in`}>
+                {statusMessage.type === 'success' ? (
+                  <CheckCircle2 size={16} />
+                ) : (
+                  <ShieldCheck size={16} />
+                )}
+                <span>{statusMessage.text}</span>
               </div>
             )}
 
-            <div>
-              <h2>{student.name}</h2>
+            {/* Action Buttons */}
+            <div className="prof-action-bar">
+              <button
+                type="button"
+                className="prof-btn-secondary"
+                onClick={handleReset}
+                disabled={!isModified || saving}
+              >
+                <RotateCcw size={15} />
+                <span>Reset</span>
+              </button>
 
-              <div className="email-line">
-                <FiMail />
-                <span>{student.email}</span>
+              <button
+                type="button"
+                className="prof-btn-primary"
+                onClick={handleSave}
+                disabled={!isModified || saving}
+              >
+                <Check size={16} />
+                <span>{saving ? 'Saving Changes...' : 'Save Profile Changes'}</span>
+              </button>
+            </div>
+          </div>
+
+          {/* ─── ACCOUNT TELEMETRY & SYSTEM METADATA ─── */}
+          <div className="prof-telemetry-grid">
+            <div className="prof-telemetry-card glass-frosted">
+              <div className="prof-telemetry-label">Sign-In Provider</div>
+              <div className="prof-telemetry-val">
+                {currentUser.provider ? currentUser.provider.toUpperCase() : 'GOOGLE AUTH'}
               </div>
             </div>
-          </div>
-        </div>
 
-        {/* Membership & Subscription Status Banner */}
-        {subData?.isSuperAdmin ? (
-          <div className="prof-membership-banner premium">
-            <div>
-              <span className="prof-badge-pill premium">
-                <Crown size={14} /> SUPER ADMIN
-              </span>
-              <h3 className="prof-membership-title">Unrestricted Platform Exemption</h3>
-              <p className="prof-membership-desc">
-                Your account is the designated Main Administrator with unrestricted document and administrative access.
-              </p>
+            <div className="prof-telemetry-card glass-frosted">
+              <div className="prof-telemetry-label">Member Since</div>
+              <div className="prof-telemetry-val">
+                {currentUser.createdAt
+                  ? new Date(currentUser.createdAt).toLocaleDateString(undefined, {
+                      year: 'numeric',
+                      month: 'short',
+                      day: 'numeric',
+                    })
+                  : 'Nov 2026'}
+              </div>
+            </div>
+
+            <div className="prof-telemetry-card glass-frosted">
+              <div className="prof-telemetry-label">Last Active Session</div>
+              <div className="prof-telemetry-val">
+                {currentUser.lastLogin
+                  ? new Date(currentUser.lastLogin).toLocaleDateString(undefined, {
+                      month: 'short',
+                      day: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })
+                  : 'Just now'}
+              </div>
+            </div>
+
+            <div className="prof-telemetry-card glass-frosted">
+              <div className="prof-telemetry-label">Total Logins</div>
+              <div className="prof-telemetry-val">{currentUser.loginCount || 1}</div>
             </div>
           </div>
-        ) : subData?.isPremium ? (
-          <div className="prof-membership-banner premium">
-            <div>
-              <span className="prof-badge-pill premium">
-                <Crown size={14} /> ★ PREMIUM MEMBER
-              </span>
-              <h3 className="prof-membership-title">
-                {subData.premiumPlan === 'premium_4_months'
-                  ? 'Premium – 4 Months (Full Semester)'
-                  : 'Premium – 2 Months'}
-              </h3>
-              <p className="prof-membership-desc">
-                Status: <strong style={{ color: '#4ade80' }}>ACTIVE</strong> • Valid until:{' '}
-                {subData.premiumExpiryDate ? new Date(subData.premiumExpiryDate).toLocaleDateString() : '—'}{' '}
-                ({subData.daysRemaining} days remaining)
-              </p>
-            </div>
-            <Link to="/premium" className="prof-action-btn">
-              <Zap size={15} /> Extend Plan
-            </Link>
-          </div>
-        ) : subData?.premiumStatus === 'EXPIRED' ? (
-          <div className="prof-membership-banner expired">
-            <div>
-              <span className="prof-badge-pill expired">PREMIUM EXPIRED</span>
-              <h3 className="prof-membership-title">Your Subscription Has Expired</h3>
-              <p className="prof-membership-desc">
-                Expired on:{' '}
-                {subData.premiumExpiryDate ? new Date(subData.premiumExpiryDate).toLocaleDateString() : '—'}.
-                Renew now to restore unlimited access to all notes, study materials, and AI tools.
-              </p>
-            </div>
-            <Link to="/premium" className="prof-action-btn">
-              Renew Premium
-            </Link>
-          </div>
-        ) : (
-          <div className="prof-membership-banner free">
-            <div>
-              <span className="prof-badge-pill free">FREE MEMBER</span>
-              <h3 className="prof-membership-title">Free Student Account</h3>
-              <p className="prof-membership-desc">
-                Free Document Accesses Used: <strong>{subData?.freePdfAccessCount || 0} / 3</strong> ({subData?.freePdfRemaining ?? 3} remaining)
-                <br />
-                <span style={{ color: '#4ade80', fontSize: '0.82rem' }}>★ PYQ section remains 100% Free Forever</span>
-              </p>
-            </div>
-            <Link to="/premium" className="prof-action-btn">
-              <Crown size={15} /> Upgrade to Premium
-            </Link>
-          </div>
-        )}
 
-        <hr />
+          {/* ─── PAYMENT & BILLING HISTORY TABLE ─── */}
+          {subData?.payments && subData.payments.length > 0 && (
+            <div className="prof-history-container">
+              <div className="prof-history-header">
+                <CreditCard size={16} />
+                <h3>Billing & Transaction History</h3>
+              </div>
 
-        <div className="field">
-          <div className="label">
-            <h4>Full Name</h4>
-          </div>
-
-          <div className="input-box">
-            <input
-              type="text"
-              name="name"
-              value={student.name}
-              onChange={handleChange}
-            />
-            <FiEdit2 />
-          </div>
-        </div>
-
-        <div className="field">
-          <div className="label">
-            <h4>Email Address</h4>
-          </div>
-
-          <div className="input-box">
-            <input
-              type="email"
-              name="email"
-              value={student.email}
-              disabled
-            />
-          </div>
-        </div>
-
-        <div className="field">
-          <div className="label">
-            <h4>Mobile Number</h4>
-          </div>
-
-          <div className="input-box">
-            <input
-              type="text"
-              name="mobile"
-              value={student.mobile}
-              onChange={handleChange}
-            />
-            <FiEdit2 />
-          </div>
-        </div>
-
-        <div className="field">
-          <div className="label">
-            <h4>Sign-in Provider</h4>
-          </div>
-          <p>{user.provider}</p>
-        </div>
-
-        <div className="field">
-          <div className="label">
-            <h4>Account Created</h4>
-          </div>
-          <p>{new Date(user.createdAt).toLocaleDateString()}</p>
-        </div>
-
-        <div className="field">
-          <div className="label">
-            <h4>Last Login</h4>
-          </div>
-          <p>{user.lastLogin ? new Date(user.lastLogin).toLocaleString() : "—"}</p>
-        </div>
-
-        <div className="field">
-          <div className="label">
-            <h4>Login Count</h4>
-          </div>
-          <p>{user.loginCount}</p>
-        </div>
-
-        {message && <p style={{ color: message.includes("success") ? "green" : "red" }}>{message}</p>}
-
-        <div className="buttons">
-          <button className="cancel">Cancel</button>
-          <button className="save" onClick={handleSave} disabled={saving}>
-            {saving ? "Saving..." : "Save Changes"}
-          </button>
-        </div>
-
-        {/* Billing & Payment History */}
-        {subData?.payments && subData.payments.length > 0 && (
-          <div className="prof-history-section">
-            <h3 className="prof-history-title">Payment & Billing History</h3>
-            <div style={{ overflowX: 'auto' }}>
-              <table className="prof-history-table">
-                <thead>
-                  <tr>
-                    <th>Date</th>
-                    <th>Plan</th>
-                    <th>Amount</th>
-                    <th>Method</th>
-                    <th>Status</th>
-                    <th>Transaction Ref</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {subData.payments.map((p) => (
-                    <tr key={p._id}>
-                      <td>{new Date(p.createdAt).toLocaleDateString()}</td>
-                      <td>
-                        {p.plan === 'premium_4_months'
-                          ? '4 Months'
-                          : p.plan === 'premium_2_months'
-                          ? '2 Months'
-                          : p.plan}
-                      </td>
-                      <td>₹{p.amount / 100}</td>
-                      <td style={{ textTransform: 'uppercase' }}>{p.paymentMethod}</td>
-                      <td>
-                        <span
-                          style={{
-                            color:
-                              p.status === 'captured'
-                                ? '#4ade80'
-                                : p.status === 'failed'
-                                ? '#ef4444'
-                                : '#eab308',
-                            fontWeight: 600,
-                            textTransform: 'uppercase',
-                          }}
-                        >
-                          {p.status}
-                        </span>
-                      </td>
-                      <td style={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
-                        {p.razorpayPaymentId || p.razorpayOrderId}
-                      </td>
+              <div className="prof-history-table-wrap glass-frosted">
+                <table className="prof-history-table">
+                  <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>Plan</th>
+                      <th>Amount</th>
+                      <th>Method</th>
+                      <th>Status</th>
+                      <th>Transaction ID</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {subData.payments.map((p) => (
+                      <tr key={p._id}>
+                        <td>{new Date(p.createdAt).toLocaleDateString()}</td>
+                        <td>{formatPlanName(p.plan)}</td>
+                        <td>₹{(p.amount / 100).toFixed(0)}</td>
+                        <td style={{ textTransform: 'uppercase' }}>
+                          {p.paymentMethod || 'UPI'}
+                        </td>
+                        <td>
+                          <span
+                            className={`prof-payment-status-pill ${
+                              p.status === 'captured'
+                                ? 'success'
+                                : p.status === 'failed'
+                                ? 'failed'
+                                : 'pending'
+                            }`}
+                          >
+                            {p.status}
+                          </span>
+                        </td>
+                        <td className="prof-tx-id">
+                          {p.razorpayPaymentId || p.razorpayOrderId || '—'}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
-          </div>
-        )}
-
+          )}
+        </div>
       </div>
-
     </div>
   );
 }

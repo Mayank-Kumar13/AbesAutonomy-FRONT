@@ -1,6 +1,11 @@
 /**
- * ABES AUTONOMY — PREMIUM LANDING & PRICING LIQUID GLASS STYLES
- * Inspired by modern Apple and Forma AI dark pricing cards.
+ * ABES AUTONOMY — PREMIUM PAGE APPLE iOS 27 LIQUID GLASS STYLES
+ * Inspired by reference media_1795494392296_1458b797.jpg:
+ * - Giant optical background typography "Pricing"
+ * - 3 Floating liquid glass cards with top cylindrical lens refraction
+ * - Circular checkmarks, crisp prices, and highlighted middle card
+ * - Plan comparison specification matrix
+ * - Liquid glass interactive FAQ accordion
  */
 
 .prem-page {
@@ -8,11 +13,12 @@
   background-color: var(--bg-canvas, #060709);
   color: var(--text-primary, #F5F5F7);
   font-family: var(--font-family-sans);
-  padding: 130px 24px 120px;
+  padding: 120px 24px 120px;
   position: relative;
-  overflow: hidden;
+  overflow-x: hidden;
 }
 
+/* ─── AMBIENT LIGHTING DECORATIONS ─── */
 .prem-bg-decorations {
   position: absolute;
   inset: 0;
@@ -23,329 +29,488 @@
 
 .prem-orb-1 {
   position: absolute;
-  top: -80px;
+  top: -120px;
   left: 50%;
   transform: translateX(-50%);
-  width: 700px;
-  height: 400px;
-  background: radial-gradient(ellipse at 50% 0%, rgba(197, 172, 134, 0.09) 0%, rgba(56, 189, 248, 0.03) 40%, transparent 70%);
+  width: 900px;
+  height: 520px;
+  background: radial-gradient(ellipse at 50% 0%, rgba(197, 172, 134, 0.12) 0%, rgba(56, 189, 248, 0.04) 40%, transparent 70%);
+}
+
+.prem-orb-2 {
+  position: absolute;
+  top: 450px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 1200px;
+  height: 600px;
+  background: radial-gradient(ellipse at 50% 50%, rgba(255, 255, 255, 0.03) 0%, transparent 60%);
+}
+
+.prem-orb-caustic {
+  position: absolute;
+  top: 180px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 750px;
+  height: 280px;
+  background: radial-gradient(ellipse at 50% 50%, rgba(223, 202, 170, 0.07) 0%, transparent 65%);
+  filter: blur(40px);
 }
 
 .prem-container {
-  max-width: 1080px;
+  max-width: 1140px;
   margin: 0 auto;
   position: relative;
   z-index: 1;
 }
 
-/* ─── HERO ─── */
-.prem-hero {
+/* ─── TOP HERO HEADER ─── */
+.prem-hero-header {
   text-align: center;
-  max-width: 720px;
-  margin: 0 auto 56px;
+  max-width: 760px;
+  margin: 0 auto 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .prem-badge {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: rgba(197, 172, 134, 0.10);
-  border: 1px solid rgba(197, 172, 134, 0.22);
-  color: var(--brand-gold, #C5AC86);
-  padding: 5px 16px;
+  padding: 6px 18px;
   border-radius: var(--radius-pill, 9999px);
-  font-size: 11px;
+  font-size: 11.5px;
   font-weight: 700;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  margin-bottom: 20px;
+  color: var(--brand-gold-light, #DFCAAA);
+  margin-bottom: 14px;
 }
 
-.prem-heading {
-  font-size: clamp(34px, 5.5vw, 56px);
-  font-weight: 750;
-  color: #FFFFFF;
-  margin: 0 0 18px 0;
-  line-height: 1.1;
-  letter-spacing: -0.035em;
+.prem-badge-icon {
+  color: var(--brand-gold, #C5AC86);
 }
 
-.prem-heading span {
-  background: linear-gradient(180deg, #FFFFFF 0%, #DFCAAA 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.prem-description {
-  font-size: clamp(15px, 1.6vw, 17.5px);
+.prem-subtitle-lead {
+  font-size: clamp(15px, 1.8vw, 17px);
   color: var(--text-secondary, #A1A1A6);
-  line-height: 1.6;
-  margin: 0 0 24px 0;
+  line-height: 1.55;
+  margin: 0 0 16px 0;
 }
 
 .prem-pyq-banner {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: rgba(48, 209, 88, 0.08);
-  border: 1px solid rgba(48, 209, 88, 0.22);
-  color: #A3E7B7;
-  padding: 8px 18px;
+  padding: 7px 18px;
   border-radius: var(--radius-pill, 9999px);
-  font-size: 13.5px;
+  font-size: 13px;
   font-weight: 600;
+  color: #A3E7B7;
+  border-color: rgba(48, 209, 88, 0.3);
+  background: rgba(48, 209, 88, 0.08);
 }
 
-/* ─── PRICING CARDS GRID (FORMA AI / APPLE STYLE) ─── */
-.prem-pricing-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 24px;
-  margin-bottom: 70px;
-  max-width: 900px;
-  margin-left: auto;
-  margin-right: auto;
+.prem-error-alert {
+  margin-top: 18px;
+  color: #FCA5A5;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  padding: 10px 20px;
+  border-radius: 12px;
+  font-size: 13.5px;
 }
 
-.prem-plan-card {
-  background: rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(32px) saturate(200%) brightness(1.10);
-  -webkit-backdrop-filter: blur(32px) saturate(200%) brightness(1.10);
-  border: 1px solid rgba(255, 255, 255, 0.38);
-  border-radius: var(--radius-xl, 26px);
-  padding: 38px 32px;
+/* ─── OPTICAL PRICING SHOWCASE WITH GIANT 'PRICING' BACKDROP ─── */
+.prem-pricing-showcase {
   position: relative;
-  display: flex;
-  flex-direction: column;
+  margin-top: 20px;
+  margin-bottom: 84px;
+}
+
+/* Giant Bold Typography "Pricing" Sitting Behind Cards */
+.prem-bg-pricing-text {
+  position: absolute;
+  top: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: clamp(90px, 16vw, 195px);
+  font-weight: 850;
+  line-height: 0.85;
+  letter-spacing: -0.04em;
+  color: #FFFFFF;
+  opacity: 0.96;
+  text-align: center;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 1;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* 3 Floating Liquid Glass Cards Grid */
+.prem-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  position: relative;
+  z-index: 2;
+  align-items: stretch;
+  padding-top: 90px; /* Allows the top of 'Pricing' to peek out boldly behind the cards */
+}
+
+/* ─── LIQUID GLASS CARD CONTAINER ─── */
+.prem-glass-card {
+  position: relative;
+  background: rgba(255, 255, 255, 0.055);
+  backdrop-filter: blur(28px) saturate(200%) brightness(1.08);
+  -webkit-backdrop-filter: blur(28px) saturate(200%) brightness(1.08);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 28px;
   box-shadow: 
-    0 24px 60px -12px rgba(0, 0, 0, 0.45),
+    0 30px 70px -15px rgba(0, 0, 0, 0.65),
     inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.90),
     inset 0 -1px 0.5px rgba(255, 255, 255, 0.20),
-    0 0 20px rgba(255, 255, 255, 0.10) inset;
+    0 0 24px rgba(255, 255, 255, 0.08) inset;
+  transition: transform 280ms cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 280ms ease,
+              box-shadow 280ms ease;
   overflow: hidden;
-  transition: all var(--duration-normal, 260ms) var(--ease-apple);
+  display: flex;
+  flex-direction: column;
 }
 
-.prem-plan-card::before {
-  content: '';
+.prem-glass-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(255, 255, 255, 0.45);
+  box-shadow: 
+    0 36px 85px -12px rgba(0, 0, 0, 0.75),
+    inset 0 2px 1.5px 0 #FFFFFF,
+    0 0 32px rgba(255, 255, 255, 0.12) inset;
+}
+
+/* ─── CYLINDRICAL OPTICAL REFRACTION MENISCUS LENS ─── */
+/* Creates the curved optical lens refraction at the top edge of each card */
+.prem-card-refraction-lens {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+  height: 120px;
   pointer-events: none;
-}
-
-.prem-plan-card:hover {
-  transform: translateY(-4px);
-  border-color: rgba(255, 255, 255, 0.20);
-  box-shadow: 0 24px 60px -10px rgba(0, 0, 0, 0.8), 0 0 24px rgba(255, 255, 255, 0.04);
-}
-
-/* Recommended Tier with glowing border catch (Forma AI style) */
-.prem-plan-card.best-value {
-  border-color: rgba(56, 189, 248, 0.45);
+  z-index: 1;
+  background: radial-gradient(ellipse 120% 70% at 50% 0%, rgba(255, 255, 255, 0.26) 0%, rgba(255, 255, 255, 0.06) 45%, transparent 100%);
+  border-top-left-radius: inherit;
+  border-top-right-radius: inherit;
   box-shadow: 
-    0 0 0 1px rgba(56, 189, 248, 0.35),
-    0 24px 60px -12px rgba(0, 0, 0, 0.85),
-    0 0 35px -5px rgba(56, 189, 248, 0.22),
-    inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.35),
-    inset 0 0 24px rgba(56, 189, 248, 0.08);
+    inset 0 2px 1.5px rgba(255, 255, 255, 0.95),
+    inset 0 8px 24px -6px rgba(255, 255, 255, 0.22);
 }
 
-.prem-plan-card.best-value:hover {
-  border-color: rgba(56, 189, 248, 0.65);
-  box-shadow: 
-    0 0 0 1px rgba(56, 189, 248, 0.5),
-    0 28px 70px -10px rgba(0, 0, 0, 0.9),
-    0 0 45px -5px rgba(56, 189, 248, 0.32),
-    inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.45),
-    inset 0 0 30px rgba(56, 189, 248, 0.12);
-}
-
-.prem-best-tag {
+.prem-lens-caustic {
   position: absolute;
-  top: -12px;
-  right: 28px;
-  background: linear-gradient(180deg, #DFCAAA 0%, #C5AC86 100%);
+  top: 0;
+  left: 10%;
+  right: 10%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent 0%, rgba(56, 189, 248, 0.3) 25%, #FFFFFF 50%, rgba(223, 202, 170, 0.4) 75%, transparent 100%);
+  opacity: 0.85;
+}
+
+/* ─── HIGHLIGHTED / MOST POPULAR MIDDLE CARD ─── */
+.prem-glass-card.featured-popular {
+  border-color: rgba(223, 202, 170, 0.65);
+  background: rgba(255, 255, 255, 0.075);
+  box-shadow: 
+    0 36px 85px -12px rgba(0, 0, 0, 0.8),
+    0 0 45px -8px rgba(197, 172, 134, 0.28),
+    inset 0 2px 1.5px 0 #FFFFFF,
+    inset 0 0 28px rgba(223, 202, 170, 0.12);
+  transform: translateY(-4px);
+}
+
+.prem-glass-card.featured-popular:hover {
+  transform: translateY(-10px);
+  border-color: rgba(255, 255, 255, 0.85);
+  box-shadow: 
+    0 44px 100px -10px rgba(0, 0, 0, 0.9),
+    0 0 60px -5px rgba(223, 202, 170, 0.4),
+    inset 0 2px 1.5px 0 #FFFFFF;
+}
+
+/* Featured Ribbon Badge */
+.prem-featured-ribbon {
+  position: absolute;
+  top: 14px;
+  right: 18px;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, #DFCAAA 0%, #C5AC86 100%);
   color: #0A0C10;
-  font-size: 11px;
+  font-size: 10.5px;
   font-weight: 750;
-  padding: 4px 14px;
-  border-radius: var(--radius-pill, 9999px);
   letter-spacing: 0.08em;
-  text-transform: uppercase;
-  box-shadow: 0 4px 14px rgba(197, 172, 134, 0.35);
+  padding: 4px 12px;
+  border-radius: var(--radius-pill, 9999px);
+  box-shadow: 0 4px 14px rgba(197, 172, 134, 0.45);
 }
 
-.prem-card-header {
-  margin-bottom: 20px;
+.prem-featured-ribbon.lifetime {
+  background: linear-gradient(135deg, #FFFFFF 0%, #DFCAAA 100%);
+  box-shadow: 0 4px 14px rgba(255, 255, 255, 0.35);
 }
 
-.prem-plan-title {
-  font-size: 22px;
-  font-weight: 700;
+/* ─── CARD INNER CONTENT ─── */
+.prem-card-inner {
+  position: relative;
+  z-index: 2;
+  padding: 34px 28px 32px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.prem-card-top {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.prem-plan-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.prem-plan-label {
+  font-size: 21px;
+  font-weight: 750;
   color: #FFFFFF;
-  margin: 0 0 6px 0;
   letter-spacing: -0.015em;
 }
 
-.prem-plan-sub {
-  font-size: 14px;
-  color: var(--text-secondary, #A1A1A6);
-  margin: 0;
+.prem-plan-label.featured {
+  color: #FFFFFF;
 }
 
-.prem-card-price-wrap {
+.prem-plan-sub {
+  font-size: 13.5px;
+  color: var(--text-secondary, #A1A1A6);
+}
+
+/* Price Block (Large Bold Display) */
+.prem-price-block {
   display: flex;
   align-items: baseline;
-  gap: 6px;
-  margin-bottom: 6px;
+  gap: 4px;
+  margin-top: 4px;
 }
 
-.prem-currency {
-  font-size: 24px;
-  font-weight: 700;
-  color: var(--brand-gold, #C5AC86);
-}
-
-.prem-amount {
-  font-size: 50px;
-  font-weight: 800;
+.prem-price-num {
+  font-size: clamp(38px, 4vw, 48px);
+  font-weight: 850;
   color: #FFFFFF;
+  letter-spacing: -0.035em;
   line-height: 1;
-  letter-spacing: -0.03em;
 }
 
-.prem-billing-term {
-  font-size: 14px;
-  color: var(--text-secondary, #A1A1A6);
-  font-weight: 500;
+.prem-price-num.featured {
+  background: linear-gradient(180deg, #FFFFFF 0%, #DFCAAA 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
-.prem-one-time-badge {
-  display: inline-block;
-  background: rgba(255, 255, 255, 0.05);
-  color: var(--text-secondary, #A1A1A6);
-  font-size: 11.5px;
+.prem-price-period {
+  font-size: 15px;
   font-weight: 600;
-  padding: 3px 10px;
-  border-radius: var(--radius-pill, 9999px);
-  margin-bottom: 24px;
-  width: fit-content;
+  color: var(--text-secondary, #A1A1A6);
 }
 
-.prem-features-list {
+/* Hairline Divider */
+.prem-divider {
+  height: 1px;
+  width: 100%;
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.22) 30%, rgba(255, 255, 255, 0.22) 70%, transparent 100%);
+  margin: 22px 0 24px;
+}
+
+.prem-divider.featured {
+  background: linear-gradient(90deg, transparent 0%, rgba(223, 202, 170, 0.45) 50%, transparent 100%);
+}
+
+/* Feature Checklist with Sleek Circular Icons */
+.prem-feature-checklist {
   list-style: none;
   padding: 0;
   margin: 0 0 32px 0;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 15px;
   flex: 1;
 }
 
-.prem-feature-item {
+.prem-feature-checklist li {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 12px;
-  font-size: 14px;
+  font-size: 13.5px;
+  line-height: 1.45;
   color: var(--text-primary, #F5F5F7);
 }
 
-.prem-check-icon {
-  width: 18px;
-  height: 18px;
+.prem-feature-checklist li.featured-item {
+  color: #FFFFFF;
+}
+
+/* Circular Checkmark Icon */
+.prem-check-circle {
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
-  background: rgba(48, 209, 88, 0.12);
-  color: var(--status-success, #30D158);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.35);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  color: #FFFFFF;
+  margin-top: 1px;
 }
 
-.prem-cta-btn {
+.prem-check-circle.featured {
+  background: rgba(197, 172, 134, 0.18);
+  border-color: rgba(223, 202, 170, 0.6);
+  color: #DFCAAA;
+}
+
+/* ─── BOTTOM CTA BUTTONS ─── */
+.prem-card-cta-btn {
   width: 100%;
-  padding: 13px 24px;
+  padding: 13px 20px;
   border-radius: var(--radius-pill, 9999px);
   font-family: var(--font-family-sans);
-  font-size: 15px;
-  font-weight: 600;
+  font-size: 14.5px;
+  font-weight: 650;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  transition: all var(--duration-fast, 160ms) var(--ease-apple);
+  transition: all 200ms cubic-bezier(0.16, 1, 0.3, 1);
+  text-decoration: none;
+  border: none;
 }
 
-.prem-cta-btn.gold {
-  background: rgba(255, 255, 255, 0.18);
-  backdrop-filter: blur(20px) saturate(180%) brightness(1.12);
-  -webkit-backdrop-filter: blur(20px) saturate(180%) brightness(1.12);
-  color: #FFFFFF !important;
-  -webkit-text-fill-color: #FFFFFF !important;
-  border: 1px solid rgba(255, 255, 255, 0.65);
-  box-shadow: 
-    inset 0 1.5px 1px 0 #FFFFFF,
-    inset 0 -1px 0.5px rgba(255, 255, 255, 0.25),
-    0 4px 16px rgba(0, 0, 0, 0.35),
-    0 0 14px rgba(255, 255, 255, 0.15) inset;
-}
-
-.prem-cta-btn.gold:hover {
-  background: rgba(255, 255, 255, 0.30);
-  border-color: #FFFFFF;
-  transform: translateY(-1px);
-  box-shadow: 
-    inset 0 1.5px 1px 0 #FFFFFF,
-    0 0 24px rgba(255, 255, 255, 0.40),
-    0 8px 24px rgba(0, 0, 0, 0.40);
-}
-
-.prem-cta-btn.gold:active {
-  transform: translateY(0.5px) scale(0.96);
-  transition-duration: 0.05s;
-}
-
-.prem-cta-btn.secondary {
-  background: rgba(255, 255, 255, 0.05);
-  color: #F5F5F7;
-  border: 1px solid rgba(255, 255, 255, 0.10);
-}
-
-.prem-cta-btn.secondary:hover {
-  background: rgba(255, 255, 255, 0.10);
-  border-color: rgba(255, 255, 255, 0.20);
+/* Glass Outline Pill (Outer Cards) */
+.prem-card-cta-btn.glass-outline {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.35);
   color: #FFFFFF;
+  box-shadow: 
+    inset 0 1px 0.5px rgba(255, 255, 255, 0.7),
+    0 4px 16px rgba(0, 0, 0, 0.25);
 }
 
-.prem-cta-btn.secondary:active {
-  transform: translateY(0.5px) scale(0.96);
-  transition-duration: 0.05s;
+.prem-card-cta-btn.glass-outline:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.65);
+  box-shadow: 
+    inset 0 1.5px 1px #FFFFFF,
+    0 8px 24px rgba(0, 0, 0, 0.35),
+    0 0 16px rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
 }
 
-/* ─── COMPARISON & FAQ SECTIONS ─── */
-.prem-comparison-section,
-.prem-faq-section {
-  margin-top: 120px;
-  scroll-margin-top: 130px;
-  padding-top: 32px;
+/* Solid Bright Glow Pill (Middle Card) */
+.prem-card-cta-btn.featured-solid {
+  background: #FFFFFF;
+  color: #060709 !important;
+  -webkit-text-fill-color: #060709 !important;
+  font-weight: 750;
+  box-shadow: 
+    0 6px 24px rgba(255, 255, 255, 0.35),
+    0 0 20px rgba(223, 202, 170, 0.4);
+}
+
+.prem-card-cta-btn.featured-solid:hover:not(:disabled) {
+  background: #DFCAAA;
+  box-shadow: 
+    0 8px 30px rgba(223, 202, 170, 0.6),
+    0 0 28px rgba(255, 255, 255, 0.5);
+  transform: translateY(-2px);
+}
+
+.prem-card-cta-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* ─── BOTTOM BILLING TOGGLE PILL ─── */
+.prem-billing-toggle-pill {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: fit-content;
+  margin: 36px auto 0;
+  padding: 8px 24px;
+  border-radius: var(--radius-pill, 9999px);
+  font-size: 13px;
+  font-weight: 550;
+  color: var(--text-secondary, #A1A1A6);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+}
+
+.prem-toggle-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #30D158;
+  box-shadow: 0 0 10px #30D158;
+  display: inline-block;
+}
+
+/* ─── PLAN COMPARISON SECTION ─── */
+.prem-comparison-section {
+  margin-bottom: 96px;
 }
 
 .prem-section-header {
   text-align: center;
-  margin-bottom: 40px;
+  max-width: 680px;
+  margin: 0 auto 36px;
+}
+
+.prem-section-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--brand-gold, #C5AC86);
+  background: rgba(197, 172, 134, 0.12);
+  border: 1px solid rgba(197, 172, 134, 0.25);
+  padding: 4px 14px;
+  border-radius: var(--radius-pill, 9999px);
+  margin-bottom: 12px;
 }
 
 .prem-section-title {
-  font-size: clamp(26px, 3.5vw, 36px);
-  font-weight: 700;
+  font-size: clamp(28px, 4vw, 40px);
+  font-weight: 750;
+  letter-spacing: -0.025em;
   color: #FFFFFF;
-  margin: 0 0 10px 0;
-  letter-spacing: -0.03em;
+  margin: 0 0 8px 0;
 }
 
 .prem-section-sub {
@@ -354,175 +519,260 @@
   margin: 0;
 }
 
-/* ─── COMPARISON TABLE WRAPPER (APPLE FROSTED GLASS) ─── */
+/* Liquid Glass Comparison Table */
 .prem-comparison-table-wrap {
-  border-radius: var(--radius-xl, 24px);
-  overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(12, 15, 22, 0.85);
-  backdrop-filter: blur(28px) saturate(180%);
-  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  border-radius: 24px;
+  overflow-x: auto;
+  border: 1px solid rgba(255, 255, 255, 0.32);
   box-shadow: 
-    0 0 0 1px rgba(0, 0, 0, 0.65),
-    0 20px 48px -10px rgba(0, 0, 0, 0.75),
-    inset 0 1px 0.5px rgba(255, 255, 255, 0.22);
+    0 24px 60px -12px rgba(0, 0, 0, 0.55),
+    inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.85);
 }
 
 .prem-table {
   width: 100%;
   border-collapse: collapse;
+  text-align: center;
+  min-width: 720px;
 }
 
 .prem-table th,
 .prem-table td {
-  padding: 18px 24px;
-  text-align: left;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
-  font-size: 14.5px;
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 14px;
 }
 
 .prem-table th {
   background: rgba(255, 255, 255, 0.04);
-  font-weight: 600;
+  font-weight: 700;
   color: #FFFFFF;
-  letter-spacing: -0.01em;
-  font-size: 14px;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+  font-size: 14.5px;
 }
 
-.prem-table tbody tr {
-  transition: background var(--duration-fast, 160ms) ease;
-}
-
-.prem-table tbody tr:hover {
-  background: rgba(255, 255, 255, 0.03);
-}
-
-.prem-table tbody tr:last-child td {
-  border-bottom: none;
-}
-
-/* Status Badges */
-.prem-status-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 12px;
-  border-radius: var(--radius-pill, 9999px);
-  font-size: 12.5px;
+.prem-th-feature,
+.prem-td-feature {
+  text-align: left;
   font-weight: 600;
-  letter-spacing: -0.01em;
+  color: var(--text-primary, #F5F5F7);
+  width: 28%;
 }
 
-.prem-status-pill.success {
-  background: rgba(48, 209, 88, 0.12);
-  border: 1px solid rgba(48, 209, 88, 0.28);
-  color: #30D158;
+.prem-th-highlight,
+.prem-td-highlight {
+  background: rgba(197, 172, 134, 0.07);
+  border-left: 1px solid rgba(197, 172, 134, 0.2);
+  border-right: 1px solid rgba(197, 172, 134, 0.2);
 }
 
-.prem-status-pill.gold {
-  background: rgba(197, 172, 134, 0.14);
-  border: 1px solid rgba(197, 172, 134, 0.30);
-  color: var(--brand-gold, #C5AC86);
-}
-
-.prem-status-pill.locked {
-  background: rgba(255, 69, 58, 0.12);
-  border: 1px solid rgba(255, 69, 58, 0.25);
-  color: #FF453A;
+.prem-status-dim {
+  color: var(--text-tertiary, #6E6E73);
+  font-size: 13px;
 }
 
 .prem-status-text {
-  color: var(--text-secondary, #A1A1A6);
-  font-size: 14px;
+  color: var(--text-primary, #F5F5F7);
+  font-size: 13.5px;
 }
 
-/* ─── FAQ ACCORDION GRID (APPLE CLEAR GLASS) ─── */
+.prem-status-text.bold {
+  font-weight: 700;
+  color: #FFFFFF;
+}
+
+.prem-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 12px;
+  border-radius: var(--radius-pill, 9999px);
+  font-size: 12px;
+  font-weight: 650;
+  letter-spacing: 0.02em;
+}
+
+.prem-pill.success {
+  background: rgba(48, 209, 88, 0.14);
+  border: 1px solid rgba(48, 209, 88, 0.35);
+  color: #A3E7B7;
+}
+
+.prem-pill.gold {
+  background: rgba(197, 172, 134, 0.16);
+  border: 1px solid rgba(223, 202, 170, 0.4);
+  color: #DFCAAA;
+}
+
+.prem-pill.locked {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: var(--text-tertiary, #6E6E73);
+}
+
+/* ─── RELEVANT FAQS ACCORDION ─── */
+.prem-faq-section {
+  margin-bottom: 84px;
+}
+
 .prem-faq-grid {
+  max-width: 860px;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
   gap: 14px;
-  max-width: 820px;
-  margin: 0 auto;
 }
 
 .prem-faq-item {
-  border-radius: var(--radius-lg, 20px);
+  border-radius: 18px;
   overflow: hidden;
-  background: rgba(14, 17, 24, 0.82);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  backdrop-filter: blur(28px) saturate(180%);
-  -webkit-backdrop-filter: blur(28px) saturate(180%);
-  box-shadow: 
-    0 0 0 1px rgba(0, 0, 0, 0.6),
-    0 8px 24px -4px rgba(0, 0, 0, 0.5),
-    inset 0 1px 0 rgba(255, 255, 255, 0.18);
-  transition: all var(--duration-normal, 260ms) var(--ease-apple);
+  transition: all 240ms ease;
 }
 
-.prem-faq-item:hover,
 .prem-faq-item.is-open {
-  background: rgba(20, 25, 36, 0.92);
-  border-color: rgba(223, 202, 170, 0.35);
+  border-color: rgba(255, 255, 255, 0.5);
   box-shadow: 
-    0 0 0 1px rgba(0, 0, 0, 0.7),
-    0 12px 32px rgba(0, 0, 0, 0.6),
-    0 0 24px rgba(197, 172, 134, 0.15),
-    inset 0 1px 0 rgba(255, 255, 255, 0.28);
+    0 16px 36px -8px rgba(0, 0, 0, 0.4),
+    inset 0 1.5px 0.5px 0 #FFFFFF;
 }
 
 .prem-faq-question {
   width: 100%;
   padding: 20px 24px;
+  background: transparent;
+  border: none;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  font-family: var(--font-family-sans);
-  font-weight: 600;
-  font-size: 16px;
-  color: #FFFFFF;
   text-align: left;
-  letter-spacing: -0.01em;
-  transition: color var(--duration-fast, 160ms) ease;
+  cursor: pointer;
+  color: #FFFFFF;
+  font-family: var(--font-family-sans);
+  font-size: 15.5px;
+  font-weight: 650;
+  gap: 16px;
 }
 
-.prem-faq-question:hover {
-  color: var(--brand-gold, #C5AC86);
+.prem-faq-q-text {
+  flex: 1;
 }
 
-.faq-chevron {
-  color: var(--brand-gold, #C5AC86);
+.prem-faq-chevron-wrap {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary, #A1A1A6);
+  transition: all 200ms ease;
   flex-shrink: 0;
-  transition: transform var(--duration-fast, 160ms) var(--ease-apple);
+}
+
+.prem-faq-chevron-wrap.active {
+  background: rgba(223, 202, 170, 0.2);
+  border-color: rgba(223, 202, 170, 0.5);
+  color: #DFCAAA;
 }
 
 .prem-faq-answer {
   padding: 0 24px 22px;
-  font-size: 14.5px;
-  line-height: 1.65;
   color: var(--text-secondary, #A1A1A6);
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
-  margin-top: -4px;
-  padding-top: 14px;
+  font-size: 14.5px;
+  line-height: 1.6;
+  animation: premFadeIn 200ms ease forwards;
 }
 
-/* ─── RESPONSIVE ─── */
-@media (max-width: 800px) {
-  .prem-page {
-    padding: 105px 16px 80px;
-  }
+.prem-faq-answer p {
+  margin: 0;
+}
 
-  .prem-pricing-grid {
+@keyframes premFadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── TRUST & SECURITY FOOTER ─── */
+.prem-trust-footer {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 16px 28px;
+  border-radius: var(--radius-pill, 9999px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  font-size: 13px;
+  color: var(--text-secondary, #A1A1A6);
+  font-weight: 550;
+}
+
+.prem-trust-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.prem-trust-item svg {
+  color: var(--brand-gold, #C5AC86);
+}
+
+.prem-trust-sep {
+  color: rgba(255, 255, 255, 0.25);
+}
+
+/* ─── RESPONSIVE BREAKPOINTS ─── */
+@media (max-width: 980px) {
+  .prem-cards-grid {
     grid-template-columns: 1fr;
+    max-width: 480px;
+    margin: 0 auto;
+    padding-top: 60px;
   }
 
-  .prem-table th,
-  .prem-table td {
-    padding: 14px 16px;
-    font-size: 13.5px;
+  .prem-bg-pricing-text {
+    font-size: clamp(60px, 14vw, 120px);
+    top: -15px;
+  }
+
+  .prem-glass-card.featured-popular {
+    transform: none;
+    order: -1; /* Puts the featured plan first on tablet/mobile */
+  }
+
+  .prem-glass-card.featured-popular:hover {
+    transform: translateY(-4px);
+  }
+}
+
+@media (max-width: 640px) {
+  .prem-page {
+    padding: 100px 16px 80px;
+  }
+
+  .prem-card-inner {
+    padding: 28px 20px 24px;
+  }
+
+  .prem-price-num {
+    font-size: 38px;
+  }
+
+  .prem-billing-toggle-pill {
+    padding: 8px 16px;
+    font-size: 12px;
+    text-align: center;
+  }
+
+  .prem-trust-footer {
+    border-radius: 18px;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .prem-trust-sep {
+    display: none;
   }
 }

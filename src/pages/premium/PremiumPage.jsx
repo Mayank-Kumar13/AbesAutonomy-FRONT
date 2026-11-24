@@ -15,6 +15,10 @@ import {
   BookOpen,
   Bot,
   Lock,
+  ArrowRight,
+  Infinity as InfinityIcon,
+  HelpCircle,
+  Award,
 } from 'lucide-react';
 import './PremiumPage.css';
 
@@ -76,256 +80,410 @@ export default function PremiumPage() {
   const faqs = [
     {
       q: 'Are Previous Year Questions (PYQs) really free forever?',
-      a: 'Yes! All PYQs are 100% free forever for every student, whether you have a free or premium account. PYQ views never count against your free document limit.',
+      a: 'Yes, absolutely! All PYQs and solution hints are 100% free forever for every student, whether you have a free or premium account. PYQ views never count against your free document limit.',
     },
     {
       q: 'How does the 5-free-document system work?',
-      a: 'As a free student, your first 5 eligible premium document accesses are free of cost. Once you access a document, you can revisit and re-read it as many times as you like without consuming additional credits.',
+      a: 'As a free student, your first 5 eligible premium document accesses are completely free of cost. Once you access a document, you can revisit and re-read it as many times as you like without consuming additional credits.',
+    },
+    {
+      q: 'What is included in the ₹499 Lifetime Access Plan?',
+      a: 'The Lifetime Plan grants you permanent, unrestricted access across all 8 semesters for your entire degree tenure. There are zero recurring renewals or annual maintenance fees.',
     },
     {
       q: 'Which payment methods are accepted?',
-      a: 'We accept all major UPI apps (Google Pay, PhonePe, Paytm, BHIM, CRED), debit/credit cards, and netbanking through our official Razorpay integration.',
+      a: 'We accept all major UPI apps (Google Pay, PhonePe, Paytm, BHIM, CRED), debit/credit cards, and netbanking securely through our official Razorpay payment gateway.',
     },
     {
-      q: 'Will my subscription renew automatically?',
-      a: 'No! All subscriptions are strictly one-time payments. You will never be charged automatically. When your subscription ends, your account simply returns to free status.',
+      q: 'Will my subscription renew automatically or deduct money?',
+      a: 'No! All subscriptions on ABES Autonomy are strictly one-time payments. You will never be charged automatically. When your subscription ends, your account simply returns to free status without penalty.',
     },
     {
       q: 'Can I extend my plan before it expires?',
-      a: 'Yes! If you purchase a plan while you already have an active subscription, your validity is automatically extended from your current expiry date.',
+      a: 'Yes! If you purchase a plan while you already have an active subscription, your validity is automatically extended from your current expiry date without losing a single day.',
     },
     {
       q: 'Are AI study features included in Premium?',
-      a: 'Yes, all AI Academic Assistant features and upcoming AI learning integrations are fully included in both Premium plans at no extra charge.',
+      a: 'Yes! All AI Academic Assistant features, instant doubt-solving, summarization, and upcoming AI study tools are fully included in all Premium plans at no extra charge.',
     },
   ];
 
   return (
     <div className="prem-page">
+      {/* Ambient Canvas Lighting */}
       <div className="prem-bg-decorations" aria-hidden="true">
         <div className="prem-glow-orb prem-orb-1" />
         <div className="prem-glow-orb prem-orb-2" />
+        <div className="prem-glow-orb prem-orb-caustic" />
       </div>
 
       <div className="prem-container">
-        {/* Hero Section */}
-        <section className="prem-hero">
-          <div className="prem-badge">
-            <Crown size={15} />
-            <span>ABES Autonomy Premium</span>
+        {/* Top Header Badge & Tagline */}
+        <div className="prem-hero-header">
+          <div className="prem-badge glass-clear">
+            <Crown size={14} className="prem-badge-icon" />
+            <span>ABES AUTONOMY PREMIUM</span>
           </div>
 
-          <h1 className="prem-heading">
-            Unlock Your Full <span>Learning Potential</span>
-          </h1>
-
-          <p className="prem-description">
-            Get unlimited access to ABES Autonomy’s academic resources, verified semester notes,
-            question banks, and AI-powered learning experience.
+          <p className="prem-subtitle-lead">
+            Transparent, student-first academic access designed for ABES engineering excellence.
           </p>
 
-          <div className="prem-pyq-banner">
-            <Sparkles size={16} />
-            <span>PYQ Section is 100% FREE FOREVER for all students — No subscription required!</span>
+          <div className="prem-pyq-banner glass-clear">
+            <Sparkles size={15} />
+            <span>PYQ Section is 100% Free Forever for all students — No subscription required!</span>
           </div>
 
           {error && (
-            <div style={{ marginTop: '1.5rem', color: '#fca5a5', background: 'rgba(239, 68, 68, 0.12)', border: '1px solid rgba(239, 68, 68, 0.3)', padding: '10px 16px', borderRadius: '10px' }}>
+            <div className="prem-error-alert glass-clear">
               {error}
             </div>
           )}
-        </section>
+        </div>
 
-        {/* Pricing Cards Grid */}
-        <section className="prem-pricing-grid">
-          {/* Plan 1: 2 Months */}
-          <div className="prem-plan-card">
-            <div className="prem-card-header">
-              <h3 className="prem-plan-title">Premium – 2 Months</h3>
-              <p className="prem-plan-sub">Ideal for mid-term exams & quick revisions</p>
-            </div>
-
-            <div className="prem-card-price-wrap">
-              <span className="prem-currency">₹</span>
-              <span className="prem-amount">100</span>
-              <span className="prem-billing-term">/ 60 Days</span>
-            </div>
-
-            <div className="prem-one-time-badge">One-time payment • No auto-renewal</div>
-
-            <ul className="prem-features-list">
-              <li>
-                <Check size={18} color="#C5AC86" />
-                <span>Unlimited access to all subject notes & theory PDFs</span>
-              </li>
-              <li>
-                <Check size={18} color="#C5AC86" />
-                <span>AI Study Assistant & interactive academic help</span>
-              </li>
-              <li>
-                <Check size={18} color="#C5AC86" />
-                <span>Handwritten toppers' notes & assignment solutions</span>
-              </li>
-              <li>
-                <Check size={18} color="#C5AC86" />
-                <span>PYQs included free forever</span>
-              </li>
-              <li>
-                <Check size={18} color="#C5AC86" />
-                <span>Verified student Premium badge</span>
-              </li>
-            </ul>
-
-            <button
-              className="prem-cta-btn"
-              onClick={() => handleSubscribe('premium_2_months')}
-              disabled={loadingPlan !== null}
-            >
-              <Zap size={18} />
-              <span>{loadingPlan === 'premium_2_months' ? 'Opening Payment...' : 'Choose 2 Months'}</span>
-            </button>
+        {/* ─── OPTICAL PRICING SHOWCASE WITH GIANT 'PRICING' BACKDROP ─── */}
+        <section className="prem-pricing-showcase">
+          {/* Giant Bold Backdrop Typography (Behind the Cards) */}
+          <div className="prem-bg-pricing-text" aria-hidden="true">
+            Pricing
           </div>
 
-          {/* Plan 2: 4 Months (Best Value) */}
-          <div className="prem-plan-card best-value">
-            <div className="prem-best-tag">BEST VALUE • FULL SEMESTER</div>
+          {/* 3 Floating Liquid Glass Cards */}
+          <div className="prem-cards-grid">
+            {/* ── CARD 1: ₹49/m (Monthly Plan) ── */}
+            <div className="prem-glass-card">
+              {/* Cylindrical Optical Refraction Meniscus Lens */}
+              <div className="prem-card-refraction-lens" aria-hidden="true">
+                <div className="prem-lens-caustic" />
+              </div>
 
-            <div className="prem-card-header">
-              <h3 className="prem-plan-title">Premium – 4 Months</h3>
-              <p className="prem-plan-sub">Complete semester protection & maximum savings</p>
+              <div className="prem-card-inner">
+                <div className="prem-card-top">
+                  <div className="prem-plan-meta">
+                    <span className="prem-plan-label">Monthly Plan</span>
+                    <span className="prem-plan-sub">1-Month Exam Sprint</span>
+                  </div>
+
+                  <div className="prem-price-block">
+                    <span className="prem-price-num">₹49</span>
+                    <span className="prem-price-period">/m</span>
+                  </div>
+                </div>
+
+                <div className="prem-divider" />
+
+                <ul className="prem-feature-checklist">
+                  <li>
+                    <span className="prem-check-circle"><Check size={13} strokeWidth={2.8} /></span>
+                    <span>Unlimited access to all subject notes & theory PDFs</span>
+                  </li>
+                  <li>
+                    <span className="prem-check-circle"><Check size={13} strokeWidth={2.8} /></span>
+                    <span>AI Academic Study Assistant & instant doubt solver</span>
+                  </li>
+                  <li>
+                    <span className="prem-check-circle"><Check size={13} strokeWidth={2.8} /></span>
+                    <span>Handwritten toppers' notes & assignment solutions</span>
+                  </li>
+                  <li>
+                    <span className="prem-check-circle"><Check size={13} strokeWidth={2.8} /></span>
+                    <span>PYQs included 100% free forever</span>
+                  </li>
+                  <li>
+                    <span className="prem-check-circle"><Check size={13} strokeWidth={2.8} /></span>
+                    <span>Verified student Premium badge</span>
+                  </li>
+                </ul>
+
+                <button
+                  type="button"
+                  className="prem-card-cta-btn glass-outline"
+                  onClick={() => handleSubscribe('premium_1_month')}
+                  disabled={loadingPlan !== null}
+                >
+                  <span>{loadingPlan === 'premium_1_month' ? 'Opening Payment...' : 'Get Started'}</span>
+                </button>
+              </div>
             </div>
 
-            <div className="prem-card-price-wrap">
-              <span className="prem-currency">₹</span>
-              <span className="prem-amount">150</span>
-              <span className="prem-billing-term">/ 120 Days</span>
+            {/* ── CARD 2: ₹139/4m (Semester Plan - BEST VALUE / HIGHLIGHTED) ── */}
+            <div className="prem-glass-card featured-popular">
+              {/* Cylindrical Optical Refraction Meniscus Lens */}
+              <div className="prem-card-refraction-lens" aria-hidden="true">
+                <div className="prem-lens-caustic" />
+              </div>
+
+              <div className="prem-featured-ribbon">
+                <Crown size={12} />
+                <span>MOST POPULAR • FULL SEMESTER</span>
+              </div>
+
+              <div className="prem-card-inner">
+                <div className="prem-card-top">
+                  <div className="prem-plan-meta">
+                    <span className="prem-plan-label featured">Semester Plan</span>
+                    <span className="prem-plan-sub">Full Semester Coverage (₹34.75/mo)</span>
+                  </div>
+
+                  <div className="prem-price-block">
+                    <span className="prem-price-num featured">₹139</span>
+                    <span className="prem-price-period">/4m</span>
+                  </div>
+                </div>
+
+                <div className="prem-divider featured" />
+
+                <ul className="prem-feature-checklist">
+                  <li className="featured-item">
+                    <span className="prem-check-circle featured"><Check size={13} strokeWidth={2.8} /></span>
+                    <span><strong>All Monthly Plan features included</strong></span>
+                  </li>
+                  <li>
+                    <span className="prem-check-circle featured"><Check size={13} strokeWidth={2.8} /></span>
+                    <span>Full 120-Day semester exam protection</span>
+                  </li>
+                  <li>
+                    <span className="prem-check-circle featured"><Check size={13} strokeWidth={2.8} /></span>
+                    <span>Priority AI Study Assistant query processing</span>
+                  </li>
+                  <li>
+                    <span className="prem-check-circle featured"><Check size={13} strokeWidth={2.8} /></span>
+                    <span>Complete question bank & solved sample papers</span>
+                  </li>
+                  <li>
+                    <span className="prem-check-circle featured"><Check size={13} strokeWidth={2.8} /></span>
+                    <span>Early access to upcoming 2.0 academic tools</span>
+                  </li>
+                </ul>
+
+                <button
+                  type="button"
+                  className="prem-card-cta-btn featured-solid"
+                  onClick={() => handleSubscribe('premium_4_months')}
+                  disabled={loadingPlan !== null}
+                >
+                  <Zap size={16} />
+                  <span>{loadingPlan === 'premium_4_months' ? 'Opening Payment...' : 'Get Started'}</span>
+                </button>
+              </div>
             </div>
 
-            <div className="prem-one-time-badge">One-time payment • No auto-renewal</div>
+            {/* ── CARD 3: ₹499 (Lifetime Plan - DEGREE PASS) ── */}
+            <div className="prem-glass-card">
+              {/* Cylindrical Optical Refraction Meniscus Lens */}
+              <div className="prem-card-refraction-lens" aria-hidden="true">
+                <div className="prem-lens-caustic" />
+              </div>
 
-            <ul className="prem-features-list">
-              <li>
-                <Check size={18} color="#C5AC86" />
-                <span><strong>All 2-Month plan features included</strong></span>
-              </li>
-              <li>
-                <Check size={18} color="#C5AC86" />
-                <span>Full semester 120-day validity (Only ₹37.5/month)</span>
-              </li>
-              <li>
-                <Check size={18} color="#C5AC86" />
-                <span>AI Study Assistant with priority processing</span>
-              </li>
-              <li>
-                <Check size={18} color="#C5AC86" />
-                <span>All semester resources, question banks & solutions</span>
-              </li>
-              <li>
-                <Check size={18} color="#C5AC86" />
-                <span>Early access to all upcoming 2.0 features</span>
-              </li>
-            </ul>
+              <div className="prem-featured-ribbon lifetime">
+                <Sparkles size={12} />
+                <span>ALL-DEGREE LIFETIME PASS</span>
+              </div>
 
-            <button
-              className="prem-cta-btn"
-              onClick={() => handleSubscribe('premium_4_months')}
-              disabled={loadingPlan !== null}
-            >
-              <Crown size={18} />
-              <span>{loadingPlan === 'premium_4_months' ? 'Opening Payment...' : 'Get Full Semester (Best Value)'}</span>
-            </button>
+              <div className="prem-card-inner">
+                <div className="prem-card-top">
+                  <div className="prem-plan-meta">
+                    <span className="prem-plan-label">Lifetime Plan</span>
+                    <span className="prem-plan-sub">Entire 4-Year B.Tech Degree Access</span>
+                  </div>
+
+                  <div className="prem-price-block">
+                    <span className="prem-price-num">₹499</span>
+                    <span className="prem-price-period">/lifetime</span>
+                  </div>
+                </div>
+
+                <div className="prem-divider" />
+
+                <ul className="prem-feature-checklist">
+                  <li>
+                    <span className="prem-check-circle"><Check size={13} strokeWidth={2.8} /></span>
+                    <span><strong>Permanent lifetime access — Zero renewals</strong></span>
+                  </li>
+                  <li>
+                    <span className="prem-check-circle"><Check size={13} strokeWidth={2.8} /></span>
+                    <span>All 8 Semesters across all engineering branches</span>
+                  </li>
+                  <li>
+                    <span className="prem-check-circle"><Check size={13} strokeWidth={2.8} /></span>
+                    <span>Unlimited high-speed downloads & offline saves</span>
+                  </li>
+                  <li>
+                    <span className="prem-check-circle"><Check size={13} strokeWidth={2.8} /></span>
+                    <span>Unrestricted AI Assistant with highest token limit</span>
+                  </li>
+                  <li>
+                    <span className="prem-check-circle"><Check size={13} strokeWidth={2.8} /></span>
+                    <span>Exclusive Lifetime Scholar verified badge & VIP support</span>
+                  </li>
+                </ul>
+
+                <button
+                  type="button"
+                  className="prem-card-cta-btn glass-outline"
+                  onClick={() => handleSubscribe('premium_lifetime')}
+                  disabled={loadingPlan !== null}
+                >
+                  <span>{loadingPlan === 'premium_lifetime' ? 'Opening Payment...' : 'Get Started'}</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom Billing Info Pill (Like Toggle in Reference Image) */}
+          <div className="prem-billing-toggle-pill glass-clear">
+            <span className="prem-toggle-dot" />
+            <span>One-Time Payment • No Auto-Debit • Instant Digital Activation via Razorpay UPI</span>
           </div>
         </section>
 
-        {/* Comparison Table */}
+        {/* ─── PLAN COMPARISON SECTION ─── */}
         <section className="prem-comparison-section">
           <div className="prem-section-header">
-            <h2 className="prem-section-title">Plan Comparison</h2>
-            <p className="prem-section-sub">Transparent access control designed for students</p>
+            <div className="prem-section-badge">
+              <Award size={13} />
+              <span>SPECIFICATION MATRIX</span>
+            </div>
+            <h2 className="prem-section-title">Compare Academic Plans</h2>
+            <p className="prem-section-sub">Transparent feature breakdown designed for ABES engineering students</p>
           </div>
 
           <div className="prem-comparison-table-wrap glass-frosted">
             <table className="prem-table">
               <thead>
                 <tr>
-                  <th>Feature / Resource</th>
+                  <th className="prem-th-feature">Feature / Resource</th>
                   <th>Free Student</th>
-                  <th>Premium Member</th>
+                  <th>Monthly (₹49)</th>
+                  <th className="prem-th-highlight">Full Semester (₹139)</th>
+                  <th>Lifetime (₹499)</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
-                  <td>Previous Year Questions (PYQs)</td>
-                  <td><span className="prem-status-pill success">Unlimited Free Forever</span></td>
-                  <td><span className="prem-status-pill success">Unlimited Free Forever</span></td>
+                  <td className="prem-td-feature">Previous Year Questions (PYQs)</td>
+                  <td><span className="prem-pill success">✓ Free Forever</span></td>
+                  <td><span className="prem-pill success">✓ Free Forever</span></td>
+                  <td className="prem-td-highlight"><span className="prem-pill success">✓ Free Forever</span></td>
+                  <td><span className="prem-pill success">✓ Free Forever</span></td>
                 </tr>
                 <tr>
-                  <td>Theory & Subject Notes</td>
-                  <td><span className="prem-status-text">5 Free Document Accesses</span></td>
-                  <td><span className="prem-status-pill gold">Unlimited Access</span></td>
+                  <td className="prem-td-feature">Theory & Subject Notes</td>
+                  <td><span className="prem-status-dim">5 Free Accesses</span></td>
+                  <td><span className="prem-pill gold">Unlimited</span></td>
+                  <td className="prem-td-highlight"><span className="prem-pill gold">Unlimited</span></td>
+                  <td><span className="prem-pill gold">Unlimited</span></td>
                 </tr>
                 <tr>
-                  <td>Question Banks & Assignments</td>
-                  <td><span className="prem-status-text">5 Free Document Accesses</span></td>
-                  <td><span className="prem-status-pill gold">Unlimited Access</span></td>
+                  <td className="prem-td-feature">Question Banks & Model Solutions</td>
+                  <td><span className="prem-status-dim">5 Free Accesses</span></td>
+                  <td><span className="prem-pill gold">Unlimited</span></td>
+                  <td className="prem-td-highlight"><span className="prem-pill gold">Unlimited</span></td>
+                  <td><span className="prem-pill gold">Unlimited</span></td>
                 </tr>
                 <tr>
-                  <td>AI Study Assistant</td>
-                  <td><span className="prem-status-pill locked">Locked</span></td>
-                  <td><span className="prem-status-pill gold">Included (Unlimited)</span></td>
+                  <td className="prem-td-feature">AI Academic Assistant</td>
+                  <td><span className="prem-pill locked"><Lock size={12} /> Locked</span></td>
+                  <td><span className="prem-pill gold">Unlimited Access</span></td>
+                  <td className="prem-td-highlight"><span className="prem-pill gold">Priority Speed ⚡</span></td>
+                  <td><span className="prem-pill gold">Highest Quota 🚀</span></td>
                 </tr>
                 <tr>
-                  <td>Dynamic Watermarked Downloads</td>
-                  <td><span className="prem-status-text">Free allowance only</span></td>
-                  <td><span className="prem-status-pill gold">Unlimited</span></td>
+                  <td className="prem-td-feature">High-Speed Watermarked PDFs</td>
+                  <td><span className="prem-status-dim">Free Quota Only</span></td>
+                  <td><span className="prem-pill gold">Unlimited</span></td>
+                  <td className="prem-td-highlight"><span className="prem-pill gold">Unlimited</span></td>
+                  <td><span className="prem-pill gold">Unlimited + Offline</span></td>
                 </tr>
                 <tr>
-                  <td>Student Profile Badge</td>
-                  <td><span className="prem-status-text">Free Member</span></td>
-                  <td><span className="prem-status-pill gold">★ Premium Badge</span></td>
+                  <td className="prem-td-feature">Student Profile Badge</td>
+                  <td><span className="prem-status-dim">Free Member</span></td>
+                  <td><span className="prem-pill gold">Verified Student</span></td>
+                  <td className="prem-td-highlight"><span className="prem-pill gold">★ Premium Scholar</span></td>
+                  <td><span className="prem-pill gold">★ Lifetime Scholar</span></td>
+                </tr>
+                <tr>
+                  <td className="prem-td-feature">Duration & Validity</td>
+                  <td><span className="prem-status-dim">Continuous Free</span></td>
+                  <td><span className="prem-status-text">30 Days</span></td>
+                  <td className="prem-td-highlight"><span className="prem-status-text bold">120 Days</span></td>
+                  <td><span className="prem-status-text bold">All 4 Years (Degree)</span></td>
+                </tr>
+                <tr>
+                  <td className="prem-td-feature">Effective Cost</td>
+                  <td><span className="prem-status-dim">₹0</span></td>
+                  <td><span className="prem-status-text">₹49 / month</span></td>
+                  <td className="prem-td-highlight"><span className="prem-pill gold">₹34.75 / mo (Save 29%)</span></td>
+                  <td><span className="prem-pill gold">One-time forever</span></td>
                 </tr>
               </tbody>
             </table>
           </div>
         </section>
 
-        {/* FAQs */}
+        {/* ─── RELEVANT FAQS ACCORDION ─── */}
         <section className="prem-faq-section">
           <div className="prem-section-header">
-            <h2 className="prem-section-title">Frequently Asked Questions</h2>
-            <p className="prem-section-sub">Everything you need to know about ABES Autonomy Premium</p>
+            <div className="prem-section-badge">
+              <HelpCircle size={13} />
+              <span>FREQUENTLY ASKED QUESTIONS</span>
+            </div>
+            <h2 className="prem-section-title">Got Questions? We’ve Got Answers.</h2>
+            <p className="prem-section-sub">Everything you need to know about ABES Autonomy access and subscriptions</p>
           </div>
 
           <div className="prem-faq-grid">
             {faqs.map((faq, idx) => (
-              <div key={idx} className={`prem-faq-item glass-clear ${openFaq === idx ? 'is-open' : ''}`}>
-                <button 
+              <div
+                key={idx}
+                className={`prem-faq-item glass-frosted ${openFaq === idx ? 'is-open' : ''}`}
+              >
+                <button
                   type="button"
-                  className="prem-faq-question" 
+                  className="prem-faq-question"
                   onClick={() => toggleFaq(idx)}
                   aria-expanded={openFaq === idx}
                 >
-                  <span>{faq.q}</span>
-                  {openFaq === idx ? (
-                    <ChevronUp size={18} className="faq-chevron" />
-                  ) : (
-                    <ChevronDown size={18} className="faq-chevron" />
-                  )}
+                  <span className="prem-faq-q-text">{faq.q}</span>
+                  <div className={`prem-faq-chevron-wrap ${openFaq === idx ? 'active' : ''}`}>
+                    {openFaq === idx ? (
+                      <ChevronUp size={18} />
+                    ) : (
+                      <ChevronDown size={18} />
+                    )}
+                  </div>
                 </button>
                 {openFaq === idx && (
-                  <div className="prem-faq-answer anim-fade-in">{faq.a}</div>
+                  <div className="prem-faq-answer">
+                    <p>{faq.a}</p>
+                  </div>
                 )}
               </div>
             ))}
           </div>
         </section>
 
-        {/* Trust & Security Footer */}
-        <div className="prem-trust-footer">
-          <span><ShieldCheck size={16} style={{ display: 'inline', verticalAlign: '-3px' }} /> 256-Bit SSL Encrypted</span>
-          <span>• Verified Razorpay UPI Gateway</span>
-          <span>• Instant Digital Activation</span>
-          <span>• No Auto-Debit / No Hidden Fees</span>
+        {/* ─── TRUST & SECURITY FOOTER ─── */}
+        <div className="prem-trust-footer glass-clear">
+          <div className="prem-trust-item">
+            <ShieldCheck size={16} />
+            <span>256-Bit SSL Encrypted</span>
+          </div>
+          <span className="prem-trust-sep">•</span>
+          <div className="prem-trust-item">
+            <Zap size={16} />
+            <span>Official Razorpay UPI</span>
+          </div>
+          <span className="prem-trust-sep">•</span>
+          <div className="prem-trust-item">
+            <Sparkles size={16} />
+            <span>Instant Digital Activation</span>
+          </div>
+          <span className="prem-trust-sep">•</span>
+          <div className="prem-trust-item">
+            <Lock size={16} />
+            <span>Zero Auto-Debits or Hidden Fees</span>
+          </div>
         </div>
       </div>
     </div>
