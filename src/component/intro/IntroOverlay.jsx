@@ -15,6 +15,17 @@ const IntroOverlay = ({ locationKey }) => {
   const containerRef = useRef(null);
 
   useLayoutEffect(() => {
+    if (stage === "init" || stage === "hold") {
+      document.documentElement.classList.add("intro-running");
+    } else {
+      document.documentElement.classList.remove("intro-running");
+    }
+    return () => {
+      document.documentElement.classList.remove("intro-running");
+    };
+  }, [stage]);
+
+  useLayoutEffect(() => {
     const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     if (prefersReducedMotion) {

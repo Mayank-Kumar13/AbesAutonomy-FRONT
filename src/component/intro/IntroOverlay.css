@@ -7,13 +7,20 @@
   inset: 0;
   width: 100vw;
   height: 100vh;
-  background: radial-gradient(circle at 50% 48%, rgba(18, 22, 30, 0.94) 0%, rgba(6, 8, 12, 0.98) 100%);
-  backdrop-filter: blur(28px) saturate(190%);
-  -webkit-backdrop-filter: blur(28px) saturate(190%);
+  background: #060709; /* 100% solid dark canvas — zero bleed-through from page behind */
   z-index: 99999;
   pointer-events: all;
   overflow: hidden;
   transition: opacity 0.42s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Hide underlying campus title and canvas during boot animation so there is zero duplicate text */
+html.intro-running .campus-stage,
+html.intro-running .campus-fallback,
+html.intro-running .campus-canvas,
+html.intro-running .campus-fallback-title {
+  visibility: hidden !important;
+  opacity: 0 !important;
 }
 
 .intro-overlay.fade-out {

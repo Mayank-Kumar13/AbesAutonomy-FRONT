@@ -229,10 +229,6 @@ const ChooseSubject = () => {
         {isHandwritten && (
           <section className="handwritten-credit-glass glass-frosted" aria-label="Contributor Acknowledgement">
             <div className="handwritten-credit-header">
-              <div className="credit-tag-pill">
-                <Sparkles size={12} />
-                <span>TOPPER ACKNOWLEDGEMENT</span>
-              </div>
               <h2 className="handwritten-credit-title">Notes Contributed By</h2>
               <p className="handwritten-credit-subtitle">
                 Gratitude to academic toppers whose meticulously maintained notes assist hundreds of fellow ABES students.

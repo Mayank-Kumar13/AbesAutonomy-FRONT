@@ -32,12 +32,6 @@ const UnderConstruction = () => {
         {/* Top shine streak */}
         <div className="uc-shine" />
 
-        {/* Badge */}
-        <div className="uc-badge">
-          <span className="uc-dot" />
-          Opening Soon
-        </div>
-
         {/* Title */}
         <h1 className="uc-title">
           ABES Autonomy <span className="uc-v">2.0</span>

@@ -69,48 +69,17 @@
 .prem-hero-header {
   text-align: center;
   max-width: 760px;
-  margin: 0 auto 32px;
+  margin: 0 auto 16px;
   display: flex;
   flex-direction: column;
   align-items: center;
-}
-
-.prem-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 18px;
-  border-radius: var(--radius-pill, 9999px);
-  font-size: 11.5px;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--brand-gold-light, #DFCAAA);
-  margin-bottom: 14px;
-}
-
-.prem-badge-icon {
-  color: var(--brand-gold, #C5AC86);
 }
 
 .prem-subtitle-lead {
   font-size: clamp(15px, 1.8vw, 17px);
   color: var(--text-secondary, #A1A1A6);
   line-height: 1.55;
-  margin: 0 0 16px 0;
-}
-
-.prem-pyq-banner {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 7px 18px;
-  border-radius: var(--radius-pill, 9999px);
-  font-size: 13px;
-  font-weight: 600;
-  color: #A3E7B7;
-  border-color: rgba(48, 209, 88, 0.3);
-  background: rgba(48, 209, 88, 0.08);
+  margin: 0;
 }
 
 .prem-error-alert {
@@ -126,17 +95,17 @@
 /* ─── OPTICAL PRICING SHOWCASE WITH GIANT 'PRICING' BACKDROP ─── */
 .prem-pricing-showcase {
   position: relative;
-  margin-top: 20px;
+  margin-top: 32px;
   margin-bottom: 84px;
 }
 
 /* Giant Bold Typography "Pricing" Sitting Behind Cards */
 .prem-bg-pricing-text {
   position: absolute;
-  top: -55px;
+  top: -60px;
   left: 50%;
   transform: translateX(-50%);
-  font-size: clamp(80px, 14vw, 175px);
+  font-size: clamp(90px, 16vw, 195px);
   font-weight: 850;
   line-height: 0.85;
   letter-spacing: -0.04em;
@@ -158,7 +127,7 @@
   position: relative;
   z-index: 2;
   align-items: stretch;
-  padding-top: 110px; /* Allows the top of 'Pricing' to peek out boldly behind the cards without colliding with text */
+  padding-top: 130px; /* Sits cleanly so the top of 'Pricing' shines above the cards, exactly like the reference image */
 }
 
 /* ─── LIQUID GLASS CARD CONTAINER ─── */
@@ -322,13 +291,14 @@
   color: #FFFFFF;
   letter-spacing: -0.035em;
   line-height: 1;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.95);
 }
 
 .prem-price-num.featured {
-  background: linear-gradient(180deg, #FFFFFF 0%, #DFCAAA 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: #DFCAAA;
+  text-shadow: 0 0 24px rgba(223, 202, 170, 0.55), 0 2px 6px rgba(0, 0, 0, 0.8);
+  background: none;
+  -webkit-background-clip: initial;
+  -webkit-text-fill-color: initial;
 }
 
 .prem-price-period {
@@ -459,33 +429,45 @@
   transform: none !important;
 }
 
-/* ─── BOTTOM BILLING TOGGLE PILL ─── */
-.prem-billing-toggle-pill {
+/* ─── BOTTOM BILLING TOGGLE (CLEAN SWITCH MATCHING INSPIRATION MOCKUP) ─── */
+.prem-billing-toggle {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 12px;
   width: fit-content;
   margin: 36px auto 0;
-  padding: 8px 24px;
-  border-radius: var(--radius-pill, 9999px);
-  font-size: 13px;
-  font-weight: 550;
-  color: var(--text-secondary, #A1A1A6);
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.03) 100%), rgba(11, 14, 22, 0.84);
-  backdrop-filter: blur(40px);
-  -webkit-backdrop-filter: blur(40px);
-  border: 1px solid rgba(255, 255, 255, 0.35);
-  box-shadow: inset 0 1px 0.5px rgba(255, 255, 255, 0.7), 0 8px 24px -4px rgba(0, 0, 0, 0.5);
+  cursor: default;
+  user-select: none;
 }
 
-.prem-toggle-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #30D158;
-  box-shadow: 0 0 10px #30D158;
+.prem-toggle-switch {
+  width: 44px;
+  height: 24px;
+  border-radius: 9999px;
+  background: #FFFFFF;
+  position: relative;
   display: inline-block;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  flex-shrink: 0;
+}
+
+.prem-toggle-slider {
+  position: absolute;
+  top: 3px;
+  left: 4px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #0A0C10;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+.prem-toggle-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary, #A1A1A6);
+  letter-spacing: -0.01em;
 }
 
 /* ─── PLAN COMPARISON SECTION ─── */

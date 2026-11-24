@@ -118,21 +118,11 @@ export default function PremiumPage() {
       </div>
 
       <div className="prem-container">
-        {/* Top Header Badge & Tagline */}
+        {/* Top Header Title & Tagline */}
         <div className="prem-hero-header">
-          <div className="prem-badge glass-clear">
-            <Crown size={14} className="prem-badge-icon" />
-            <span>ABES AUTONOMY PREMIUM</span>
-          </div>
-
           <p className="prem-subtitle-lead">
             Transparent, student-first academic access designed for ABES engineering excellence.
           </p>
-
-          <div className="prem-pyq-banner glass-clear">
-            <Sparkles size={15} />
-            <span>PYQ Section is 100% Free Forever for all students — No subscription required!</span>
-          </div>
 
           {error && (
             <div className="prem-error-alert glass-clear">
@@ -330,20 +320,18 @@ export default function PremiumPage() {
             </div>
           </div>
 
-          {/* Bottom Billing Info Pill (Like Toggle in Reference Image) */}
-          <div className="prem-billing-toggle-pill glass-clear">
-            <span className="prem-toggle-dot" />
-            <span>One-Time Payment • No Auto-Debit • Instant Digital Activation via Razorpay UPI</span>
+          {/* Bottom Billing Info Toggle (Clean iOS Switch matching inspiration mockup) */}
+          <div className="prem-billing-toggle">
+            <span className="prem-toggle-switch" aria-hidden="true">
+              <span className="prem-toggle-slider" />
+            </span>
+            <span className="prem-toggle-label">One-Time Payment • No Auto-Debit • Instant UPI Activation</span>
           </div>
         </section>
 
         {/* ─── PLAN COMPARISON SECTION ─── */}
         <section className="prem-comparison-section">
           <div className="prem-section-header">
-            <div className="prem-section-badge">
-              <Award size={13} />
-              <span>SPECIFICATION MATRIX</span>
-            </div>
             <h2 className="prem-section-title">Compare Academic Plans</h2>
             <p className="prem-section-sub">Transparent feature breakdown designed for ABES engineering students</p>
           </div>
@@ -424,10 +412,6 @@ export default function PremiumPage() {
         {/* ─── RELEVANT FAQS ACCORDION ─── */}
         <section className="prem-faq-section">
           <div className="prem-section-header">
-            <div className="prem-section-badge">
-              <HelpCircle size={13} />
-              <span>FREQUENTLY ASKED QUESTIONS</span>
-            </div>
             <h2 className="prem-section-title">Got Questions? We’ve Got Answers.</h2>
             <p className="prem-section-sub">Everything you need to know about ABES Autonomy access and subscriptions</p>
           </div>

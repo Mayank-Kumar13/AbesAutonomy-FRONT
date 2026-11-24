@@ -41,25 +41,6 @@ const Amcat = () => {
         alignItems: 'center',
         textAlign: 'center'
       }}>
-        {/* Pill Tag */}
-        <div style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: '8px',
-          padding: '5px 16px',
-          background: 'rgba(197, 172, 134, 0.10)',
-          border: '1px solid rgba(197, 172, 134, 0.25)',
-          borderRadius: '9999px',
-          fontSize: '11px',
-          fontWeight: 650,
-          letterSpacing: '0.16em',
-          color: 'var(--brand-gold, #C5AC86)',
-          marginBottom: '20px'
-        }}>
-          <Rocket size={13} />
-          <span>INNOVATION SHOWCASE</span>
-        </div>
-
         {/* Poster in Frosted Glass Container */}
         <div style={{
           position: 'relative',
