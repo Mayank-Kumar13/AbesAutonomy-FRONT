@@ -25,6 +25,15 @@ const IntroOverlay = ({ locationKey }) => {
     };
   }, [stage]);
 
+  // Safety failsafe: under no circumstances should the intro overlay block the screen longer than 3.5s
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setStage("done");
+      document.documentElement.classList.remove("intro-running");
+    }, 3500);
+    return () => clearTimeout(timer);
+  }, []);
+
   useLayoutEffect(() => {
     const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 

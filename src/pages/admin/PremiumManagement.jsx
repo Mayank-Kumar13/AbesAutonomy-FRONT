@@ -54,6 +54,7 @@ export default function PremiumManagement() {
   const [targetUser, setTargetUser] = useState(null);
   const [userDetails, setUserDetails] = useState(null);
   const [modalForm, setModalForm] = useState({ plan: 'premium_2_months', days: 30, reason: '' });
+  const [directGrantId, setDirectGrantId] = useState('');
   const [modalLoading, setModalLoading] = useState(false);
   const [modalMsg, setModalMsg] = useState('');
 
@@ -157,29 +158,34 @@ export default function PremiumManagement() {
   // Submit Modal Actions
   const handleModalSubmit = async (e) => {
     e.preventDefault();
-    if (!targetUser) return;
+    const effectiveUserId = targetUser?._id || directGrantId?.trim();
+    if (!effectiveUserId) {
+      setModalMsg('Please select a student or enter a valid User ID.');
+      return;
+    }
     setModalLoading(true);
     setModalMsg('');
 
     try {
       if (activeModal === 'activate') {
-        await adminPremiumApi.manualActivate(targetUser._id, {
+        await adminPremiumApi.manualActivate(effectiveUserId, {
           plan: modalForm.plan,
           reason: modalForm.reason || 'Admin manual activation',
         });
       } else if (activeModal === 'extend') {
-        await adminPremiumApi.manualExtend(targetUser._id, {
+        await adminPremiumApi.manualExtend(effectiveUserId, {
           days: modalForm.days,
           reason: modalForm.reason || 'Admin manual extension',
         });
       } else if (activeModal === 'revoke') {
-        await adminPremiumApi.manualRevoke(targetUser._id, {
+        await adminPremiumApi.manualRevoke(effectiveUserId, {
           reason: modalForm.reason || 'Admin manual revocation',
         });
       }
 
       // Reload
       setActiveModal(null);
+      setDirectGrantId('');
       loadUsers();
       loadAnalytics();
       loadAuditLogs();
@@ -351,13 +357,14 @@ export default function PremiumManagement() {
             <div className="pm-controls">
               <input
                 type="text"
-                placeholder="Search name or email..."
+                placeholder="Search Name, Email, or User ID..."
                 value={usersQuery}
                 onChange={(e) => {
                   setUsersQuery(e.target.value);
                   setUsersPage(1);
                 }}
                 className="pm-input"
+                style={{ minWidth: '240px' }}
               />
               <select
                 value={usersStatusFilter}
@@ -368,10 +375,38 @@ export default function PremiumManagement() {
                 className="pm-select"
               >
                 <option value="all">All Statuses</option>
+                <option value="verified">Verified Students Only</option>
                 <option value="active">Active Premium</option>
                 <option value="expired">Expired</option>
                 <option value="free">Free Members</option>
               </select>
+              <button
+                type="button"
+                className="pm-btn-primary"
+                onClick={() => {
+                  setTargetUser(null);
+                  setDirectGrantId('');
+                  setActiveModal('activate');
+                  setModalForm({ plan: 'premium_4_months', days: 120, reason: 'Direct admin grant' });
+                }}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  background: 'linear-gradient(135deg, #DFCAAA, #C5AC86)',
+                  color: '#080a0e',
+                  border: 'none',
+                  padding: '8px 16px',
+                  borderRadius: '8px',
+                  fontWeight: '700',
+                  fontSize: '0.85rem',
+                  cursor: 'pointer',
+                  whiteSpace: 'nowrap'
+                }}
+              >
+                <Zap size={14} />
+                <span>Direct Grant by ID</span>
+              </button>
             </div>
           </div>
 
@@ -392,8 +427,30 @@ export default function PremiumManagement() {
                 {users.map((u) => (
                   <tr key={u._id}>
                     <td>
-                      <strong>{u.name}</strong>
-                      <div style={{ fontSize: '0.75rem', color: '#64748b' }}>{u.email}</div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                        <strong>{u.name}</strong>
+                        {u.isVerified && (
+                          <span className="pm-verified-pill" title="Verified Student">
+                            ✓ Verified
+                          </span>
+                        )}
+                      </div>
+                      <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>{u.email}</div>
+                      <div className="pm-id-copy-row">
+                        <span className="pm-id-label">ID:</span>
+                        <code className="pm-id-code">{u._id}</code>
+                        <button
+                          type="button"
+                          className="pm-copy-id-btn"
+                          title="Copy User ID to clipboard"
+                          onClick={() => {
+                            navigator.clipboard.writeText(u._id);
+                            alert(`Copied ID: ${u._id}`);
+                          }}
+                        >
+                          Copy
+                        </button>
+                      </div>
                     </td>
                     <td>
                       {u.isSuperAdmin ? (
@@ -650,13 +707,17 @@ export default function PremiumManagement() {
         <div className="pm-modal-backdrop" onClick={() => setActiveModal(null)}>
           <div className="pm-modal-card" onClick={(e) => e.stopPropagation()}>
             <h3 className="pm-modal-title">
-              {activeModal === 'activate' && 'Manually Activate Premium'}
-              {activeModal === 'extend' && 'Extend Subscription'}
-              {activeModal === 'revoke' && 'Revoke Premium Subscription'}
+              {activeModal === 'activate' && (targetUser ? `Grant Premium to ${targetUser.name}` : 'Direct Grant Premium by ID')}
+              {activeModal === 'extend' && `Extend Subscription: ${targetUser?.name}`}
+              {activeModal === 'revoke' && `Revoke Premium: ${targetUser?.name}`}
             </h3>
 
             <p style={{ color: '#94a3b8', fontSize: '0.88rem', marginBottom: '1.2rem' }}>
-              Target: <strong>{targetUser?.name}</strong> ({targetUser?.email})
+              {targetUser ? (
+                <>Target: <strong>{targetUser.name}</strong> ({targetUser.email}) — ID: <code style={{ color: '#DFCAAA' }}>{targetUser._id}</code></>
+              ) : (
+                <>Paste any student's MongoDB User ID to immediately assign active Premium privileges.</>
+              )}
             </p>
 
             {modalMsg && (
@@ -666,6 +727,20 @@ export default function PremiumManagement() {
             )}
 
             <form onSubmit={handleModalSubmit}>
+              {activeModal === 'activate' && !targetUser && (
+                <div className="pm-field">
+                  <label>Student User ID (24-character hex ID)</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. 660f1b2c4d8e9a1234567890"
+                    className="pm-input"
+                    style={{ width: '100%', fontFamily: 'monospace' }}
+                    value={directGrantId}
+                    onChange={(e) => setDirectGrantId(e.target.value)}
+                    required
+                  />
+                </div>
+              )}
               {activeModal === 'activate' && (
                 <div className="pm-field">
                   <label>Select Plan</label>

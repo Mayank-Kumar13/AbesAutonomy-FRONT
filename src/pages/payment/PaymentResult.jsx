@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { useLocation, useNavigate, Link } from 'react-router-dom';
-import { CheckCircle2, XCircle, Clock, ArrowRight, BookOpen, Crown } from 'lucide-react';
+import { useLocation, Link } from 'react-router-dom';
+import { Crown, BookOpen, ArrowRight, XCircle, Clock } from 'lucide-react';
 import { paymentApi } from '../../services/api';
 import { useAuth } from '../../auth/AuthContext';
 import './PaymentResult.css';
 
 export default function PaymentResult({ type = 'success' }) {
   const location = useLocation();
-  const navigate = useNavigate();
   const { user } = useAuth();
 
   const stateData = location.state || {};
@@ -19,9 +18,11 @@ export default function PaymentResult({ type = 'success' }) {
     paymentApi
       .getSubscriptionStatus()
       .then((res) => {
-        setSubStatus(res.data);
+        if (res?.data) setSubStatus(res.data);
       })
-      .catch(() => {})
+      .catch((err) => {
+        console.warn('Could not fetch subscription status:', err.message);
+      })
       .finally(() => setLoading(false));
   }, []);
 
@@ -37,10 +38,26 @@ export default function PaymentResult({ type = 'success' }) {
       ? 'Premium – 2 Months'
       : 'ABES Autonomy Premium');
 
-  const isLifetime = stateData.plan?.isLifetime || subStatus?.premiumPlan === 'premium_lifetime';
-  const expiryDate = isLifetime
-    ? 'Permanent Lifetime Access'
-    : stateData.subscription?.endDate || subStatus?.premiumExpiryDate;
+  const isLifetime = Boolean(
+    stateData.plan?.isLifetime ||
+    stateData.plan?.id === 'premium_lifetime' ||
+    subStatus?.premiumPlan === 'premium_lifetime'
+  );
+
+  const rawExpiry = stateData.subscription?.endDate || subStatus?.premiumExpiryDate;
+
+  const formattedExpiry = isLifetime
+    ? 'Permanent (Lifetime Access)'
+    : rawExpiry
+    ? (() => {
+        try {
+          const d = new Date(rawExpiry);
+          return isNaN(d.getTime()) ? 'Active' : d.toLocaleDateString();
+        } catch {
+          return 'Active';
+        }
+      })()
+    : 'Active';
 
   const paymentId =
     stateData.payment?.razorpayPaymentId || stateData.payment?._id || 'Verified via Razorpay';
@@ -80,10 +97,10 @@ export default function PaymentResult({ type = 'success' }) {
             <Clock size={38} />
           </div>
 
-          <h1 className="pay-res-title">Payment Processing</h1>
+          <h1 className="pay-res-title">Verifying Payment...</h1>
           <p className="pay-res-sub">
             Your transaction is currently being verified with the payment gateway.
-            Your Premium features will be active as soon as verification completes.
+            Your Premium features will activate immediately.
           </p>
 
           <div className="pay-res-actions">
@@ -125,12 +142,12 @@ export default function PaymentResult({ type = 'success' }) {
             <span className="pay-res-label">Status</span>
             <span className="pay-res-val" style={{ color: '#4ade80' }}>ACTIVE</span>
           </div>
-          {expiryDate && (
-            <div className="pay-res-row">
-              <span className="pay-res-label">Valid Until</span>
-              <span className="pay-res-val">{new Date(expiryDate).toLocaleDateString()}</span>
-            </div>
-          )}
+          <div className="pay-res-row">
+            <span className="pay-res-label">Valid Until</span>
+            <span className="pay-res-val" style={{ color: isLifetime ? '#DFCAAA' : 'inherit' }}>
+              {formattedExpiry}
+            </span>
+          </div>
           <div className="pay-res-row">
             <span className="pay-res-label">Transaction Ref</span>
             <span className="pay-res-val" style={{ fontSize: '0.8rem', fontFamily: 'monospace' }}>

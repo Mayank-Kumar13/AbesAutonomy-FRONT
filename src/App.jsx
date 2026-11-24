@@ -31,10 +31,11 @@ import AdminRoute from './auth/AdminRoute';
 import GlobalStatusGuard from './auth/GlobalStatusGuard';
 import { trackingApi } from './services/api';
 
+import PaymentResult from './pages/payment/PaymentResult';
+
 const Pdfpreview = lazy(() => import('./pages/Pdfpreview'));
 const AdminPanel = lazy(() => import('./pages/admin/AdminPanel'));
 const PremiumPage = lazy(() => import('./pages/premium/PremiumPage'));
-const PaymentResult = lazy(() => import('./pages/payment/PaymentResult'));
 
 const App = () => {
   useEffect(() => {
@@ -48,7 +49,7 @@ const App = () => {
   const hideFooter = hideNavAndFooter || path === '/credits';
   const isHomePage = path === '/';
 
-  const [showStartupIntro] = useState(() => !isAuthPage && path !== '/credits');
+  const [showStartupIntro] = useState(() => isHomePage);
 
   return (
     <GlobalStatusGuard>
