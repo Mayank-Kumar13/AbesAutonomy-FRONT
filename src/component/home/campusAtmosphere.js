@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { periodicNoise } from './campusSurfaces';
+import { getTimeOfDayTheme } from './timeOfDay';
 
 function periodicFbm(u, v, px, py, seed) {
   let sum = 0;
@@ -35,34 +36,33 @@ function sampleCloudChannels(u, v) {
   const wu = u + warpX;
   const wv = v + warpY;
 
-  // Primary cumulus mass: blends smooth fBm with rounded cauliflower billows
   const fbmMain = periodicFbm(wu, wv, 8, 3, 4);
   const billowMain = periodicBillow(wu, wv, 8, 3, 29);
   const cumulus = THREE.MathUtils.clamp(fbmMain * 0.52 + billowMain * 0.55, 0, 1);
-
-  // Secondary billowing turbulence for organic morphing as clouds drift
   const detail = periodicBillow(u + warpX * 0.6, v + warpY * 0.6, 12, 4.5, 41);
-
-  // Fine high-frequency wisps and cirrus streaks
   const wisp = periodicFbm(u * 1.0 + warpX * 1.4, v * 0.75, 16, 6, 73);
-
-  // Broad atmospheric cluster mask so sky keeps clean clear-blue openings
   const cluster = periodicFbm(u, v, 4, 1.8, 97);
 
   return [cumulus, detail, wisp, cluster];
 }
 
-function createCloudMaterial(texture, { opacity, scale, driftScale, wispWeight, horizonTint }) {
+function createCloudMaterial(texture, themeCloud, { isCirrus, scale, driftScale, wispWeight, horizonTint }) {
   return new THREE.ShaderMaterial({
     uniforms: {
       cloudMap: { value: texture },
       driftPrimary: { value: 0 },
       driftSecondary: { value: 0 },
-      layerOpacity: { value: opacity },
+      layerOpacity: { value: isCirrus ? themeCloud.cirrusOpacity : themeCloud.cumulusOpacity },
       uvScale: { value: new THREE.Vector2(scale[0], scale[1]) },
       driftScale: { value: driftScale },
       wispWeight: { value: wispWeight },
       horizonTint: { value: horizonTint },
+      uSunCol: { value: new THREE.Color(themeCloud.sunCol) },
+      uMidCol: { value: new THREE.Color(themeCloud.midCol) },
+      uShadowCol: { value: new THREE.Color(themeCloud.shadowCol) },
+      uMistCol: { value: new THREE.Color(themeCloud.mistCol) },
+      uSunGlow: { value: new THREE.Vector3(...themeCloud.sunGlow) },
+      uSunOffset: { value: new THREE.Vector2(...themeCloud.sunOffset) },
     },
     transparent: true,
     depthWrite: false,
@@ -83,6 +83,12 @@ function createCloudMaterial(texture, { opacity, scale, driftScale, wispWeight, 
       uniform float driftScale;
       uniform float wispWeight;
       uniform float horizonTint;
+      uniform vec3 uSunCol;
+      uniform vec3 uMidCol;
+      uniform vec3 uShadowCol;
+      uniform vec3 uMistCol;
+      uniform vec3 uSunGlow;
+      uniform vec2 uSunOffset;
       varying vec2 vUv;
 
       float sampleDensity(vec2 baseUv, float d1, float d2) {
@@ -100,36 +106,25 @@ function createCloudMaterial(texture, { opacity, scale, driftScale, wispWeight, 
         float d2 = driftSecondary * driftScale;
 
         float density = sampleDensity(baseUv, d1, d2);
-
-        // Directional self-shadowing toward upper-left daytime sun (-30, 32, 16)
-        float sunSample = sampleDensity(baseUv + vec2(-0.014, 0.042), d1, d2);
+        float sunSample = sampleDensity(baseUv + uSunOffset, d1, d2);
         float lightDiff = clamp((density - sunSample) * 2.2, -0.5, 0.7);
 
-        // Sun-facing upper ridges + silver lining on thinner edges
         float topExposure = smoothstep(0.18, 0.85, vUv.y);
         float edgeGlow = (1.0 - smoothstep(0.25, 0.85, density)) * smoothstep(0.05, 0.35, density);
         float directSun = clamp(0.58 + lightDiff * 0.55 + topExposure * 0.24 + edgeGlow * 0.28, 0.0, 1.0);
-
-        // Cool atmospheric underside shading on thick cloud bellies
         float bellyShade = smoothstep(0.35, 0.95, density) * (1.0 - topExposure * 0.75);
 
-        vec3 shadowCol = vec3(0.62, 0.74, 0.86);
-        vec3 midCol = vec3(0.90, 0.95, 0.99);
-        vec3 sunCol = vec3(1.0, 0.994, 0.975);
+        vec3 cloudCol = mix(uShadowCol, uMidCol, smoothstep(0.1, 0.65, directSun));
+        cloudCol = mix(cloudCol, uSunCol, smoothstep(0.55, 1.0, directSun));
+        cloudCol = mix(cloudCol, uShadowCol * 0.94, bellyShade * 0.35);
 
-        vec3 cloudCol = mix(shadowCol, midCol, smoothstep(0.1, 0.65, directSun));
-        cloudCol = mix(cloudCol, sunCol, smoothstep(0.55, 1.0, directSun));
-        cloudCol = mix(cloudCol, shadowCol * 0.96, bellyShade * 0.35);
+        float sunSide = uSunOffset.x < 0.0 ? (1.0 - smoothstep(0.0, 0.72, vUv.x)) : smoothstep(0.28, 1.0, vUv.x);
+        float sunProximity = sunSide * smoothstep(0.20, 0.95, vUv.y);
+        cloudCol += uSunGlow * sunProximity;
 
-        // Gentle warm sunlight boost toward upper-left sun quadrant
-        float sunProximity = (1.0 - smoothstep(0.0, 0.7, vUv.x)) * smoothstep(0.25, 0.95, vUv.y);
-        cloudCol += vec3(0.04, 0.03, 0.01) * sunProximity;
-
-        // Soft aerial perspective blend near the horizon
         float horizonFade = smoothstep(0.0, 0.24, vUv.y);
         float topFade = 1.0 - smoothstep(0.84, 1.0, vUv.y);
-        vec3 mistCol = vec3(0.82, 0.90, 0.97);
-        cloudCol = mix(mistCol, cloudCol, mix(1.0, horizonFade, horizonTint));
+        cloudCol = mix(uMistCol, cloudCol, mix(1.0, horizonFade, horizonTint));
 
         float alpha = density * horizonFade * topFade * layerOpacity;
         if (alpha < 0.004) discard;
@@ -140,7 +135,7 @@ function createCloudMaterial(texture, { opacity, scale, driftScale, wispWeight, 
   });
 }
 
-export function createCampusAtmosphere(renderer) {
+export function createCampusAtmosphere(renderer, initialTheme = getTimeOfDayTheme()) {
   const width = 1024;
   const height = 384;
   const pixels = new Uint8Array(width * height * 4);
@@ -168,10 +163,9 @@ export function createCampusAtmosphere(renderer) {
 
   const clouds = new THREE.Group();
 
-  // Primary mid-altitude sunlit cumulus layer across the daytime sky
   const cumulusGeo = new THREE.PlaneGeometry(240, 48);
-  const cumulusMat = createCloudMaterial(texture, {
-    opacity: 0.88,
+  const cumulusMat = createCloudMaterial(texture, initialTheme.cloud, {
+    isCirrus: false,
     scale: [1.0, 1.0],
     driftScale: 1.0,
     wispWeight: 0.14,
@@ -182,10 +176,9 @@ export function createCampusAtmosphere(renderer) {
   cumulusMesh.renderOrder = -10;
   clouds.add(cumulusMesh);
 
-  // Higher-altitude wispy cirrus layer moving slower for atmospheric depth parallax
   const cirrusGeo = new THREE.PlaneGeometry(290, 62);
-  const cirrusMat = createCloudMaterial(texture, {
-    opacity: 0.46,
+  const cirrusMat = createCloudMaterial(texture, initialTheme.cloud, {
+    isCirrus: true,
     scale: [1.35, 1.0],
     driftScale: 0.52,
     wispWeight: 0.72,
@@ -196,13 +189,13 @@ export function createCampusAtmosphere(renderer) {
   cirrusMesh.renderOrder = -12;
   clouds.add(cirrusMesh);
 
-  // Daytime environment reflection map aligned with the blue sky & sunlit clouds
+  // Environment reflection map built for the active time-of-day sky
   const skyWidth = 512;
   const skyHeight = 256;
   const skyPixels = new Uint8Array(skyWidth * skyHeight * 4);
-  const skyTop = new THREE.Color('#2b78c4');
-  const horizon = new THREE.Color('#dceaf5');
-  const ground = new THREE.Color('#6b7268');
+  const skyTop = new THREE.Color(initialTheme.sky[1]);
+  const horizon = new THREE.Color(initialTheme.sky[4]);
+  const ground = new THREE.Color(initialTheme.light.hemiGround);
   const color = new THREE.Color();
   for (let y = 0; y < skyHeight; y++) {
     const v = y / (skyHeight - 1);
@@ -211,7 +204,7 @@ export function createCampusAtmosphere(renderer) {
         color.copy(skyTop).lerp(horizon, Math.pow(v * 2, 0.72));
         const [cumulus] = sampleCloudChannels(x / skyWidth, v * 2);
         const cloudMask = THREE.MathUtils.smoothstep(cumulus, 0.44, 0.76);
-        color.lerp(horizon, cloudMask * 0.55);
+        color.lerp(new THREE.Color(initialTheme.cloud.midCol), cloudMask * 0.48);
       } else {
         color.copy(horizon).lerp(ground, Math.min(1, (v - 0.5) * 10));
       }
@@ -227,10 +220,24 @@ export function createCampusAtmosphere(renderer) {
   generator.dispose();
   sky.dispose();
 
+  const applyCloudTheme = (mat, cloud, isCirrus) => {
+    mat.uniforms.layerOpacity.value = isCirrus ? cloud.cirrusOpacity : cloud.cumulusOpacity;
+    mat.uniforms.uSunCol.value.set(cloud.sunCol);
+    mat.uniforms.uMidCol.value.set(cloud.midCol);
+    mat.uniforms.uShadowCol.value.set(cloud.shadowCol);
+    mat.uniforms.uMistCol.value.set(cloud.mistCol);
+    mat.uniforms.uSunGlow.value.set(...cloud.sunGlow);
+    mat.uniforms.uSunOffset.value.set(...cloud.sunOffset);
+  };
+
   return {
     clouds,
     environment: environment.texture,
-    // Advance dual-octave drift uniforms so clouds glide and gently evolve across the sky.
+    setTheme(theme) {
+      if (!theme?.cloud) return;
+      applyCloudTheme(cumulusMat, theme.cloud, false);
+      applyCloudTheme(cirrusMat, theme.cloud, true);
+    },
     advance(seconds) {
       cumulusMat.uniforms.driftPrimary.value = (cumulusMat.uniforms.driftPrimary.value + seconds * 0.0085) % 1;
       cumulusMat.uniforms.driftSecondary.value = (cumulusMat.uniforms.driftSecondary.value + seconds * 0.0052) % 1;

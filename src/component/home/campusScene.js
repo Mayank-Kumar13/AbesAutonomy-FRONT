@@ -6,17 +6,18 @@ import brandFont from './assets/gentilis-brand.json';
 import { createCampusSurfaces, seededRandom } from './campusSurfaces';
 import { createCampusAtmosphere } from './campusAtmosphere';
 import { addCampusPlanting } from './campusPlanting';
+import { getTimeOfDayTheme } from './timeOfDay';
 
 // A deliberately architectural interpretation of the supplied ABES facade.
 // Repeated facade details are instanced: hundreds of windows, only a few draw calls.
-export function createCampusScene(canvas) {
+export function createCampusScene(canvas, initialTheme = getTimeOfDayTheme()) {
   const lowPower = window.matchMedia('(pointer: coarse)').matches || (navigator.hardwareConcurrency || 8) <= 4;
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'low-power' });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
   renderer.setClearColor(0x000000, 0);
   renderer.localClippingEnabled = true;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 0.98;
+  renderer.toneMappingExposure = initialTheme.light.exposure;
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFShadowMap;
   // Architecture is static; cache its shadows instead of rebuilding them on scroll.
@@ -30,14 +31,15 @@ export function createCampusScene(canvas) {
   const room = new RoomEnvironment();
   const pmrem = new THREE.PMREMGenerator(renderer);
   const environment = pmrem.fromScene(room, 0.04);
-  const atmosphere = createCampusAtmosphere(renderer);
+  const atmosphere = createCampusAtmosphere(renderer, initialTheme);
   scene.environment = atmosphere.environment;
   scene.add(atmosphere.clouds);
   room.dispose();
   pmrem.dispose();
-  scene.add(new THREE.HemisphereLight(0xdceeff, 0x858374, 0.78));
-  const sun = new THREE.DirectionalLight(0xfff5e4, 2.2);
-  sun.position.set(-30, 32, 16);
+  const hemi = new THREE.HemisphereLight(initialTheme.light.hemiSky, initialTheme.light.hemiGround, initialTheme.light.hemiIntensity);
+  scene.add(hemi);
+  const sun = new THREE.DirectionalLight(initialTheme.light.sunColor, initialTheme.light.sunIntensity);
+  sun.position.set(...initialTheme.light.sunPos);
   sun.castShadow = true;
   sun.shadow.mapSize.set(lowPower ? 1024 : 2048, lowPower ? 1024 : 2048);
   Object.assign(sun.shadow.camera, { left: -42, right: 42, top: 32, bottom: -25, near: 1, far: 110 });
@@ -46,7 +48,7 @@ export function createCampusScene(canvas) {
   sun.shadow.bias = -0.00015;
   sun.shadow.radius = 2.5;
   scene.add(sun);
-  const rim = new THREE.DirectionalLight(0xb3d5ed, 0.35);
+  const rim = new THREE.DirectionalLight(initialTheme.light.rimColor, initialTheme.light.rimIntensity);
   rim.position.set(15, 22, -16);
   scene.add(rim);
 
@@ -177,7 +179,14 @@ export function createCampusScene(canvas) {
   ctx.font = '58px Arial'; ctx.fillText('Engineering College', 582, 208);
   const signTexture = new THREE.CanvasTexture(signCanvas);
   signTexture.colorSpace = THREE.SRGBColorSpace;
-  const signMaterial = new THREE.MeshStandardMaterial({ map: signTexture, roughness: 0.65, envMapIntensity: 0.2 });
+  const signMaterial = new THREE.MeshStandardMaterial({
+    map: signTexture,
+    emissiveMap: signTexture,
+    emissive: new THREE.Color(0xfff1d6),
+    emissiveIntensity: initialTheme.arch.signEmissiveIntensity,
+    roughness: 0.65,
+    envMapIntensity: 0.2,
+  });
   mesh(new THREE.BoxGeometry(9.35, 2.5, 0.22), signMaterial, 0, 13.15, 3.02);
 
   // Forecourt, walkway, planting beds and palms add depth without a bitmap backdrop.
@@ -222,6 +231,7 @@ export function createCampusScene(canvas) {
   }
 
   const title = new THREE.Group();
+  const titleVertexHeights = [];
   // The atrium has real openings. Clip only the lettering below the roofline
   // so it cannot show through those openings while rising behind the campus.
   const titleRoofline = new THREE.Plane(new THREE.Vector3(0, 1, 0), -15.5);
@@ -234,15 +244,18 @@ export function createCampusScene(canvas) {
     const bounds = geometry.boundingBox;
     const positions = geometry.attributes.position;
     const colors = new Float32Array(positions.count * 3);
-    const lower = new THREE.Color(0xa8c2d8);
-    const upper = new THREE.Color(0xf7faff);
+    const heights = new Float32Array(positions.count);
+    const lower = new THREE.Color(initialTheme.arch.titleLower);
+    const upper = new THREE.Color(initialTheme.arch.titleUpper);
     const color = new THREE.Color();
     for (let vertex = 0; vertex < positions.count; vertex++) {
       const height = (positions.getY(vertex) - bounds.min.y) / (bounds.max.y - bounds.min.y);
+      heights[vertex] = height;
       color.copy(lower).lerp(upper, height);
       color.toArray(colors, vertex * 3);
     }
     geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+    titleVertexHeights.push({ geometry, heights });
     const scale = width / (bounds.max.x - bounds.min.x);
     geometry.translate(-(bounds.max.x + bounds.min.x) / 2, 0, 0);
     const text = new THREE.Mesh(geometry, [materials.silver, materials.silverSide]);
@@ -251,6 +264,45 @@ export function createCampusScene(canvas) {
     title.add(text);
   }
   scene.add(title);
+
+  const applyTimeOfDay = (theme) => {
+    if (!theme) return;
+    renderer.toneMappingExposure = theme.light.exposure;
+    hemi.color.set(theme.light.hemiSky);
+    hemi.groundColor.set(theme.light.hemiGround);
+    hemi.intensity = theme.light.hemiIntensity;
+    sun.color.set(theme.light.sunColor);
+    sun.intensity = theme.light.sunIntensity;
+    const [sx, sy, sz] = theme.light.sunPos;
+    if (sun.position.x !== sx || sun.position.y !== sy || sun.position.z !== sz) {
+      sun.position.set(sx, sy, sz);
+      renderer.shadowMap.needsUpdate = true;
+    }
+    rim.color.set(theme.light.rimColor);
+    rim.intensity = theme.light.rimIntensity;
+
+    materials.glass.emissive.set(theme.arch.glassEmissive);
+    materials.glass.emissiveIntensity = theme.arch.glassIntensity;
+    materials.glass.envMapIntensity = theme.arch.envIntensity;
+    materials.glassLight.emissive.set(theme.arch.glassLightEmissive);
+    materials.glassLight.emissiveIntensity = theme.arch.glassLightIntensity;
+    materials.glassLight.envMapIntensity = theme.arch.envIntensity * 0.75;
+    signMaterial.emissiveIntensity = theme.arch.signEmissiveIntensity;
+
+    const lower = new THREE.Color(theme.arch.titleLower);
+    const upper = new THREE.Color(theme.arch.titleUpper);
+    const color = new THREE.Color();
+    for (const { geometry, heights } of titleVertexHeights) {
+      const attr = geometry.attributes.color;
+      for (let v = 0; v < heights.length; v++) {
+        color.copy(lower).lerp(upper, heights[v]);
+        attr.setXYZ(v, color.r, color.g, color.b);
+      }
+      attr.needsUpdate = true;
+    }
+    atmosphere.setTheme(theme);
+  };
+  applyTimeOfDay(initialTheme);
   let aspect = 1;
   let lastWidth = 0;
   let lastHeight = 0;
@@ -293,6 +345,12 @@ export function createCampusScene(canvas) {
   motionQuery.addEventListener('change', refreshClouds);
 
   return {
+    setTimeOfDay(theme) {
+      applyTimeOfDay(theme);
+      if (!released && sceneVisible) {
+        renderer.render(scene, camera);
+      }
+    },
     resize(width, height) {
       if (width === lastWidth && height === lastHeight) return;
       lastWidth = width; lastHeight = height;

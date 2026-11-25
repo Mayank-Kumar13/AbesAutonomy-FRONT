@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { ArrowDown, ArrowUpRight } from 'lucide-react';
 import HomeNavigation from './HomeNavigation';
 import { getJourneyState } from './journey';
+import { applySkyCssVars, getTimeOfDayTheme, resolveTargetHour } from './timeOfDay';
 import './HomeContent.css';
 
 export default function HomeContent() {
@@ -34,6 +35,8 @@ export default function HomeContent() {
     const finePointer = window.matchMedia('(pointer: fine)');
     let disposed = false;
     let scene;
+    let currentTheme = getTimeOfDayTheme(resolveTargetHour());
+    applySkyCssVars(stage, currentTheme);
     let hasRenderedScene = false;
     let frame = 0;
     let progress = 0;
@@ -134,7 +137,9 @@ export default function HomeContent() {
     import('./campusScene')
       .then(({ createCampusScene }) => {
         if (disposed) return;
-        scene = createCampusScene(canvas);
+        currentTheme = getTimeOfDayTheme(resolveTargetHour());
+        applySkyCssVars(stage, currentTheme);
+        scene = createCampusScene(canvas, currentTheme);
         measure();
         window.cancelAnimationFrame(frame);
         render();
@@ -148,8 +153,17 @@ export default function HomeContent() {
         }
       });
 
+    // Periodically refresh sky, clouds, and lighting as real local time progresses
+    const timeSyncTimer = window.setInterval(() => {
+      if (disposed || document.hidden) return;
+      currentTheme = getTimeOfDayTheme(resolveTargetHour());
+      applySkyCssVars(stage, currentTheme);
+      scene?.setTimeOfDay?.(currentTheme);
+    }, 60000);
+
     return () => {
       disposed = true;
+      window.clearInterval(timeSyncTimer);
       if (frame) window.cancelAnimationFrame(frame);
       resizeObserver.disconnect();
       window.removeEventListener('scroll', schedule);
@@ -173,7 +187,9 @@ export default function HomeContent() {
         <section className="campus-journey" id="campus" ref={journeyRef} aria-labelledby="campus-title">
           <div className={`campus-stage${sceneReady ? ' is-3d-ready' : ''}`} ref={stageRef}>
             <h1 className="home-sr-only" id="campus-title">ABES Autonomy</h1>
-            <div className="campus-sky" aria-hidden="true" />
+            <div className="campus-sky" aria-hidden="true">
+              <div className="campus-stars" />
+            </div>
             <div className="campus-fallback" aria-hidden="true">
               <div className="campus-fallback-title"><span>ABES</span><span>AUTONOMY</span></div>
             </div>
