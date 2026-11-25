@@ -266,7 +266,7 @@ export default function PdfPreview() {
     }
 
     // STRICT POLICY: PDF Downloads are strictly reserved for Premium members (and Main Super Admin)
-    const isSuperAdmin = user?.email === 'abesautonomy30@gmail.com' || (user?._id && (user._id === '66e13fae7323fe4db20757a3' || user.id === '66e13fae7323fe4db20757a3')) || user?.isSuperAdmin;
+    const isSuperAdmin = user?.email?.toLowerCase().trim() === 'abesautonomy30@gmail.com' || user?.isSuperAdmin === true;
     const isPremiumUser = user?.isPremium === true;
 
     if (!isSuperAdmin && !isPremiumUser) {

@@ -94,7 +94,16 @@ export default function AdminPanel() {
   const [actionLoading, setActionLoading] = useState(null);
   
   const { websiteStatus, setWebsiteStatus, user, token } = useAuth();
+  const isMainSuperAdmin = Boolean(
+    user && (user.isSuperAdmin === true || user.email?.toLowerCase().trim() === 'abesautonomy30@gmail.com')
+  );
   const [statusLoading, setStatusLoading] = useState(false);
+
+  useEffect(() => {
+    if (tab === 'premium' && !isMainSuperAdmin) {
+      setTab('analytics');
+    }
+  }, [tab, isMainSuperAdmin]);
 
   // ─── Announcement state ────────────────────────────
   const [announcementMsg, setAnnouncementMsg] = useState('');
@@ -846,9 +855,11 @@ export default function AdminPanel() {
             <button className={`admin-tab-btn ${tab === 'analytics' ? 'active' : ''}`} onClick={() => setTab('analytics')}>
               Analytics
             </button>
-            <button className={`admin-tab-btn ${tab === 'premium' ? 'active' : ''}`} onClick={() => setTab('premium')}>
-              👑 Premium
-            </button>
+            {isMainSuperAdmin && (
+              <button className={`admin-tab-btn ${tab === 'premium' ? 'active' : ''}`} onClick={() => setTab('premium')}>
+                👑 Premium
+              </button>
+            )}
             <button className={`admin-tab-btn ${tab === 'users' ? 'active' : ''}`} onClick={() => setTab('users')}>
               Users
             </button>
@@ -898,7 +909,7 @@ export default function AdminPanel() {
         <AnalyticsDashboard />
       )}
 
-      {tab === 'premium' && user?.role !== 'coordinator' && (
+      {tab === 'premium' && isMainSuperAdmin && (
         <PremiumManagement />
       )}
 
@@ -1117,7 +1128,7 @@ export default function AdminPanel() {
                         >
                           <option value="user">User</option>
                           <option value="coordinator">Coordinator</option>
-                          <option value="admin">Admin</option>
+                          {isMainSuperAdmin && <option value="admin">Admin</option>}
                         </select>
                         <div style={{ display: 'flex', gap: '0.5rem' }}>
                           <button type="button" onClick={() => handleSaveRole(u)} className="upload-submit-btn" style={{ padding: '2px 8px', fontSize: '0.75rem', margin: 0, width: 'auto' }} disabled={actionLoading === `role-${u._id}`}>Save</button>
@@ -1129,18 +1140,31 @@ export default function AdminPanel() {
                         <button
                           type="button"
                           className="admin-action-btn"
-                          style={{ padding: '4px 8px', fontSize: '0.8rem', backgroundColor: u.email === 'abesautonomy30@gmail.com' ? '#334155' : '#e2e8f0', color: u.email === 'abesautonomy30@gmail.com' ? '#94a3b8' : '#1e293b', border: 'none', borderRadius: '4px', cursor: u.email === 'abesautonomy30@gmail.com' ? 'not-allowed' : 'pointer' }}
+                          style={{
+                            padding: '4px 8px',
+                            fontSize: '0.8rem',
+                            backgroundColor: (u.email === 'abesautonomy30@gmail.com' || (u.role === 'admin' && !isMainSuperAdmin)) ? '#334155' : '#e2e8f0',
+                            color: (u.email === 'abesautonomy30@gmail.com' || (u.role === 'admin' && !isMainSuperAdmin)) ? '#94a3b8' : '#1e293b',
+                            border: 'none',
+                            borderRadius: '4px',
+                            cursor: (u.email === 'abesautonomy30@gmail.com' || (u.role === 'admin' && !isMainSuperAdmin)) ? 'not-allowed' : 'pointer',
+                          }}
                           onClick={() => startEditRole(u)}
-                          disabled={actionLoading === `role-${u._id}` || u.email === 'abesautonomy30@gmail.com'}
+                          disabled={actionLoading === `role-${u._id}` || u.email === 'abesautonomy30@gmail.com' || (u.role === 'admin' && !isMainSuperAdmin)}
                         >
                           Manage Role
                         </button>
                         <button
                           type="button"
                           className="delete-note-btn"
-                          style={{ padding: '4px 8px', fontSize: '0.8rem', cursor: u.email === 'abesautonomy30@gmail.com' ? 'not-allowed' : 'pointer' }}
+                          style={{
+                            padding: '4px 8px',
+                            fontSize: '0.8rem',
+                            cursor: (u.email === 'abesautonomy30@gmail.com' || (u.role === 'admin' && !isMainSuperAdmin)) ? 'not-allowed' : 'pointer',
+                            opacity: (u.email === 'abesautonomy30@gmail.com' || (u.role === 'admin' && !isMainSuperAdmin)) ? 0.5 : 1,
+                          }}
                           onClick={() => handleDeleteUser(u)}
-                          disabled={actionLoading === `delete-${u._id}` || u.email === 'abesautonomy30@gmail.com'}
+                          disabled={actionLoading === `delete-${u._id}` || u.email === 'abesautonomy30@gmail.com' || (u.role === 'admin' && !isMainSuperAdmin)}
                         >
                           {actionLoading === `delete-${u._id}` ? '...' : 'Delete'}
                         </button>

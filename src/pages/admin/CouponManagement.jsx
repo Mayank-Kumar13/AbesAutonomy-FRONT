@@ -12,6 +12,7 @@ import {
   Link2,
 } from 'lucide-react';
 import { adminPremiumApi } from '../../services/api';
+import { useAuth } from '../../auth/AuthContext';
 
 const PLAN_OPTIONS = [
   { id: 'premium_1_month', label: 'Monthly (₹29)' },
@@ -59,6 +60,10 @@ function formatPlanTag(planId) {
 }
 
 export default function CouponManagement() {
+  const { user } = useAuth();
+  const isMainSuperAdmin = Boolean(
+    user && (user.isSuperAdmin === true || user.email?.toLowerCase().trim() === 'abesautonomy30@gmail.com')
+  );
   const [coupons, setCoupons] = useState([]);
   const [summary, setSummary] = useState({
     totalCoupons: 0,
@@ -98,8 +103,12 @@ export default function CouponManagement() {
   }, [query, statusFilter]);
 
   useEffect(() => {
+    if (!isMainSuperAdmin) {
+      setLoading(false);
+      return;
+    }
     loadCoupons();
-  }, [loadCoupons]);
+  }, [isMainSuperAdmin, loadCoupons]);
 
   const openCreateModal = () => {
     setEditingCoupon(null);
@@ -217,6 +226,18 @@ export default function CouponManagement() {
     setCopiedId(id);
     setTimeout(() => setCopiedId(null), 1600);
   };
+
+  if (!isMainSuperAdmin) {
+    return (
+      <div className="pm-box" style={{ padding: '40px 24px', textAlign: 'center' }}>
+        <Ticket size={32} color="#C5AC86" style={{ margin: '0 auto 10px' }} />
+        <h3 style={{ color: '#fff', marginBottom: '6px' }}>Restricted Main Admin Area</h3>
+        <p style={{ color: '#9ca3af', maxWidth: '460px', margin: '0 auto' }}>
+          Coupon creation and management are strictly restricted to the main administrator account (abesautonomy30@gmail.com).
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div>

@@ -18,10 +18,15 @@ import {
   Ticket,
 } from 'lucide-react';
 import { adminPremiumApi } from '../../services/api';
+import { useAuth } from '../../auth/AuthContext';
 import CouponManagement from './CouponManagement';
 import './PremiumManagement.css';
 
 export default function PremiumManagement() {
+  const { user } = useAuth();
+  const isMainSuperAdmin = Boolean(
+    user && (user.isSuperAdmin === true || user.email?.toLowerCase().trim() === 'abesautonomy30@gmail.com')
+  );
   const [subTab, setSubTab] = useState('analytics'); // 'analytics', 'users', 'payments', 'audit', 'notifications'
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -126,20 +131,25 @@ export default function PremiumManagement() {
 
   // Initial load
   useEffect(() => {
+    if (!isMainSuperAdmin) {
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     Promise.all([
       loadAnalytics(),
       loadNotifications(),
     ]).finally(() => setLoading(false));
-  }, [loadAnalytics, loadNotifications]);
+  }, [isMainSuperAdmin, loadAnalytics, loadNotifications]);
 
   // Tab switch effect
   useEffect(() => {
+    if (!isMainSuperAdmin) return;
     if (subTab === 'users') loadUsers();
     if (subTab === 'payments') loadPayments();
     if (subTab === 'audit') loadAuditLogs();
     if (subTab === 'notifications') loadNotifications();
-  }, [subTab, loadUsers, loadPayments, loadAuditLogs, loadNotifications]);
+  }, [isMainSuperAdmin, subTab, loadUsers, loadPayments, loadAuditLogs, loadNotifications]);
 
   // Open User Details Modal
   const handleOpenDetails = async (u) => {
@@ -205,6 +215,18 @@ export default function PremiumManagement() {
       loadNotifications();
     } catch (err) {}
   };
+
+  if (!isMainSuperAdmin) {
+    return (
+      <div className="pm-wrap" style={{ padding: '48px 24px', textAlign: 'center' }}>
+        <Crown size={36} color="#C5AC86" style={{ margin: '0 auto 12px' }} />
+        <h3 style={{ color: '#fff', marginBottom: '8px' }}>Restricted Main Admin Area</h3>
+        <p style={{ color: '#9ca3af', maxWidth: '480px', margin: '0 auto' }}>
+          Premium management, manual grants, revenue analytics, and coupon controls are strictly restricted to the main administrator account (abesautonomy30@gmail.com).
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="pm-wrap">
