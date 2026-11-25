@@ -331,7 +331,8 @@ const ProfileCard = ({
               className="profile-card__photo" 
               src={avatarUrl} 
               alt={name || ''} 
-              loading="lazy" 
+              loading="eager" 
+              decoding="async"
               draggable={false} 
             />
           )}
@@ -351,7 +352,7 @@ const ProfileCard = ({
           <div className="profile-card__footer">
             {miniAvatarUrl && (
               <span className="profile-card__avatar">
-                <img src={miniAvatarUrl} alt="" loading="lazy" draggable={false} />
+                <img src={miniAvatarUrl} alt="" loading="lazy" decoding="async" draggable={false} />
               </span>
             )}
             <div className="profile-card__meta">

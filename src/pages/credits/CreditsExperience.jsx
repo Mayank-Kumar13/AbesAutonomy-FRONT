@@ -11,42 +11,42 @@ import './CreditsExperience.css';
 // Local verified metadata (cutouts & handles) matching contributors
 const MEMBER_META = {
   'mayank kumar': {
-    cardPhoto: '/images/contributors/mayank_kumar_card.png',
+    cardPhoto: '/images/contributors/mayank_kumar_card.webp',
     handle: 'tomar.13',
     roleFallback: 'Founder & Lead Architect'
   },
   'mayank kotuli': {
-    cardPhoto: '/images/contributors/mayank_kotuli_card.png',
+    cardPhoto: '/images/contributors/mayank_kotuli_card.webp',
     handle: '_mayank099_',
     roleFallback: 'Founder & Product Engineer'
   },
   'mukul yadav': {
-    cardPhoto: '/images/contributors/mukul_yadav_card.png',
+    cardPhoto: '/images/contributors/mukul_yadav_card.webp',
     handle: 'mukul_yddv08',
     roleFallback: 'Co-Founder & Core Developer'
   },
   'mayank chaudhary': {
-    cardPhoto: '/images/contributors/mayank_chaudhary_card.png',
+    cardPhoto: '/images/contributors/mayank_chaudhary_card.webp',
     handle: 'mayankchaudhary_03',
     roleFallback: 'Communications & PR Strategist'
   },
   'mayank sharma': {
-    cardPhoto: '/images/contributors/mayank_sharma_card.png',
+    cardPhoto: '/images/contributors/mayank_sharma_card.webp',
     handle: 'mynk_911',
     roleFallback: 'Motion & Media Producer'
   },
   'medhawin tiwari': {
-    cardPhoto: '/images/contributors/medhawin_tiwari_card.png',
+    cardPhoto: '/images/contributors/medhawin_tiwari_card.webp',
     handle: 'medhawintiwari',
     roleFallback: 'Visual & Interface Designer'
   },
   'kanishq atterya': {
-    cardPhoto: '/images/contributors/kanishq_atterya_card.png',
+    cardPhoto: '/images/contributors/kanishq_atterya_card.webp',
     handle: 'kanishq_attreya',
     roleFallback: 'Academic Contributions Head'
   },
   'nitin bhardwaj': {
-    cardPhoto: '/images/contributors/nitin_bhardwaj_card.png',
+    cardPhoto: '/images/contributors/nitin_bhardwaj_card.webp',
     handle: 'nitin_bhardwaj',
     roleFallback: '10 SGPA Topper Contributor'
   }
@@ -63,7 +63,7 @@ const DEFAULT_ROLE_SECTIONS = [
         name: "Mayank Kumar",
         role: "Founder & Lead Architect",
         description: "Still figuring it out, but never settling for a version that isn’t mine.",
-        cardPhoto: "/images/contributors/mayank_kumar_card.png",
+        cardPhoto: "/images/contributors/mayank_kumar_card.webp",
         handle: "tomar.13",
         status: "Online",
         statusColor: "#22c55e",
@@ -76,7 +76,7 @@ const DEFAULT_ROLE_SECTIONS = [
         name: "Mayank Kotuli",
         role: "Founder & Product Engineer",
         description: "Turning ideas into products, and problems into possibilities.",
-        cardPhoto: "/images/contributors/mayank_kotuli_card.png",
+        cardPhoto: "/images/contributors/mayank_kotuli_card.webp",
         handle: "_mayank099_",
         status: "Online",
         statusColor: "#22c55e",
@@ -95,7 +95,7 @@ const DEFAULT_ROLE_SECTIONS = [
         name: "Mukul Yadav",
         role: "Co-Founder & Core Developer",
         description: "Learning as I build, building as I learn.",
-        cardPhoto: "/images/contributors/mukul_yadav_card.png",
+        cardPhoto: "/images/contributors/mukul_yadav_card.webp",
         handle: "mukul_yddv08",
         status: "Online",
         statusColor: "#22c55e",
@@ -114,7 +114,7 @@ const DEFAULT_ROLE_SECTIONS = [
         name: "Mayank Chaudhary",
         role: "Communications & PR Strategist",
         description: "Driving community outreach, strategic partnerships, and student engagement.",
-        cardPhoto: "/images/contributors/mayank_chaudhary_card.png",
+        cardPhoto: "/images/contributors/mayank_chaudhary_card.webp",
         handle: "mayankchaudhary_03",
         status: "Online",
         statusColor: "#22c55e",
@@ -127,7 +127,7 @@ const DEFAULT_ROLE_SECTIONS = [
         name: "Mayank Sharma",
         role: "Motion & Media Producer",
         description: "Crafting digital stories, cinematic edits, and platform visual narratives.",
-        cardPhoto: "/images/contributors/mayank_sharma_card.png",
+        cardPhoto: "/images/contributors/mayank_sharma_card.webp",
         handle: "mynk_911",
         status: "Online",
         statusColor: "#22c55e",
@@ -140,7 +140,7 @@ const DEFAULT_ROLE_SECTIONS = [
         name: "Medhawin Tiwari",
         role: "Visual & Interface Designer",
         description: "Designing modern aesthetics, brand materials, and intuitive visual assets.",
-        cardPhoto: "/images/contributors/medhawin_tiwari_card.png",
+        cardPhoto: "/images/contributors/medhawin_tiwari_card.webp",
         handle: "medhawintiwari",
         status: "Online",
         statusColor: "#22c55e",
@@ -159,7 +159,7 @@ const DEFAULT_ROLE_SECTIONS = [
         name: "Kanishq Atterya",
         role: "Academic Contributions Head",
         description: "Curating verified syllabus modules, lecture notes, and topper resources.",
-        cardPhoto: "/images/contributors/kanishq_atterya_card.png",
+        cardPhoto: "/images/contributors/kanishq_atterya_card.webp",
         handle: "kanishq_attreya",
         status: "Online",
         statusColor: "#22c55e",
@@ -178,7 +178,7 @@ const DEFAULT_ROLE_SECTIONS = [
         name: "Nitin Bhardwaj",
         role: "10 SGPA Topper Contributor",
         description: "Authoring high-yield handwritten solutions for semester exam excellence.",
-        cardPhoto: "/images/contributors/nitin_bhardwaj_card.png",
+        cardPhoto: "/images/contributors/nitin_bhardwaj_card.webp",
         handle: "nitin_bhardwaj",
         status: "Online",
         statusColor: "#22c55e",
@@ -206,7 +206,7 @@ export default function CreditsExperience({ liveSections = [] }) {
               return {
                 ...m,
                 role: m.role || meta.roleFallback || 'Contributor',
-                cardPhoto: meta.cardPhoto || m.photoUrl || '/images/contributors/mayank_kumar_card.png',
+                cardPhoto: meta.cardPhoto || m.photoUrl || '/images/contributors/mayank_kumar_card.webp',
                 handle: meta.handle || defaultHandle,
                 status: 'Online',
                 statusColor: '#22c55e',
@@ -235,6 +235,27 @@ export default function CreditsExperience({ liveSections = [] }) {
   const cardsRowRef = useRef(null);
 
   const activeSection = sections[activeSectionIndex] || sections[0];
+
+  // Warm browser cache for non-active sections' lightweight WebP portraits after initial render
+  useEffect(() => {
+    const urls = [];
+    sections.forEach((sec, idx) => {
+      if (idx === activeSectionIndex) return;
+      sec.members?.forEach((m) => {
+        if (m.cardPhoto) urls.push(m.cardPhoto);
+      });
+    });
+    if (urls.length === 0) return;
+
+    const timer = setTimeout(() => {
+      urls.forEach((src) => {
+        const img = new window.Image();
+        img.decoding = 'async';
+        img.src = src;
+      });
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [sections, activeSectionIndex]);
 
   const goToSection = useCallback((targetIndex, direction) => {
     if (targetIndex === activeSectionIndex || isTransitioning) return;
