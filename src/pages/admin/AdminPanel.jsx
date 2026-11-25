@@ -10,6 +10,7 @@ import AnalyticsDashboard from './AnalyticsDashboard';
 import TopReadersLeaderboard from './TopReadersLeaderboard';
 import SupabasePdfManager from './SupabasePdfManager';
 import PremiumManagement from './PremiumManagement';
+import AdsManagementPanel from './AdsManagementPanel';
 
 const BRANCHES_Y1 = ['electrical', 'electronics', 'common'];
 const BRANCHES_Y2 = ['cse', 'ds', 'aiml', 'ece', 'elce', 'common'];
@@ -901,6 +902,9 @@ export default function AdminPanel() {
             <button className={`admin-tab-btn ${tab === 'liveTracking' ? 'active' : ''}`} onClick={() => setTab('liveTracking')}>
               Document Read Logs
             </button>
+            <button className={`admin-tab-btn ${tab === 'ads' ? 'active' : ''}`} onClick={() => setTab('ads')}>
+              Google Ads
+            </button>
           </>
         )}
       </div>
@@ -928,6 +932,10 @@ export default function AdminPanel() {
 
       {tab === 'credits' && (
         <CreditsManagement />
+      )}
+
+      {tab === 'ads' && user?.role !== 'coordinator' && (
+        <AdsManagementPanel />
       )}
 
       {tab === 'liveTracking' && (() => {

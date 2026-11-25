@@ -28,6 +28,7 @@ import ProviderCallback from './pages/oauth/ProviderCallback';
 import ProtectedRoute from './auth/ProtectedRoute';
 import AdminRoute from './auth/AdminRoute';
 import GlobalStatusGuard from './auth/GlobalStatusGuard';
+import AdLayoutShell from './component/ads/AdLayoutShell';
 import { trackingApi } from './services/api';
 import PaymentResult from './pages/payment/PaymentResult';
 
@@ -157,7 +158,8 @@ const App = () => {
       <RouteErrorBoundary key={location.pathname}>
         <Suspense fallback={<PageLoaderFallback />}>
           <div key={location.pathname} className="page-transition-container">
-            <Routes>
+            <AdLayoutShell>
+              <Routes>
               <Route path="/" element={<HomeContent />} />
               <Route path="/premium" element={<PremiumPage />} />
               <Route path="/payment/success" element={<PaymentResult type="success" />} />
@@ -183,7 +185,8 @@ const App = () => {
               <Route path="/contribute" element={<Contribute />} />
               <Route path="/under-construction" element={<UnderConstruction />} />
               <Route path="/admin" element={<AdminRoute><AdminPanel /></AdminRoute>} />
-            </Routes>
+              </Routes>
+            </AdLayoutShell>
           </div>
         </Suspense>
       </RouteErrorBoundary>

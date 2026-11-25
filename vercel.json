@@ -5,7 +5,7 @@
       "destination": "https://api.abes.work/api/:path*"
     },
     {
-      "source": "/((?!api/|assets/|pdfjs-).*)",
+      "source": "/((?!api/|assets/|pdfjs-|ads\\.txt|robots\\.txt|sitemap\\.xml).*)",
       "destination": "/"
     }
   ]

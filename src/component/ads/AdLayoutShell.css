@@ -1,0 +1,173 @@
+/* ──────────────────────────────────────────────────────────────
+ * Responsive Left / Right AdSense Skyscraper Rail Layout Shell
+ * Desktop (>= 1280px): 3-column symmetric grid with sticky 160x600 rails
+ * Tablet & Mobile (< 1280px): side rails hidden, compact responsive bottom slot
+ * ────────────────────────────────────────────────────────────── */
+
+.ad-rail-shell {
+  flex: 1;
+  width: 100%;
+  background: var(--ad-shell-bg, #060709);
+  overflow-x: clip; /* preserves position: sticky inside children */
+}
+
+.ad-rail-center {
+  width: 100%;
+  min-width: 0;
+  overflow-x: clip;
+}
+
+.ad-rail-col {
+  display: none;
+}
+
+/* Mobile & Tablet in-flow banner below main page content */
+.ad-mobile-banner-slot {
+  width: 100%;
+  max-width: 728px;
+  margin: 0 auto 48px;
+  padding: 0 16px;
+}
+
+@media (min-width: 1280px) {
+  .ad-rail-shell.has-side-rails {
+    display: grid;
+    grid-template-columns: minmax(172px, 1fr) minmax(0, 1180px) minmax(172px, 1fr);
+    align-items: start;
+  }
+
+  .ad-rail-col {
+    display: flex;
+    justify-content: center;
+    align-self: stretch;
+    padding: 104px 8px 84px;
+    min-width: 0;
+  }
+
+  .ad-rail-sticky {
+    position: sticky;
+    top: 96px;
+    z-index: 10;
+  }
+
+  /* Keep center page wrappers flush without double horizontal squeezing inside the grid */
+  .ad-rail-shell.has-side-rails .ad-rail-center .resource-shelf {
+    padding-inline: 24px;
+  }
+
+  .ad-rail-shell.has-side-rails .ad-rail-center .choose-ambient-light,
+  .ad-rail-shell.has-side-rails .ad-rail-center .subject-ambient-light,
+  .ad-rail-shell.has-side-rails .ad-rail-center .info-page-wrapper::before {
+    max-width: 100%;
+  }
+
+  .ad-mobile-banner-slot {
+    display: none;
+  }
+}
+
+/* ─── AD UNIT FRAMES ────────────────────────────────────────── */
+.ad-unit-frame {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.ad-unit-frame--skyscraper {
+  width: 160px;
+}
+
+.ad-unit-frame--banner {
+  width: 100%;
+}
+
+.ad-unit-frame.is-unfilled {
+  display: none;
+}
+
+.ad-unit-caption {
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.36);
+  user-select: none;
+}
+
+.ad-unit-ins {
+  border-radius: 12px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.015);
+}
+
+/* Admin / Preview card shown only before AdSense slot IDs are configured */
+.ad-unit-frame.is-preview .ad-unit-preview-body {
+  width: 100%;
+  border-radius: 16px;
+  border: 1px dashed rgba(197, 172, 134, 0.32);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.035) 0%, rgba(255, 255, 255, 0.015) 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 18px 12px;
+  gap: 8px;
+}
+
+.ad-unit-frame--skyscraper.is-preview .ad-unit-preview-body {
+  height: 600px;
+}
+
+.ad-unit-frame--banner.is-preview .ad-unit-preview-body {
+  min-height: 96px;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 14px 18px;
+}
+
+.ad-unit-preview-badge {
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: #C5AC86;
+  background: rgba(197, 172, 134, 0.12);
+  border: 1px solid rgba(197, 172, 134, 0.28);
+  border-radius: 9999px;
+  padding: 3px 9px;
+}
+
+.ad-unit-preview-size {
+  font-size: 14px;
+  font-weight: 650;
+  color: #F5F5F7;
+}
+
+.ad-unit-preview-note {
+  font-size: 11.5px;
+  line-height: 1.45;
+  color: #94a3b8;
+  max-width: 136px;
+}
+
+.ad-unit-frame--banner.is-preview .ad-unit-preview-note {
+  max-width: none;
+}
+
+.ad-unit-admin-link {
+  margin-top: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #C5AC86;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(197, 172, 134, 0.45);
+  padding-bottom: 1px;
+}
+
+.ad-unit-admin-link:hover {
+  color: #fff;
+  border-bottom-color: #fff;
+}

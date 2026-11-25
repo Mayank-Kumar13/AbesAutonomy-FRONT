@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, useCallback, useRef } from "react";
 import { authApi } from "./authApi";
+import { DEFAULT_ADS_SETTINGS, mergeAdsSettings } from "../utils/adConfig";
 
 const AuthContext = createContext(null);
 const HEARTBEAT_INTERVAL_MS = 60000;
@@ -16,6 +17,7 @@ export function AuthProvider({ children }) {
   const [token, setToken] = useState(() => localStorage.getItem("token"));
   const [loading, setLoading] = useState(true);
   const [websiteStatus, setWebsiteStatus] = useState('LIVE');
+  const [adsSettings, setAdsSettings] = useState(DEFAULT_ADS_SETTINGS);
   const [currentWatchTime, setCurrentWatchTime] = useState(0);
   const heartbeatRef = useRef(null);
   const sessionStartTimeRef = useRef(Date.now());
@@ -50,6 +52,9 @@ export function AuthProvider({ children }) {
 
       if (settingsRes && settingsRes.data) {
         setWebsiteStatus(settingsRes.data.websiteStatus);
+        if (settingsRes.data.ads) {
+          setAdsSettings(mergeAdsSettings(settingsRes.data.ads));
+        }
       }
     } catch (err) {
       const saved = localStorage.getItem("abes_user");
@@ -183,8 +188,10 @@ export function AuthProvider({ children }) {
     token,
     loading,
     websiteStatus,
+    adsSettings,
     currentWatchTime,
     setWebsiteStatus,
+    setAdsSettings,
     isAuthenticated: !!user,
     login,
     register,
