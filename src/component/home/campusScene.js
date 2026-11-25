@@ -16,7 +16,7 @@ export function createCampusScene(canvas) {
   renderer.setClearColor(0x000000, 0);
   renderer.localClippingEnabled = true;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 0.92;
+  renderer.toneMappingExposure = 0.98;
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFShadowMap;
   // Architecture is static; cache its shadows instead of rebuilding them on scroll.
@@ -35,8 +35,8 @@ export function createCampusScene(canvas) {
   scene.add(atmosphere.clouds);
   room.dispose();
   pmrem.dispose();
-  scene.add(new THREE.HemisphereLight(0xd6e8f4, 0x72705e, 0.65));
-  const sun = new THREE.DirectionalLight(0xfff4e0, 2.1);
+  scene.add(new THREE.HemisphereLight(0xdceeff, 0x858374, 0.78));
+  const sun = new THREE.DirectionalLight(0xfff5e4, 2.2);
   sun.position.set(-30, 32, 16);
   sun.castShadow = true;
   sun.shadow.mapSize.set(lowPower ? 1024 : 2048, lowPower ? 1024 : 2048);
@@ -234,8 +234,8 @@ export function createCampusScene(canvas) {
     const bounds = geometry.boundingBox;
     const positions = geometry.attributes.position;
     const colors = new Float32Array(positions.count * 3);
-    const lower = new THREE.Color(0x2e5574);
-    const upper = new THREE.Color(0xc1d8e5);
+    const lower = new THREE.Color(0xa8c2d8);
+    const upper = new THREE.Color(0xf7faff);
     const color = new THREE.Color();
     for (let vertex = 0; vertex < positions.count; vertex++) {
       const height = (positions.getY(vertex) - bounds.min.y) / (bounds.max.y - bounds.min.y);
@@ -276,7 +276,7 @@ export function createCampusScene(canvas) {
     cloudTimer = window.setTimeout(() => {
       cloudTimer = 0;
       cloudFrame = requestAnimationFrame(tickClouds);
-    }, 1000 / (lowPower ? 15 : 24));
+    }, 1000 / (lowPower ? 20 : 30));
   };
   function tickClouds(time) {
     cloudFrame = 0;
