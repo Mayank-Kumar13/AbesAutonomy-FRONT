@@ -426,9 +426,130 @@
 .pum-card-top-row {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: space-between;
+  gap: 8px;
   margin-bottom: 10px;
   min-height: 22px;
+}
+
+.pum-save-tag {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #4ADE80;
+  background: rgba(74, 222, 128, 0.14);
+  border: 1px solid rgba(74, 222, 128, 0.35);
+  padding: 2px 8px;
+  border-radius: 9999px;
+  white-space: nowrap;
+}
+
+/* Modal Coupon Row */
+.pum-coupon-row {
+  position: relative;
+  z-index: 2;
+  margin-bottom: 14px;
+}
+
+.pum-coupon-form {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 6px 5px 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 12px;
+}
+
+.pum-coupon-tag-icon {
+  color: #C5AC86;
+  flex-shrink: 0;
+}
+
+.pum-coupon-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #FFFFFF;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  min-width: 0;
+}
+
+.pum-coupon-input::placeholder {
+  color: rgba(255, 255, 255, 0.45);
+  font-weight: 400;
+  letter-spacing: normal;
+}
+
+.pum-coupon-btn {
+  padding: 5px 13px;
+  border-radius: 8px;
+  border: none;
+  background: linear-gradient(135deg, #DFCAAA, #C5AC86);
+  color: #0B0E15;
+  font-size: 12px;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.pum-coupon-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.pum-coupon-applied {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 7px 12px;
+  border-radius: 12px;
+  background: rgba(74, 222, 128, 0.12);
+  border: 1px solid rgba(74, 222, 128, 0.35);
+  font-size: 12.5px;
+  color: #E2F8E9;
+}
+
+.pum-coupon-applied-left {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.pum-coupon-check-icon {
+  color: #4ADE80;
+  flex-shrink: 0;
+}
+
+.pum-coupon-applied code {
+  color: #DFCAAA;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-family: ui-monospace, SFMono-Regular, monospace;
+}
+
+.pum-coupon-clear {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #F8FAFC;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.pum-coupon-err {
+  font-size: 11.5px;
+  color: #FCA5A5;
+  margin-top: 5px;
+  padding-left: 4px;
 }
 
 .pum-badge-pill {
@@ -488,8 +609,15 @@
 .pum-price-wrap {
   display: flex;
   align-items: baseline;
-  gap: 2px;
+  gap: 4px;
   white-space: nowrap;
+}
+
+.pum-price-orig {
+  font-size: 14px;
+  font-weight: 650;
+  color: rgba(255, 255, 255, 0.42);
+  text-decoration: line-through;
 }
 
 .pum-price-num {
@@ -503,6 +631,11 @@
 .pum-price-num.featured {
   color: #DFCAAA;
   text-shadow: 0 0 18px rgba(223, 202, 170, 0.45);
+}
+
+.pum-price-num.is-free {
+  color: #4ADE80;
+  text-shadow: 0 0 16px rgba(74, 222, 128, 0.4);
 }
 
 .pum-price-period {

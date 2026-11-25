@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../auth/AuthContext';
 import { paymentApi } from '../../services/api';
 import { openRazorpayCheckout } from '../../utils/razorpay';
-import { Crown, Check, X, Shield, Zap, Sparkles, ArrowRight, Loader2, Clock } from 'lucide-react';
+import { formatRupees, getPlanDisplayPrice } from '../../utils/couponUi';
+import { Crown, Check, X, Shield, Zap, Sparkles, ArrowRight, Loader2, Clock, Tag } from 'lucide-react';
 import './PremiumUpgradeModal.css';
 
 export default function PremiumUpgradeModal({
@@ -17,6 +18,11 @@ export default function PremiumUpgradeModal({
   const navigate = useNavigate();
   const [loadingPlan, setLoadingPlan] = useState(null);
   const [error, setError] = useState('');
+
+  const [couponInput, setCouponInput] = useState('');
+  const [couponLoading, setCouponLoading] = useState(false);
+  const [couponError, setCouponError] = useState('');
+  const [appliedCouponData, setAppliedCouponData] = useState(null);
 
   const targetResetAt = propResetAt || user?.freePdfResetAt || null;
   const [countdown, setCountdown] = useState(null);
@@ -39,7 +45,37 @@ export default function PremiumUpgradeModal({
     return () => clearInterval(interval);
   }, [targetResetAt]);
 
+  const handleApplyCoupon = useCallback(async (e) => {
+    e.preventDefault();
+    const clean = couponInput.trim().toUpperCase();
+    if (!clean) {
+      setCouponError('Please enter a coupon code.');
+      return;
+    }
+    setCouponLoading(true);
+    setCouponError('');
+    try {
+      const res = await paymentApi.validateCoupon(clean);
+      setAppliedCouponData(res.data);
+      setCouponInput(res.data.coupon.code);
+    } catch (err) {
+      setAppliedCouponData(null);
+      setCouponError(err.message || 'Invalid or expired coupon code.');
+    } finally {
+      setCouponLoading(false);
+    }
+  }, [couponInput]);
+
+  const handleRemoveCoupon = () => {
+    setAppliedCouponData(null);
+    setCouponInput('');
+    setCouponError('');
+  };
+
   if (!isOpen) return null;
+
+  const monthPrice = getPlanDisplayPrice('premium_1_month', 29, appliedCouponData);
+  const semesterPrice = getPlanDisplayPrice('premium_4_months', 99, appliedCouponData);
 
   const handleCheckout = async (planId) => {
     if (!user) {
@@ -51,10 +87,32 @@ export default function PremiumUpgradeModal({
     setLoadingPlan(planId);
     setError('');
 
+    const planPriceInfo = getPlanDisplayPrice(planId, 0, appliedCouponData);
+    const couponToUse =
+      appliedCouponData?.coupon?.code && planPriceInfo.eligible
+        ? appliedCouponData.coupon.code
+        : null;
+
     try {
-      // 1. Create order on backend
-      const orderRes = await paymentApi.createOrder(planId);
+      // 1. Create order (or instant 100% coupon unlock) on backend
+      const orderRes = await paymentApi.createOrder(planId, couponToUse);
       const orderDetails = orderRes.data;
+
+      if (orderDetails.isFreeActivation) {
+        const currentToken = localStorage.getItem('token');
+        if (currentToken) await setTokenAndLoad(currentToken);
+
+        if (onSuccess) onSuccess(orderDetails);
+        if (onClose) onClose();
+        navigate('/payment/success', {
+          state: {
+            plan: orderDetails.plan,
+            payment: orderDetails.payment,
+            subscription: orderDetails.subscription,
+          },
+        });
+        return;
+      }
 
       // 2. Open Razorpay checkout
       const paymentResponse = await openRazorpayCheckout(orderDetails, user);
@@ -63,7 +121,6 @@ export default function PremiumUpgradeModal({
       const verifyRes = await paymentApi.verifyPayment(paymentResponse);
 
       if (verifyRes.success) {
-        // Refresh auth profile
         const currentToken = localStorage.getItem('token');
         if (currentToken) await setTokenAndLoad(currentToken);
 
@@ -89,7 +146,28 @@ export default function PremiumUpgradeModal({
 
   const handleViewAllPlans = () => {
     if (onClose) onClose();
-    navigate('/premium');
+    navigate(
+      appliedCouponData?.coupon?.code
+        ? `/premium?coupon=${encodeURIComponent(appliedCouponData.coupon.code)}`
+        : '/premium'
+    );
+  };
+
+  const renderModalPrice = (priceInfo, period, isFeatured = false) => {
+    const showDiscount = priceInfo.hasCoupon && priceInfo.eligible && priceInfo.discountRupees > 0;
+    return (
+      <div className="pum-price-wrap">
+        {showDiscount && (
+          <span className="pum-price-orig">{formatRupees(priceInfo.originalRupees)}</span>
+        )}
+        <span className={`pum-price-num ${isFeatured ? 'featured' : ''} ${priceInfo.isFree && showDiscount ? 'is-free' : ''}`}>
+          {priceInfo.isFree && showDiscount ? 'FREE' : formatRupees(priceInfo.finalRupees)}
+        </span>
+        {!(priceInfo.isFree && showDiscount) && (
+          <span className="pum-price-period">{period}</span>
+        )}
+      </div>
+    );
   };
 
   return (
@@ -169,22 +247,71 @@ export default function PremiumUpgradeModal({
           </div>
         )}
 
+        {/* Compact Coupon Code Bar inside Modal */}
+        <div className="pum-coupon-row">
+          {appliedCouponData ? (
+            <div className="pum-coupon-applied">
+              <div className="pum-coupon-applied-left">
+                <Check size={13} className="pum-coupon-check-icon" />
+                <span>
+                  Coupon <code>{appliedCouponData.coupon.code}</code> applied (
+                  {appliedCouponData.coupon.discountType === 'percentage'
+                    ? `${appliedCouponData.coupon.discountValue}% OFF`
+                    : `Flat ₹${appliedCouponData.coupon.discountValue} OFF`}
+                  )
+                </span>
+              </div>
+              <button
+                type="button"
+                className="pum-coupon-clear"
+                onClick={handleRemoveCoupon}
+              >
+                <X size={12} /> Remove
+              </button>
+            </div>
+          ) : (
+            <form className="pum-coupon-form" onSubmit={handleApplyCoupon}>
+              <Tag size={13} className="pum-coupon-tag-icon" />
+              <input
+                type="text"
+                placeholder="Have a coupon code? Enter here (e.g. ABES20)"
+                value={couponInput}
+                onChange={(e) => {
+                  setCouponInput(e.target.value.toUpperCase());
+                  if (couponError) setCouponError('');
+                }}
+                className="pum-coupon-input"
+                maxLength={32}
+              />
+              <button
+                type="submit"
+                className="pum-coupon-btn"
+                disabled={couponLoading || !couponInput.trim()}
+              >
+                {couponLoading ? 'Checking...' : 'Apply'}
+              </button>
+            </form>
+          )}
+          {couponError && <div className="pum-coupon-err">{couponError}</div>}
+        </div>
+
         {/* ─── SIDE-BY-SIDE 2-COLUMN LIQUID GLASS PLANS GRID ─── */}
         <div className="pum-cards-grid">
           {/* ── CARD 1: Monthly Plan (₹29) ── */}
           <div className="pum-glass-card pum-card-monthly">
-            {/* Cylindrical Optical Refraction Meniscus Lens */}
             <div className="pum-card-refraction-lens" aria-hidden="true">
               <div className="pum-lens-caustic" />
             </div>
 
             <div className="pum-card-content">
-              {/* Badge Pill Header */}
               <div className="pum-card-top-row">
                 <div className="pum-badge-pill standard">
                   <Sparkles size={11} />
                   <span>EXAM SPRINT</span>
                 </div>
+                {monthPrice.hasCoupon && monthPrice.eligible && monthPrice.discountRupees > 0 && (
+                  <span className="pum-save-tag">Save {formatRupees(monthPrice.discountRupees)}</span>
+                )}
               </div>
 
               <div className="pum-plan-header">
@@ -193,10 +320,7 @@ export default function PremiumUpgradeModal({
                   <span className="pum-plan-sub">30-Day Complete Notes Pass</span>
                 </div>
 
-                <div className="pum-price-wrap">
-                  <span className="pum-price-num">₹29</span>
-                  <span className="pum-price-period">/m</span>
-                </div>
+                {renderModalPrice(monthPrice, '/m', false)}
               </div>
 
               <div className="pum-divider" />
@@ -236,7 +360,11 @@ export default function PremiumUpgradeModal({
                     <span>Opening Payment...</span>
                   </>
                 ) : (
-                  <span>Get 1 Month • ₹29</span>
+                  <span>
+                    {monthPrice.isFree && monthPrice.eligible
+                      ? 'Activate 1 Month Free'
+                      : `Get 1 Month • ${formatRupees(monthPrice.finalRupees)}`}
+                  </span>
                 )}
               </button>
             </div>
@@ -244,18 +372,19 @@ export default function PremiumUpgradeModal({
 
           {/* ── CARD 2: Semester Plan (₹99) - BEST VALUE / HIGHLIGHTED ── */}
           <div className="pum-glass-card pum-card-semester featured">
-            {/* Cylindrical Optical Refraction Meniscus Lens */}
             <div className="pum-card-refraction-lens" aria-hidden="true">
               <div className="pum-lens-caustic" />
             </div>
 
             <div className="pum-card-content">
-              {/* Badge Pill Header */}
               <div className="pum-card-top-row">
                 <div className="pum-badge-pill featured">
                   <Crown size={11} />
                   <span>MOST POPULAR • FULL SEMESTER</span>
                 </div>
+                {semesterPrice.hasCoupon && semesterPrice.eligible && semesterPrice.discountRupees > 0 && (
+                  <span className="pum-save-tag">Save {formatRupees(semesterPrice.discountRupees)}</span>
+                )}
               </div>
 
               <div className="pum-plan-header">
@@ -264,10 +393,7 @@ export default function PremiumUpgradeModal({
                   <span className="pum-plan-sub">Full Semester Coverage (₹24.75/mo)</span>
                 </div>
 
-                <div className="pum-price-wrap">
-                  <span className="pum-price-num featured">₹99</span>
-                  <span className="pum-price-period">/4m</span>
-                </div>
+                {renderModalPrice(semesterPrice, '/4m', true)}
               </div>
 
               <div className="pum-divider featured" />
@@ -309,7 +435,11 @@ export default function PremiumUpgradeModal({
                 ) : (
                   <>
                     <Zap size={14} />
-                    <span>Get Semester Pass • ₹99</span>
+                    <span>
+                      {semesterPrice.isFree && semesterPrice.eligible
+                        ? 'Activate Semester Free'
+                        : `Get Semester Pass • ${formatRupees(semesterPrice.finalRupees)}`}
+                    </span>
                   </>
                 )}
               </button>

@@ -138,6 +138,27 @@ export default function PaymentResult({ type = 'success' }) {
             <span className="pay-res-label">Subscription Plan</span>
             <span className="pay-res-val">{planName}</span>
           </div>
+          {typeof stateData.payment?.amount === 'number' && (
+            <div className="pay-res-row">
+              <span className="pay-res-label">Amount Paid</span>
+              <span className="pay-res-val">
+                ₹{Number((stateData.payment.amount / 100).toFixed(2))}
+                {stateData.payment.discountAmount > 0 && (
+                  <span style={{ color: '#4ade80', fontSize: '0.8rem', marginLeft: '6px' }}>
+                    (Saved ₹{Number((stateData.payment.discountAmount / 100).toFixed(2))})
+                  </span>
+                )}
+              </span>
+            </div>
+          )}
+          {stateData.payment?.couponCode && (
+            <div className="pay-res-row">
+              <span className="pay-res-label">Coupon Applied</span>
+              <span className="pay-res-val" style={{ color: '#DFCAAA', fontFamily: 'monospace' }}>
+                {stateData.payment.couponCode}
+              </span>
+            </div>
+          )}
           <div className="pay-res-row">
             <span className="pay-res-label">Status</span>
             <span className="pay-res-val" style={{ color: '#4ade80' }}>ACTIVE</span>

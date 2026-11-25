@@ -15,8 +15,10 @@ import {
   Eye,
   FileText,
   Bot,
+  Ticket,
 } from 'lucide-react';
 import { adminPremiumApi } from '../../services/api';
+import CouponManagement from './CouponManagement';
 import './PremiumManagement.css';
 
 export default function PremiumManagement() {
@@ -229,6 +231,12 @@ export default function PremiumManagement() {
           <Users size={16} /> Users & Subscriptions
         </button>
         <button
+          className={`pm-nav-btn ${subTab === 'coupons' ? 'active' : ''}`}
+          onClick={() => setSubTab('coupons')}
+        >
+          <Ticket size={16} /> Coupons
+        </button>
+        <button
           className={`pm-nav-btn ${subTab === 'payments' ? 'active' : ''}`}
           onClick={() => setSubTab('payments')}
         >
@@ -335,7 +343,14 @@ export default function PremiumManagement() {
                         <div style={{ fontSize: '0.75rem', color: '#64748b' }}>{t.userEmail}</div>
                       </td>
                       <td>{t.plan === 'premium_lifetime' ? 'Lifetime' : t.plan === 'premium_4_months' ? '4 Months' : t.plan === 'premium_1_month' ? '1 Month' : '2 Months'}</td>
-                      <td>₹{t.amount / 100}</td>
+                      <td>
+                        ₹{t.amount / 100}
+                        {t.couponCode && (
+                          <div style={{ fontSize: '0.72rem', color: '#4ade80' }}>
+                            {t.couponCode} (-₹{(t.discountAmount || 0) / 100})
+                          </div>
+                        )}
+                      </td>
                       <td style={{ textTransform: 'uppercase' }}>{t.paymentMethod}</td>
                       <td>
                         <span className={`pm-status ${t.status}`}>{t.status}</span>
@@ -546,6 +561,9 @@ export default function PremiumManagement() {
         </div>
       )}
 
+      {/* ─── TAB 2B: COUPONS MANAGEMENT ─── */}
+      {subTab === 'coupons' && <CouponManagement />}
+
       {/* ─── TAB 3: TRANSACTIONS & PAYMENTS ─── */}
       {subTab === 'payments' && (
         <div className="pm-box">
@@ -603,7 +621,14 @@ export default function PremiumManagement() {
                     <td style={{ fontFamily: 'monospace', fontSize: '0.78rem' }}>{p.razorpayOrderId}</td>
                     <td style={{ fontFamily: 'monospace', fontSize: '0.78rem' }}>{p.razorpayPaymentId || '—'}</td>
                     <td>{p.plan === 'premium_lifetime' ? 'Lifetime' : p.plan === 'premium_4_months' ? '4 Months' : p.plan === 'premium_1_month' ? '1 Month' : '2 Months'}</td>
-                    <td>₹{p.amount / 100}</td>
+                    <td>
+                      ₹{p.amount / 100}
+                      {p.couponCode && (
+                        <div style={{ fontSize: '0.72rem', color: '#4ade80' }}>
+                          {p.couponCode} (-₹{(p.discountAmount || 0) / 100})
+                        </div>
+                      )}
+                    </td>
                     <td style={{ textTransform: 'uppercase' }}>{p.paymentMethod}</td>
                     <td>
                       <span className={`pm-status ${p.status}`}>{p.status}</span>

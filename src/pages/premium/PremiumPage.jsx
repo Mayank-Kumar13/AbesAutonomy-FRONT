@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../auth/AuthContext';
 import { paymentApi } from '../../services/api';
 import { openRazorpayCheckout } from '../../utils/razorpay';
+import { formatRupees, getPlanDisplayPrice } from '../../utils/couponUi';
 import {
   Crown,
   Check,
@@ -12,30 +13,83 @@ import {
   ShieldCheck,
   Zap,
   Sparkles,
-  BookOpen,
-  Bot,
   Lock,
-  ArrowRight,
-  Infinity as InfinityIcon,
-  HelpCircle,
-  Award,
+  Tag,
+  Loader2,
 } from 'lucide-react';
 import './PremiumPage.css';
+
+const PENDING_COUPON_KEY = 'abes_pending_coupon';
 
 export default function PremiumPage() {
   const { user, setTokenAndLoad } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [loadingPlan, setLoadingPlan] = useState(null);
   const [error, setError] = useState('');
   const [openFaq, setOpenFaq] = useState(null);
 
+  const [couponInput, setCouponInput] = useState('');
+  const [couponLoading, setCouponLoading] = useState(false);
+  const [couponError, setCouponError] = useState('');
+  const [appliedCouponData, setAppliedCouponData] = useState(null);
+
   const toggleFaq = (index) => {
     setOpenFaq(openFaq === index ? null : index);
   };
 
+  const applyCouponCode = useCallback(async (rawCode) => {
+    const clean = String(rawCode || '').trim().toUpperCase();
+    if (!clean) {
+      setCouponError('Please enter a coupon code.');
+      return;
+    }
+    setCouponLoading(true);
+    setCouponError('');
+    try {
+      const res = await paymentApi.validateCoupon(clean);
+      setAppliedCouponData(res.data);
+      setCouponInput(res.data.coupon.code);
+      sessionStorage.setItem(PENDING_COUPON_KEY, res.data.coupon.code);
+    } catch (err) {
+      setAppliedCouponData(null);
+      setCouponError(err.message || 'Invalid or expired coupon code.');
+      sessionStorage.removeItem(PENDING_COUPON_KEY);
+    } finally {
+      setCouponLoading(false);
+    }
+  }, []);
+
+  // Auto-apply from ?coupon=CODE query param or saved code across login redirect
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const urlCoupon = params.get('coupon');
+    const savedCoupon = sessionStorage.getItem(PENDING_COUPON_KEY);
+    const target = urlCoupon || savedCoupon;
+    if (target) {
+      setCouponInput(target.toUpperCase());
+      applyCouponCode(target);
+    }
+  }, [location.search, applyCouponCode]);
+
+  const handleCouponSubmit = (e) => {
+    e.preventDefault();
+    applyCouponCode(couponInput);
+  };
+
+  const handleRemoveCoupon = () => {
+    setAppliedCouponData(null);
+    setCouponInput('');
+    setCouponError('');
+    sessionStorage.removeItem(PENDING_COUPON_KEY);
+  };
+
   const handleSubscribe = async (planId) => {
     if (!user) {
+      if (appliedCouponData?.coupon?.code) {
+        sessionStorage.setItem(PENDING_COUPON_KEY, appliedCouponData.coupon.code);
+      }
       navigate('/login', { state: { from: { pathname: '/premium' } } });
       return;
     }
@@ -43,21 +97,43 @@ export default function PremiumPage() {
     setLoadingPlan(planId);
     setError('');
 
+    const planPriceInfo = getPlanDisplayPrice(planId, 0, appliedCouponData);
+    const couponToUse =
+      appliedCouponData?.coupon?.code && planPriceInfo.eligible
+        ? appliedCouponData.coupon.code
+        : null;
+
     try {
-      // 1. Create Razorpay order on backend
-      const orderRes = await paymentApi.createOrder(planId);
+      // 1. Create order (or instant 100% coupon unlock) on backend
+      const orderRes = await paymentApi.createOrder(planId, couponToUse);
       const orderDetails = orderRes.data;
 
-      // 2. Open Razorpay Checkout modal
+      // 2. If 100% discounted coupon activated immediately, skip Razorpay
+      if (orderDetails.isFreeActivation) {
+        const currentToken = localStorage.getItem('token');
+        if (currentToken) await setTokenAndLoad(currentToken);
+        sessionStorage.removeItem(PENDING_COUPON_KEY);
+
+        navigate('/payment/success', {
+          state: {
+            plan: orderDetails.plan,
+            payment: orderDetails.payment,
+            subscription: orderDetails.subscription,
+          },
+        });
+        return;
+      }
+
+      // 3. Open Razorpay Checkout modal with discounted/final amount
       const paymentResponse = await openRazorpayCheckout(orderDetails, user);
 
-      // 3. Verify signature on backend
+      // 4. Verify signature on backend
       const verifyRes = await paymentApi.verifyPayment(paymentResponse);
 
       if (verifyRes.success) {
-        // Refresh authenticated user state
         const currentToken = localStorage.getItem('token');
         if (currentToken) await setTokenAndLoad(currentToken);
+        sessionStorage.removeItem(PENDING_COUPON_KEY);
 
         navigate('/payment/success', {
           state: {
@@ -75,6 +151,37 @@ export default function PremiumPage() {
     } finally {
       setLoadingPlan(null);
     }
+  };
+
+  const monthPrice = getPlanDisplayPrice('premium_1_month', 29, appliedCouponData);
+  const semesterPrice = getPlanDisplayPrice('premium_4_months', 99, appliedCouponData);
+  const lifetimePrice = getPlanDisplayPrice('premium_lifetime', 399, appliedCouponData);
+
+  const renderCardPricing = (priceInfo, periodLabel, isFeatured = false) => {
+    const showDiscount = priceInfo.hasCoupon && priceInfo.eligible && priceInfo.discountRupees > 0;
+    return (
+      <div className="prem-price-col">
+        <div className="prem-price-block">
+          {showDiscount && (
+            <span className="prem-price-original">{formatRupees(priceInfo.originalRupees)}</span>
+          )}
+          <span className={`prem-price-num ${isFeatured ? 'featured' : ''} ${priceInfo.isFree && showDiscount ? 'is-free' : ''}`}>
+            {priceInfo.isFree && showDiscount ? 'FREE' : formatRupees(priceInfo.finalRupees)}
+          </span>
+          {!(priceInfo.isFree && showDiscount) && (
+            <span className="prem-price-period">{periodLabel}</span>
+          )}
+        </div>
+        {showDiscount && (
+          <span className="prem-save-badge">
+            Save {formatRupees(priceInfo.discountRupees)} with {appliedCouponData.coupon.code}
+          </span>
+        )}
+        {priceInfo.hasCoupon && !priceInfo.eligible && priceInfo.reason && (
+          <span className="prem-ineligible-note">{priceInfo.reason}</span>
+        )}
+      </div>
+    );
   };
 
   const faqs = [
@@ -137,7 +244,6 @@ export default function PremiumPage() {
           <div className="prem-cards-grid">
             {/* ── CARD 1: ₹29/m (Monthly Plan) ── */}
             <div className="prem-glass-card">
-              {/* Cylindrical Optical Refraction Meniscus Lens */}
               <div className="prem-card-refraction-lens" aria-hidden="true">
                 <div className="prem-lens-caustic" />
               </div>
@@ -149,10 +255,7 @@ export default function PremiumPage() {
                     <span className="prem-plan-sub">1-Month Exam Sprint</span>
                   </div>
 
-                  <div className="prem-price-block">
-                    <span className="prem-price-num">₹29</span>
-                    <span className="prem-price-period">/m</span>
-                  </div>
+                  {renderCardPricing(monthPrice, '/m', false)}
                 </div>
 
                 <div className="prem-divider" />
@@ -186,14 +289,21 @@ export default function PremiumPage() {
                   onClick={() => handleSubscribe('premium_1_month')}
                   disabled={loadingPlan !== null}
                 >
-                  <span>{loadingPlan === 'premium_1_month' ? 'Opening Payment...' : 'Get Started'}</span>
+                  <span>
+                    {loadingPlan === 'premium_1_month'
+                      ? 'Opening Payment...'
+                      : monthPrice.hasCoupon && monthPrice.eligible
+                      ? monthPrice.isFree
+                        ? 'Activate Free Now'
+                        : `Get Started • ${formatRupees(monthPrice.finalRupees)}`
+                      : 'Get Started'}
+                  </span>
                 </button>
               </div>
             </div>
 
             {/* ── CARD 2: ₹99/4m (Semester Plan - BEST VALUE / HIGHLIGHTED) ── */}
             <div className="prem-glass-card featured-popular">
-              {/* Cylindrical Optical Refraction Meniscus Lens */}
               <div className="prem-card-refraction-lens" aria-hidden="true">
                 <div className="prem-lens-caustic" />
               </div>
@@ -210,10 +320,7 @@ export default function PremiumPage() {
                     <span className="prem-plan-sub">Full Semester Coverage (₹24.75/mo)</span>
                   </div>
 
-                  <div className="prem-price-block">
-                    <span className="prem-price-num featured">₹99</span>
-                    <span className="prem-price-period">/4m</span>
-                  </div>
+                  {renderCardPricing(semesterPrice, '/4m', true)}
                 </div>
 
                 <div className="prem-divider featured" />
@@ -248,14 +355,21 @@ export default function PremiumPage() {
                   disabled={loadingPlan !== null}
                 >
                   <Zap size={16} />
-                  <span>{loadingPlan === 'premium_4_months' ? 'Opening Payment...' : 'Get Started'}</span>
+                  <span>
+                    {loadingPlan === 'premium_4_months'
+                      ? 'Opening Payment...'
+                      : semesterPrice.hasCoupon && semesterPrice.eligible
+                      ? semesterPrice.isFree
+                        ? 'Activate Free Now'
+                        : `Get Started • ${formatRupees(semesterPrice.finalRupees)}`
+                      : 'Get Started'}
+                  </span>
                 </button>
               </div>
             </div>
 
             {/* ── CARD 3: ₹399 (Lifetime Plan - DEGREE PASS) ── */}
             <div className="prem-glass-card">
-              {/* Cylindrical Optical Refraction Meniscus Lens */}
               <div className="prem-card-refraction-lens" aria-hidden="true">
                 <div className="prem-lens-caustic" />
               </div>
@@ -272,10 +386,7 @@ export default function PremiumPage() {
                     <span className="prem-plan-sub">Entire 4-Year B.Tech Degree Access</span>
                   </div>
 
-                  <div className="prem-price-block">
-                    <span className="prem-price-num">₹399</span>
-                    <span className="prem-price-period">/lifetime</span>
-                  </div>
+                  {renderCardPricing(lifetimePrice, '/lifetime', false)}
                 </div>
 
                 <div className="prem-divider" />
@@ -309,13 +420,92 @@ export default function PremiumPage() {
                   onClick={() => handleSubscribe('premium_lifetime')}
                   disabled={loadingPlan !== null}
                 >
-                  <span>{loadingPlan === 'premium_lifetime' ? 'Opening Payment...' : 'Get Started'}</span>
+                  <span>
+                    {loadingPlan === 'premium_lifetime'
+                      ? 'Opening Payment...'
+                      : lifetimePrice.hasCoupon && lifetimePrice.eligible
+                      ? lifetimePrice.isFree
+                        ? 'Activate Free Now'
+                        : `Get Started • ${formatRupees(lifetimePrice.finalRupees)}`
+                      : 'Get Started'}
+                  </span>
                 </button>
               </div>
             </div>
           </div>
 
-          {/* Bottom Billing Info Toggle (Clean iOS Switch matching inspiration mockup) */}
+          {/* ─── LIQUID GLASS COUPON CODE BAR ─── */}
+          <div className="prem-coupon-wrap">
+            {appliedCouponData ? (
+              <div className="prem-coupon-applied">
+                <div className="prem-coupon-applied-info">
+                  <span className="prem-coupon-check">
+                    <Check size={14} strokeWidth={2.8} />
+                  </span>
+                  <div>
+                    <div className="prem-coupon-applied-title">
+                      Coupon <code>{appliedCouponData.coupon.code}</code> applied
+                    </div>
+                    <div className="prem-coupon-applied-sub">
+                      {appliedCouponData.coupon.discountType === 'percentage'
+                        ? `${appliedCouponData.coupon.discountValue}% OFF`
+                        : `Flat ₹${appliedCouponData.coupon.discountValue} OFF`}
+                      {appliedCouponData.coupon.maxDiscountRupees
+                        ? ` (up to ₹${appliedCouponData.coupon.maxDiscountRupees})`
+                        : ''}
+                      {appliedCouponData.coupon.description
+                        ? ` • ${appliedCouponData.coupon.description}`
+                        : ' • Eligible plans updated above'}
+                    </div>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  className="prem-coupon-remove-btn"
+                  onClick={handleRemoveCoupon}
+                  title="Remove coupon"
+                >
+                  <X size={14} />
+                  <span>Remove</span>
+                </button>
+              </div>
+            ) : (
+              <form className="prem-coupon-form" onSubmit={handleCouponSubmit}>
+                <div className="prem-coupon-input-group">
+                  <Tag size={15} className="prem-coupon-icon" />
+                  <input
+                    type="text"
+                    placeholder="Have a coupon code? Enter code (e.g. ABES20)"
+                    value={couponInput}
+                    onChange={(e) => {
+                      setCouponInput(e.target.value.toUpperCase());
+                      if (couponError) setCouponError('');
+                    }}
+                    className="prem-coupon-input"
+                    maxLength={32}
+                    aria-label="Coupon code"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  className="prem-coupon-apply-btn"
+                  disabled={couponLoading || !couponInput.trim()}
+                >
+                  {couponLoading ? (
+                    <>
+                      <Loader2 size={14} className="prem-spinner" />
+                      <span>Checking...</span>
+                    </>
+                  ) : (
+                    <span>Apply Code</span>
+                  )}
+                </button>
+              </form>
+            )}
+            {couponError && <p className="prem-coupon-error">{couponError}</p>}
+          </div>
+
+          {/* Bottom Billing Info Toggle */}
           <div className="prem-billing-toggle">
             <span className="prem-toggle-switch" aria-hidden="true">
               <span className="prem-toggle-slider" />

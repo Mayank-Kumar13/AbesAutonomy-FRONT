@@ -498,3 +498,91 @@
   color: #080a0e;
   border-color: #C5AC86;
 }
+
+/* ── Coupon Management UI ── */
+.pm-gold-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, #DFCAAA, #C5AC86);
+  color: #080a0e;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.pm-gold-cta:hover {
+  filter: brightness(1.06);
+}
+
+.pm-coupon-code-cell {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pm-coupon-code-pill {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #DFCAAA;
+  background: rgba(197, 172, 134, 0.14);
+  border: 1px solid rgba(197, 172, 134, 0.35);
+  padding: 2px 8px;
+  border-radius: 6px;
+  letter-spacing: 0.04em;
+}
+
+.pm-plan-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #cbd5e1;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  padding: 2px 8px;
+  border-radius: 9999px;
+}
+
+.pm-plan-chip.selectable {
+  cursor: pointer;
+  padding: 5px 11px;
+  font-size: 0.78rem;
+  transition: all 0.15s ease;
+}
+
+.pm-plan-chip.selectable.selected {
+  background: rgba(197, 172, 134, 0.22);
+  border-color: #C5AC86;
+  color: #DFCAAA;
+}
+
+.pm-status.inactive {
+  background: rgba(148, 163, 184, 0.15);
+  color: #94a3b8;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+}
+
+.pm-status.exhausted {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.35);
+}
+
+.pm-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+@media (max-width: 560px) {
+  .pm-form-grid {
+    grid-template-columns: 1fr;
+  }
+}

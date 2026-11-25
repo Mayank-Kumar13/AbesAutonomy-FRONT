@@ -564,10 +564,16 @@ export const paymentApi = {
   async getPlans() {
     return request('/payments/plans');
   },
-  async createOrder(planId) {
+  async validateCoupon(code, planId = null) {
+    return request('/payments/validate-coupon', {
+      method: 'POST',
+      body: JSON.stringify({ code, ...(planId ? { planId } : {}) }),
+    });
+  },
+  async createOrder(planId, couponCode = null) {
     return request('/payments/create-order', {
       method: 'POST',
-      body: JSON.stringify({ planId }),
+      body: JSON.stringify({ planId, ...(couponCode ? { couponCode } : {}) }),
     });
   },
   async verifyPayment(verificationData) {
@@ -661,6 +667,30 @@ export const adminPremiumApi = {
       method: 'POST',
       body: JSON.stringify(data),
     });
+  },
+  async getCoupons(params = {}) {
+    const qs = new URLSearchParams(params).toString();
+    return request(`/admin/premium/coupons?${qs}`);
+  },
+  async createCoupon(data) {
+    return request('/admin/premium/coupons', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+  async updateCoupon(id, data) {
+    return request(`/admin/premium/coupons/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+  },
+  async deleteCoupon(id) {
+    return request(`/admin/premium/coupons/${id}`, {
+      method: 'DELETE',
+    });
+  },
+  async getCouponRedemptions(id) {
+    return request(`/admin/premium/coupons/${id}/redemptions`);
   },
 };
 
