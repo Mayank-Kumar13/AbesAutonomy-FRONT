@@ -5,7 +5,7 @@
       "destination": "https://api.abes.work/api/:path*"
     },
     {
-      "source": "/(.*)",
+      "source": "/((?!api/|assets/|pdfjs-).*)",
       "destination": "/"
     }
   ]

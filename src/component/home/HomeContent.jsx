@@ -121,6 +121,18 @@ export default function HomeContent() {
       measure();
     };
 
+    const syncTimeOfDay = () => {
+      if (disposed || document.hidden) return;
+      currentTheme = getTimeOfDayTheme(resolveTargetHour());
+      applySkyCssVars(stage, currentTheme);
+      scene?.setTimeOfDay?.(currentTheme);
+    };
+
+    const handleVisibility = () => {
+      syncTimeOfDay();
+      schedule();
+    };
+
     const resizeObserver = new ResizeObserver(measure);
     resizeObserver.observe(journey);
     resizeObserver.observe(stage);
@@ -128,7 +140,7 @@ export default function HomeContent() {
     window.addEventListener('scroll', schedule, { passive: true });
     window.addEventListener('resize', measure, { passive: true });
     window.addEventListener('pageshow', measure, { passive: true });
-    document.addEventListener('visibilitychange', schedule, { passive: true });
+    document.addEventListener('visibilitychange', handleVisibility, { passive: true });
     stage.addEventListener('pointermove', onPointer, { passive: true });
     stage.addEventListener('pointerleave', resetPointer, { passive: true });
     canvas.addEventListener('webglcontextlost', onContextLost, false);
@@ -153,13 +165,8 @@ export default function HomeContent() {
         }
       });
 
-    // Periodically refresh sky, clouds, and lighting as real local time progresses
-    const timeSyncTimer = window.setInterval(() => {
-      if (disposed || document.hidden) return;
-      currentTheme = getTimeOfDayTheme(resolveTargetHour());
-      applySkyCssVars(stage, currentTheme);
-      scene?.setTimeOfDay?.(currentTheme);
-    }, 60000);
+    // Periodically refresh solar/lunar position, sky, clouds, and lighting as local time progresses
+    const timeSyncTimer = window.setInterval(syncTimeOfDay, 30000);
 
     return () => {
       disposed = true;
@@ -169,7 +176,7 @@ export default function HomeContent() {
       window.removeEventListener('scroll', schedule);
       window.removeEventListener('resize', measure);
       window.removeEventListener('pageshow', measure);
-      document.removeEventListener('visibilitychange', schedule);
+      document.removeEventListener('visibilitychange', handleVisibility);
       stage.removeEventListener('pointermove', onPointer);
       stage.removeEventListener('pointerleave', resetPointer);
       canvas.removeEventListener('webglcontextlost', onContextLost);

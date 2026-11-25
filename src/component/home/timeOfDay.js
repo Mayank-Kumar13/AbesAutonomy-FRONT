@@ -415,10 +415,11 @@ export function resolveTargetHour() {
   if (typeof window !== 'undefined') {
     const params = new URLSearchParams(window.location.search);
     const preset = params.get('time')?.toLowerCase();
-    if (preset === 'day') return 12.0;
+    if (preset === 'day') return 12.25;
+    if (preset === 'morning') return 8.5;
     if (preset === 'evening' || preset === 'sunset' || preset === 'shaam') return 17.85;
     if (preset === 'night') return 22.5;
-    if (preset === 'dawn' || preset === 'morning') return 6.25;
+    if (preset === 'dawn') return 6.25;
 
     const customHour = Number(params.get('hour'));
     if (params.has('hour') && Number.isFinite(customHour)) {
@@ -427,6 +428,68 @@ export function resolveTargetHour() {
   }
   const now = new Date();
   return now.getHours() + now.getMinutes() / 60;
+}
+
+export function getCelestialState(hour) {
+  const h = ((hour % 24) + 24) % 24;
+
+  // Solar arc: sunrise at 05:45 (5.75) East/Left -> solar noon ~12:22 -> sunset at 19:00 (19.0) West/Right
+  const sunrise = 5.75;
+  const sunset = 19.0;
+  const solarSpan = sunset - sunrise;
+  const solarP = THREE.MathUtils.clamp((h - sunrise) / solarSpan, 0, 1);
+  const solarArc = Math.sin(solarP * Math.PI);
+
+  const smoothstep = (edge0, edge1, x) => {
+    const u = THREE.MathUtils.clamp((x - edge0) / (edge1 - edge0), 0, 1);
+    return u * u * (3 - 2 * u);
+  };
+
+  const sunVisibility = smoothstep(5.55, 6.25, h) * (1 - smoothstep(18.5, 19.25, h));
+  const sunScreenX = lerpNum(11, 89, solarP);
+  const sunScreenY = lerpNum(44, 17.5, solarArc);
+
+  // Color of the solar disc transitions warm amber-orange near horizon -> blazing cream-white at midday
+  const warmth = Math.pow(solarArc, 0.55);
+  const sunCoreColor = lerpColorHex('#ff9e52', '#fff9e6', warmth);
+  const sunCoronaColor = lerpColorHex('#ff7b3b', '#ffe6a6', warmth);
+
+  // Lunar arc: moonrise at 19:15 (19.25) -> midnight apex -> moonset at 05:30 (5.5)
+  const nightHour = h >= 19.25 ? h - 19.25 : h + 4.75;
+  const nightSpan = 10.25;
+  const lunarP = THREE.MathUtils.clamp(nightHour / nightSpan, 0, 1);
+  const lunarArc = Math.sin(lunarP * Math.PI);
+
+  const moonVisibility = Math.max(smoothstep(19.05, 19.75, h), 1 - smoothstep(5.1, 5.75, h));
+  const moonScreenX = lerpNum(15, 85, lunarP);
+  const moonScreenY = lerpNum(41, 18.5, lunarArc);
+
+  // 3D directional light position follows real solar/lunar path
+  const isDayDominant = sunVisibility >= moonVisibility;
+  const activeSunPos = isDayDominant
+    ? [lerpNum(-36, 36, solarP), lerpNum(13, 38, solarArc), lerpNum(20, 16, solarArc)]
+    : [lerpNum(30, -30, lunarP), lerpNum(22, 34, lunarArc), 22];
+
+  // Cloud directional shadow UV offset points toward the active Sun/Moon position
+  const activeScreenX = isDayDominant ? sunScreenX : moonScreenX;
+  const activeOffsetX = lerpNum(-0.02, 0.02, THREE.MathUtils.clamp((activeScreenX - 10) / 80, 0, 1));
+  const activeOffsetY = lerpNum(0.026, 0.044, isDayDominant ? solarArc : lunarArc);
+
+  return {
+    sunVisibility,
+    sunScreenX,
+    sunScreenY,
+    sunCoreColor,
+    sunCoronaColor,
+    moonVisibility,
+    moonScreenX,
+    moonScreenY,
+    solarArc,
+    activeSunPos,
+    activeHaloX: isDayDominant ? sunScreenX : moonScreenX,
+    activeHaloY: isDayDominant ? sunScreenY : moonScreenY,
+    cloudSunOffset: [activeOffsetX, activeOffsetY],
+  };
 }
 
 export function getTimeOfDayTheme(hour = resolveTargetHour()) {
@@ -446,14 +509,16 @@ export function getTimeOfDayTheme(hour = resolveTargetHour()) {
   const rawT = THREE.MathUtils.clamp((h - a.hour) / span, 0, 1);
   // Smoothstep easing prevents harsh linear jumps near sunrise/sunset boundaries
   const t = rawT * rawT * (3 - 2 * rawT);
+  const celestial = getCelestialState(h);
 
   return {
     hour: h,
     phase: t < 0.5 ? a.phase : b.phase,
+    celestial,
     sky: a.sky.map((col, idx) => lerpColorHex(col, b.sky[idx], t)),
     haloColor: lerpRgba(a.haloColor, b.haloColor, t),
     haloSecondary: lerpRgba(a.haloSecondary, b.haloSecondary, t),
-    haloPos: [lerpNum(a.haloPos[0], b.haloPos[0], t), lerpNum(a.haloPos[1], b.haloPos[1], t)],
+    haloPos: [celestial.activeHaloX, celestial.activeHaloY],
     starOpacity: lerpNum(a.starOpacity, b.starOpacity, t),
     vignetteTop: lerpNum(a.vignetteTop, b.vignetteTop, t),
     cloud: {
@@ -464,12 +529,12 @@ export function getTimeOfDayTheme(hour = resolveTargetHour()) {
       sunGlow: lerpVec3(a.cloud.sunGlow, b.cloud.sunGlow, t),
       cumulusOpacity: lerpNum(a.cloud.cumulusOpacity, b.cloud.cumulusOpacity, t),
       cirrusOpacity: lerpNum(a.cloud.cirrusOpacity, b.cloud.cirrusOpacity, t),
-      sunOffset: [lerpNum(a.cloud.sunOffset[0], b.cloud.sunOffset[0], t), lerpNum(a.cloud.sunOffset[1], b.cloud.sunOffset[1], t)],
+      sunOffset: celestial.cloudSunOffset,
     },
     light: {
       sunColor: lerpColorHex(a.light.sunColor, b.light.sunColor, t),
       sunIntensity: lerpNum(a.light.sunIntensity, b.light.sunIntensity, t),
-      sunPos: lerpVec3(a.light.sunPos, b.light.sunPos, t),
+      sunPos: celestial.activeSunPos,
       hemiSky: lerpColorHex(a.light.hemiSky, b.light.hemiSky, t),
       hemiGround: lerpColorHex(a.light.hemiGround, b.light.hemiGround, t),
       hemiIntensity: lerpNum(a.light.hemiIntensity, b.light.hemiIntensity, t),

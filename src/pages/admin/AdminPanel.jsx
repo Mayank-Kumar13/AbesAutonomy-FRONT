@@ -10,7 +10,6 @@ import AnalyticsDashboard from './AnalyticsDashboard';
 import TopReadersLeaderboard from './TopReadersLeaderboard';
 import SupabasePdfManager from './SupabasePdfManager';
 import PremiumManagement from './PremiumManagement';
-import { compressAndConvertToPdf } from '../../utils/pdfCompression';
 
 const BRANCHES_Y1 = ['electrical', 'electronics', 'common'];
 const BRANCHES_Y2 = ['cse', 'ds', 'aiml', 'ece', 'elce', 'common'];
@@ -453,6 +452,7 @@ export default function AdminPanel() {
         let fileToUpload = entry.file;
         if (entry.compress) {
           try {
+            const { compressAndConvertToPdf } = await import('../../utils/pdfCompression');
             fileToUpload = await compressAndConvertToPdf(entry.file, entry.targetSizeKb || null);
           } catch (compErr) {
             console.error("Compression failed for", entry.file.name, compErr);

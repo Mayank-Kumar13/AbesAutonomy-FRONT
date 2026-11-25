@@ -265,8 +265,10 @@ export function createCampusScene(canvas, initialTheme = getTimeOfDayTheme()) {
   }
   scene.add(title);
 
+  let activeTheme = initialTheme;
   const applyTimeOfDay = (theme) => {
     if (!theme) return;
+    activeTheme = theme;
     renderer.toneMappingExposure = theme.light.exposure;
     hemi.color.set(theme.light.hemiSky);
     hemi.groundColor.set(theme.light.hemiGround);
@@ -300,10 +302,10 @@ export function createCampusScene(canvas, initialTheme = getTimeOfDayTheme()) {
       }
       attr.needsUpdate = true;
     }
-    atmosphere.setTheme(theme);
+    atmosphere.setTheme(theme, aspect);
   };
-  applyTimeOfDay(initialTheme);
   let aspect = 1;
+  applyTimeOfDay(initialTheme);
   let lastWidth = 0;
   let lastHeight = 0;
   let released = false;
@@ -358,6 +360,7 @@ export function createCampusScene(canvas, initialTheme = getTimeOfDayTheme()) {
       camera.aspect = aspect;
       camera.updateProjectionMatrix();
       renderer.setSize(width, height, false);
+      atmosphere.updateCelestial(activeTheme, aspect);
     },
     render({ rise, zoom, fade }, pointer, reducedMotion) {
       cloudMotion = !reducedMotion;
